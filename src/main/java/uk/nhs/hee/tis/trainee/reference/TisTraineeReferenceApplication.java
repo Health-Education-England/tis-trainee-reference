@@ -38,7 +38,6 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @SpringBootApplication
 @EnableSwagger2
-//TODO: Update package and class name.
 public class TisTraineeReferenceApplication {
 
   private static final Logger log = LoggerFactory.getLogger(TisTraineeReferenceApplication.class);
