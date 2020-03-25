@@ -26,7 +26,7 @@ public class GenderResource {
   /**
    * Get Gender options from reference table.
    *
-   * @return The {@link Gender} representing the trainee profile.
+   * @return list of Genders.
    */
   @GetMapping("/gender")
   public List<GenderDto> getGender() {

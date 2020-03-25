@@ -26,7 +26,7 @@ public class QualificationResource {
   /**
    * Get Qualification options from reference table.
    *
-   * @return The {@link Qualification} representing the trainee profile.
+   * @return list of Qualifications
    */
   @GetMapping("/qualification")
   public List<QualificationDto> getQualification() {
