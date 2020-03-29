@@ -3,8 +3,8 @@ package uk.nhs.hee.tis.trainee.reference.dto;
 import lombok.Data;
 
 /**
- * A DTO for College entity
- * Holds all options for College
+ * A DTO for College entity.
+ * Holds all options for College.
  */
 @Data
 public class CollegeDto {

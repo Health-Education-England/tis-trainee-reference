@@ -1,10 +1,9 @@
 package uk.nhs.hee.tis.trainee.reference.mapper;
 
+import java.util.List;
 import org.mapstruct.Mapper;
 import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
 import uk.nhs.hee.tis.trainee.reference.model.College;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CollegeMapper {

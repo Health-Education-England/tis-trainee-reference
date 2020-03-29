@@ -1,8 +1,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import uk.nhs.hee.tis.trainee.reference.model.Qualification;
-
 import java.util.List;
+import uk.nhs.hee.tis.trainee.reference.model.Qualification;
 
 public interface QualificationService {
 

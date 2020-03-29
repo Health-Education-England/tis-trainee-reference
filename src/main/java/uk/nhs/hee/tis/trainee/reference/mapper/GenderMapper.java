@@ -1,10 +1,9 @@
 package uk.nhs.hee.tis.trainee.reference.mapper;
 
+import java.util.List;
 import org.mapstruct.Mapper;
 import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface GenderMapper {

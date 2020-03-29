@@ -1,5 +1,6 @@
 package uk.nhs.hee.tis.trainee.reference.api;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
