@@ -39,10 +39,14 @@ import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 public class CollegeResource {
 
   private static final Logger log = LoggerFactory.getLogger(CollegeResource.class);
-  @Autowired
+
   private CollegeService collegeService;
-  @Autowired
   private CollegeMapper collegeMapper;
+
+  public CollegeResource(CollegeService collegeService, CollegeMapper collegeMapper) {
+    this.collegeService = collegeService;
+    this.collegeMapper = collegeMapper;
+  }
 
   /**
    * Get College options from reference table.

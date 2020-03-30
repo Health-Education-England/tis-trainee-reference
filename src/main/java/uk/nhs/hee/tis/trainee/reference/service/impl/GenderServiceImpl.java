@@ -31,8 +31,11 @@ import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 @Service
 public class GenderServiceImpl implements GenderService {
 
-  @Autowired
   GenderRepository genderRepository;
+
+  public GenderServiceImpl(GenderRepository genderRepository) {
+    this.genderRepository = genderRepository;
+  }
 
   public List<Gender> getGender() {
     return genderRepository.findAll();

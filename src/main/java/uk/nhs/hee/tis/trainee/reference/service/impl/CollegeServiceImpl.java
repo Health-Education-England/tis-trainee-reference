@@ -31,8 +31,11 @@ import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 @Service
 public class CollegeServiceImpl implements CollegeService {
 
-  @Autowired
   CollegeRepository collegeRepository;
+
+  public CollegeServiceImpl(CollegeRepository collegeRepository) {
+    this.collegeRepository = collegeRepository;
+  }
 
   public List<College> getCollege() {
     return collegeRepository.findAll();

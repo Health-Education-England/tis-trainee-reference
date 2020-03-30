@@ -31,8 +31,11 @@ import uk.nhs.hee.tis.trainee.reference.service.QualificationService;
 @Service
 public class QualificationServiceImpl implements QualificationService {
 
-  @Autowired
   QualificationRepository qualificationRepository;
+
+  public QualificationServiceImpl(QualificationRepository qualificationRepository) {
+    this.qualificationRepository = qualificationRepository;
+  }
 
   public List<Qualification> getQualification() {
     return qualificationRepository.findAll();

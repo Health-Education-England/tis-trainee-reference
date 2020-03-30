@@ -31,8 +31,11 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 @Service
 public class LocalOfficeServiceImpl implements LocalOfficeService {
 
-  @Autowired
   LocalOfficeRepository localOfficeRepository;
+
+  public LocalOfficeServiceImpl(LocalOfficeRepository localOfficeRepository) {
+    this.localOfficeRepository = localOfficeRepository;
+  }
 
   public List<LocalOffice> getLocalOffice() {
     return localOfficeRepository.findAll();

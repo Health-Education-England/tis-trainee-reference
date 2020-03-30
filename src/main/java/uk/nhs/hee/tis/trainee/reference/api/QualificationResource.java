@@ -38,10 +38,15 @@ import uk.nhs.hee.tis.trainee.reference.service.QualificationService;
 public class QualificationResource {
 
   private static final Logger log = LoggerFactory.getLogger(QualificationResource.class);
-  @Autowired
+
   private QualificationService qualificationService;
-  @Autowired
   private QualificationMapper qualificationMapper;
+
+  public QualificationResource(QualificationService qualificationService,
+                               QualificationMapper qualificationMapper) {
+    this.qualificationService = qualificationService;
+    this.qualificationMapper = qualificationMapper;
+  }
 
   /**
    * Get Qualification options from reference table.

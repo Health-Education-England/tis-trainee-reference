@@ -38,10 +38,14 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 public class LocalOfficeResource {
 
   private static final Logger log = LoggerFactory.getLogger(LocalOfficeResource.class);
-  @Autowired
+
   private LocalOfficeService localOfficeService;
-  @Autowired
   private LocalOfficeMapper localOfficeMapper;
+
+  public LocalOfficeResource(LocalOfficeService localOfficeService, LocalOfficeMapper localOfficeMapper) {
+    this.localOfficeService = localOfficeService;
+    this.localOfficeMapper = localOfficeMapper;
+  }
 
   /**
    * Get LocalOffice options from reference table.

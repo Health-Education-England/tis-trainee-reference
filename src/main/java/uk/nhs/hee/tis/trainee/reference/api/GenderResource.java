@@ -39,10 +39,14 @@ import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 public class GenderResource {
 
   private static final Logger log = LoggerFactory.getLogger(GenderResource.class);
-  @Autowired
+
   private GenderService genderService;
-  @Autowired
   private GenderMapper genderMapper;
+
+  public GenderResource(GenderService genderService, GenderMapper genderMapper) {
+    this.genderService = genderService;
+    this.genderMapper = genderMapper;
+  }
 
   /**
    * Get Gender options from reference table.

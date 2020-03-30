@@ -21,13 +21,14 @@
 
 package uk.nhs.hee.tis.trainee.reference;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class TisTraineeReferenceApplicationTest {
 
-//  @Test
-//  void contextLoads() {
-//
-//  }
+  @Test
+  void contextLoads() {
+
+  }
 }
