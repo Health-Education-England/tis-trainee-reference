@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled("Currently fails due to no mongo instance.")
 @SpringBootTest
 class TisTraineeReferenceApplicationTest {
 
-  @Disabled("Currently fails due to no mongo instance.")
   @Test
   void contextLoads() {
 
