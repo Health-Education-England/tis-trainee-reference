@@ -13,7 +13,7 @@ public class CollegeServiceImpl implements CollegeService {
   @Autowired
   CollegeRepository collegeRepository;
 
-  public List<College> getCollege()  {
+  public List<College> getCollege() {
     return collegeRepository.findAll();
   }
 }

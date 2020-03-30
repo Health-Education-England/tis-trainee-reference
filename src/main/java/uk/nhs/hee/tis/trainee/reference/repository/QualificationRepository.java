@@ -6,4 +6,5 @@ import uk.nhs.hee.tis.trainee.reference.model.Qualification;
 
 @Repository
 public interface QualificationRepository extends MongoRepository<Qualification, String> {
+
 }

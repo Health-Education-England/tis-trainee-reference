@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest

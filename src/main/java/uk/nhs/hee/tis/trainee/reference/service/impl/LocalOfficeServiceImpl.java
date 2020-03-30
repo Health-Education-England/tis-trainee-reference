@@ -13,7 +13,7 @@ public class LocalOfficeServiceImpl implements LocalOfficeService {
   @Autowired
   LocalOfficeRepository localOfficeRepository;
 
-  public List<LocalOffice> getLocalOffice()  {
+  public List<LocalOffice> getLocalOffice() {
     return localOfficeRepository.findAll();
   }
 }

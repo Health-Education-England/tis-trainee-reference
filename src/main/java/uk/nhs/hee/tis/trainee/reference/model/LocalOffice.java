@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @Builder
 public class LocalOffice {
+
   @Id
   private String id;
 

@@ -13,7 +13,7 @@ public class QualificationServiceImpl implements QualificationService {
   @Autowired
   QualificationRepository qualificationRepository;
 
-  public List<Qualification> getQualification()  {
+  public List<Qualification> getQualification() {
     return qualificationRepository.findAll();
   }
 }

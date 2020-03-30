@@ -6,4 +6,5 @@ import uk.nhs.hee.tis.trainee.reference.model.College;
 
 @Repository
 public interface CollegeRepository extends MongoRepository<College, String> {
+
 }
