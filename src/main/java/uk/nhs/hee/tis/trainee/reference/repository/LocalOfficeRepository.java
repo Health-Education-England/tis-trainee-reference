@@ -19,18 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.repository;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 
-@Disabled("Currently fails due to no mongo instance.")
-@SpringBootTest
-class TisTraineeReferenceApplicationTest {
+@Repository
+public interface LocalOfficeRepository extends MongoRepository<LocalOffice, String> {
 
-  @Test
-  void contextLoads() {
-
-  }
 }

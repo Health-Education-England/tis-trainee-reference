@@ -19,18 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.service.impl;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.model.Gender;
+import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
+import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 
-@Disabled("Currently fails due to no mongo instance.")
-@SpringBootTest
-class TisTraineeReferenceApplicationTest {
+@Service
+public class GenderServiceImpl implements GenderService {
 
-  @Test
-  void contextLoads() {
+  GenderRepository genderRepository;
 
+  public GenderServiceImpl(GenderRepository genderRepository) {
+    this.genderRepository = genderRepository;
+  }
+
+  public List<Gender> getGender() {
+    return genderRepository.findAll();
   }
 }

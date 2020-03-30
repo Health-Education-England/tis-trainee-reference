@@ -19,18 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.service.impl;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.model.College;
+import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
+import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
-@Disabled("Currently fails due to no mongo instance.")
-@SpringBootTest
-class TisTraineeReferenceApplicationTest {
+@Service
+public class CollegeServiceImpl implements CollegeService {
 
-  @Test
-  void contextLoads() {
+  CollegeRepository collegeRepository;
 
+  public CollegeServiceImpl(CollegeRepository collegeRepository) {
+    this.collegeRepository = collegeRepository;
+  }
+
+  public List<College> getCollege() {
+    return collegeRepository.findAll();
   }
 }

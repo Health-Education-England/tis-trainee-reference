@@ -19,18 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.mapper;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import java.util.List;
+import org.mapstruct.Mapper;
+import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
+import uk.nhs.hee.tis.trainee.reference.model.Gender;
 
-@Disabled("Currently fails due to no mongo instance.")
-@SpringBootTest
-class TisTraineeReferenceApplicationTest {
+@Mapper(componentModel = "spring")
+public interface GenderMapper {
 
-  @Test
-  void contextLoads() {
+  GenderDto toDto(Gender gender);
 
-  }
+  List<GenderDto> toDtos(List<Gender> genders);
+
+  Gender toEntity(GenderDto genderDto);
+
+  List<Gender> toEntities(List<GenderDto> genderDtos);
 }

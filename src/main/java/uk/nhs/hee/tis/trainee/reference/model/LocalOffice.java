@@ -19,18 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.model;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Disabled("Currently fails due to no mongo instance.")
-@SpringBootTest
-class TisTraineeReferenceApplicationTest {
+@Document(collection = "LocalOffice")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class LocalOffice {
 
-  @Test
-  void contextLoads() {
+  @Id
+  private String id;
 
-  }
+  @Indexed(unique = true)
+  @Field(value = "localOfficeTisId")
+  private String localOfficeTisId;
+  private String label;
+  private String entityId;
 }
