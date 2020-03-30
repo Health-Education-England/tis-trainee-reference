@@ -42,7 +42,8 @@ public class LocalOfficeResource {
   private LocalOfficeService localOfficeService;
   private LocalOfficeMapper localOfficeMapper;
 
-  public LocalOfficeResource(LocalOfficeService localOfficeService, LocalOfficeMapper localOfficeMapper) {
+  public LocalOfficeResource(LocalOfficeService localOfficeService,
+                             LocalOfficeMapper localOfficeMapper) {
     this.localOfficeService = localOfficeService;
     this.localOfficeMapper = localOfficeMapper;
   }
