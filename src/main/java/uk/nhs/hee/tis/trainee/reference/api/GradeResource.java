@@ -27,34 +27,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.College;
-import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
+import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
+import uk.nhs.hee.tis.trainee.reference.model.Grade;
+import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 
 @RestController
 @RequestMapping("/api")
-public class CollegeResource {
+public class GradeResource {
 
-  private static final Logger log = LoggerFactory.getLogger(CollegeResource.class);
+  private static final Logger log = LoggerFactory.getLogger(GradeResource.class);
 
-  private CollegeService collegeService;
-  private CollegeMapper collegeMapper;
+  private GradeService gradeService;
+  private GradeMapper gradeMapper;
 
-  public CollegeResource(CollegeService collegeService, CollegeMapper collegeMapper) {
-    this.collegeService = collegeService;
-    this.collegeMapper = collegeMapper;
+  public GradeResource(GradeService gradeService,
+      GradeMapper gradeMapper) {
+    this.gradeService = gradeService;
+    this.gradeMapper = gradeMapper;
   }
 
   /**
-   * Get College options from reference table.
+   * Get Grade options from reference table.
    *
-   * @return list of Colleges.
+   * @return list of Grades.
    */
-  @GetMapping("/college")
-  public List<CollegeDto> getCollege() {
-    log.trace("Get all College");
-    List<College> colleges = collegeService.getCollege();
-    return collegeMapper.toDtos(colleges);
+  @GetMapping("/grade")
+  public List<GradeDto> getGender() {
+    log.trace("Get all Grades");
+    List<Grade> grades = gradeService.getAllGrades();
+    return gradeMapper.toDtos(grades);
   }
 }

@@ -19,23 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.model;
+package uk.nhs.hee.tis.trainee.reference.service.impl;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.model.Grade;
+import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
+import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 
-@Document(collection = "Qualification")
-@Data
-public class Qualification {
+@Service
+public class GradeServiceImpl implements GradeService {
 
-  @Id
-  private String id;
+  GradeRepository gradeRepository;
 
-  @Indexed(unique = true)
-  @Field(value = "qualificationTisId")
-  private String qualificationTisId;
-  private String label;
+  public GradeServiceImpl(GradeRepository gradeRepository) {
+    this.gradeRepository = gradeRepository;
+  }
+
+  @Override
+  public List<Grade> getAllGrades() {
+    return gradeRepository.findAll();
+  }
 }

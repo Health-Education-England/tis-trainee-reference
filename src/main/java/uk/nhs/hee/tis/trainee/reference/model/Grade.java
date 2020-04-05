@@ -27,15 +27,18 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "Qualification")
+@Document(collection = "Grade")
 @Data
-public class Qualification {
+public class Grade {
 
   @Id
   private String id;
 
   @Indexed(unique = true)
-  @Field(value = "qualificationTisId")
-  private String qualificationTisId;
+  @Field(value = "gradeTisId")
+  private String gradeTisId;
+
+  private String abbreviation;
+
   private String label;
 }

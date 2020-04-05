@@ -32,7 +32,6 @@ import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 
-
 @RestController
 @RequestMapping("/api")
 public class GenderResource {

@@ -19,23 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.model;
+package uk.nhs.hee.tis.trainee.reference.mapper;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import java.util.List;
+import org.mapstruct.Mapper;
+import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import uk.nhs.hee.tis.trainee.reference.model.Grade;
 
-@Document(collection = "Qualification")
-@Data
-public class Qualification {
+@Mapper(componentModel = "spring")
+public interface GradeMapper {
 
-  @Id
-  private String id;
+  GradeDto toDto(Grade grade);
 
-  @Indexed(unique = true)
-  @Field(value = "qualificationTisId")
-  private String qualificationTisId;
-  private String label;
+  List<GradeDto> toDtos(List<Grade> grades);
+
+  Grade toEntity(GradeDto gradeDto);
+
+  List<Grade> toEntities(List<GradeDto> gradeDtos);
 }

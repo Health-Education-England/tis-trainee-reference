@@ -19,23 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.model;
+package uk.nhs.hee.tis.trainee.reference.repository;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import uk.nhs.hee.tis.trainee.reference.model.Grade;
 
-@Document(collection = "Qualification")
-@Data
-public class Qualification {
+@Repository
+public interface GradeRepository extends MongoRepository<Grade, String> {
 
-  @Id
-  private String id;
-
-  @Indexed(unique = true)
-  @Field(value = "qualificationTisId")
-  private String qualificationTisId;
-  private String label;
 }

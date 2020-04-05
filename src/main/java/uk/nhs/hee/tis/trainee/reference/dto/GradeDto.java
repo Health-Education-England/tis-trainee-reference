@@ -19,23 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.model;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "Qualification")
+/**
+ * A DTO for Grade entity. Holds all options for Grade.
+ */
 @Data
-public class Qualification {
+public class GradeDto {
 
-  @Id
   private String id;
 
-  @Indexed(unique = true)
-  @Field(value = "qualificationTisId")
-  private String qualificationTisId;
+  private String gradeTisId;
+
+  private String abbreviation;
+
   private String label;
+
 }
