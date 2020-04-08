@@ -30,11 +30,7 @@ import lombok.Data;
 public class GradeDto {
 
   private String id;
-
   private String gradeTisId;
-
   private String abbreviation;
-
   private String label;
-
 }
