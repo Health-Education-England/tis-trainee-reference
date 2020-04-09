@@ -4,8 +4,4 @@ server:
 spring:
   data:
     mongodb:
-      host: ${DB_HOST:localhost}
-      port: ${DB_PORT:27017}
-      database: ${DB_NAME:reference}
-      user: ${DB_USER:''}
-      password: ${DB_PASSWORD:''}
+      uri: mongodb://${DB_USER:admin}:${DB_PASSWORD:pwd}@${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:reference}
