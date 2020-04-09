@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,14 +42,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Grade;
-import uk.nhs.hee.tis.trainee.reference.service.GradeService;
+import uk.nhs.hee.tis.trainee.reference.dto.QualificationDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.QualificationMapper;
+import uk.nhs.hee.tis.trainee.reference.model.Qualification;
+import uk.nhs.hee.tis.trainee.reference.service.QualificationService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = GradeResource.class)
-public class GradeResourceTest {
+@WebMvcTest(controllers = QualificationResource.class)
+public class QualificationResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -58,11 +57,8 @@ public class GradeResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
-
-  private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
-  private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
+  private static final String DEFAULT_LABEL_1 = "Academic Degree in Medicine";
+  private static final String DEFAULT_LABEL_2 = "B Med and Surgery";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,65 +66,61 @@ public class GradeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GradeService gradeServiceMock;
+  private QualificationService qualificationServiceMock;
 
   @MockBean
-  private GradeMapper gradeMapperMock;
+  private QualificationMapper qualificationMapperMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private Qualification qualification1, qualification2;
+  private QualificationDto qualificationDto1, qualificationDto2;
 
   @BeforeEach
   public void setup() {
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
+    QualificationResource qualificationResource = new QualificationResource(
+        qualificationServiceMock, qualificationMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(qualificationResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
 
   @BeforeEach
   public void initData() {
-    grade1 = new Grade();
-    grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    grade1.setLabel(DEFAULT_LABEL_1);
+    qualification1 = new Qualification();
+    qualification1.setId(DEFAULT_ID_1);
+    qualification1.setQualificationTisId(DEFAULT_TIS_ID_1);
+    qualification1.setLabel(DEFAULT_LABEL_1);
 
-    grade2 = new Grade();
-    grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    grade2.setLabel(DEFAULT_LABEL_2);
+    qualification2 = new Qualification();
+    qualification2.setId(DEFAULT_ID_2);
+    qualification2.setQualificationTisId(DEFAULT_TIS_ID_2);
+    qualification2.setLabel(DEFAULT_LABEL_2);
 
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
+    qualificationDto1 = new QualificationDto();
+    qualificationDto1.setId(DEFAULT_ID_1);
+    qualificationDto1.setQualificationTisId(DEFAULT_TIS_ID_1);
+    qualificationDto1.setLabel(DEFAULT_LABEL_1);
 
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
+    qualificationDto2 = new QualificationDto();
+    qualificationDto2.setId(DEFAULT_ID_2);
+    qualificationDto2.setQualificationTisId(DEFAULT_TIS_ID_2);
+    qualificationDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllGrades() throws Exception {
-    List<Grade> grades = new ArrayList<>();
-    grades.add(grade1);
-    grades.add(grade2);
-    List<GradeDto> gradeDtos = new ArrayList<>();
-    gradeDtos.add(gradeDto1);
-    gradeDtos.add(gradeDto2);
-    when(gradeServiceMock.getAllGrades()).thenReturn(grades);
-    when(gradeMapperMock.toDtos(grades)).thenReturn(gradeDtos);
-    this.mockMvc.perform(get("/api/grade")
+  void testGetAllQualifications() throws Exception {
+    List<Qualification> qualifications = new ArrayList<>();
+    qualifications.add(qualification1);
+    qualifications.add(qualification2);
+    List<QualificationDto> qualificationDtos = new ArrayList<>();
+    qualificationDtos.add(qualificationDto1);
+    qualificationDtos.add(qualificationDto2);
+    when(qualificationServiceMock.getQualification()).thenReturn(qualifications);
+    when(qualificationMapperMock.toDtos(qualifications)).thenReturn(qualificationDtos);
+    this.mockMvc.perform(get("/api/qualification")
         .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(gradeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(qualificationDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }

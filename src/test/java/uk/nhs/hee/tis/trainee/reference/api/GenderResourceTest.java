@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,14 +42,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Grade;
-import uk.nhs.hee.tis.trainee.reference.service.GradeService;
+import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
+import uk.nhs.hee.tis.trainee.reference.model.Gender;
+import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = GradeResource.class)
-public class GradeResourceTest {
+@WebMvcTest(controllers = GenderResource.class)
+public class GenderResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -58,11 +57,8 @@ public class GradeResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
-
-  private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
-  private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
+  private static final String DEFAULT_LABEL_1 = "Male";
+  private static final String DEFAULT_LABEL_2 = "Female";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,65 +66,60 @@ public class GradeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GradeService gradeServiceMock;
+  private GenderService genderServiceMock;
 
   @MockBean
-  private GradeMapper gradeMapperMock;
+  private GenderMapper genderMapperMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private Gender gender1, gender2;
+  private GenderDto genderDto1, genderDto2;
 
   @BeforeEach
   public void setup() {
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
+    GenderResource genderResource = new GenderResource(genderServiceMock, genderMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(genderResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
 
   @BeforeEach
   public void initData() {
-    grade1 = new Grade();
-    grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    grade1.setLabel(DEFAULT_LABEL_1);
+    gender1 = new Gender();
+    gender1.setId(DEFAULT_ID_1);
+    gender1.setGenderTisId(DEFAULT_TIS_ID_1);
+    gender1.setLabel(DEFAULT_LABEL_1);
 
-    grade2 = new Grade();
-    grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    grade2.setLabel(DEFAULT_LABEL_2);
+    gender2 = new Gender();
+    gender2.setId(DEFAULT_ID_2);
+    gender2.setGenderTisId(DEFAULT_TIS_ID_2);
+    gender2.setLabel(DEFAULT_LABEL_2);
 
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
+    genderDto1 = new GenderDto();
+    genderDto1.setId(DEFAULT_ID_1);
+    genderDto1.setGenderTisId(DEFAULT_TIS_ID_1);
+    genderDto1.setLabel(DEFAULT_LABEL_1);
 
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
+    genderDto2 = new GenderDto();
+    genderDto2.setId(DEFAULT_ID_2);
+    genderDto2.setGenderTisId(DEFAULT_TIS_ID_2);
+    genderDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllGrades() throws Exception {
-    List<Grade> grades = new ArrayList<>();
-    grades.add(grade1);
-    grades.add(grade2);
-    List<GradeDto> gradeDtos = new ArrayList<>();
-    gradeDtos.add(gradeDto1);
-    gradeDtos.add(gradeDto2);
-    when(gradeServiceMock.getAllGrades()).thenReturn(grades);
-    when(gradeMapperMock.toDtos(grades)).thenReturn(gradeDtos);
-    this.mockMvc.perform(get("/api/grade")
+  void testGetAllGenders() throws Exception {
+    List<Gender> genders = new ArrayList<>();
+    genders.add(gender1);
+    genders.add(gender2);
+    List<GenderDto> genderDtos = new ArrayList<>();
+    genderDtos.add(genderDto1);
+    genderDtos.add(genderDto2);
+    when(genderServiceMock.getGender()).thenReturn(genders);
+    when(genderMapperMock.toDtos(genders)).thenReturn(genderDtos);
+    this.mockMvc.perform(get("/api/gender")
         .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(gradeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(genderDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }

@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,14 +42,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Grade;
-import uk.nhs.hee.tis.trainee.reference.service.GradeService;
+import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
+import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = GradeResource.class)
-public class GradeResourceTest {
+@WebMvcTest(controllers = LocalOfficeResource.class)
+public class LocalOfficeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -58,11 +57,11 @@ public class GradeResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
+  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
+  private static final String DEFAULT_LABEL_2 = "Northern Ireland Medical and Dental Training Agency";
 
-  private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
-  private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
+  private static final String DEFAULT_ENTITY_ID_1 = "1";
+  private static final String DEFAULT_ENTITY_ID_2 = "2";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,65 +69,65 @@ public class GradeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GradeService gradeServiceMock;
+  private LocalOfficeService localOfficeServiceMock;
 
   @MockBean
-  private GradeMapper gradeMapperMock;
+  private LocalOfficeMapper localOfficeMapperMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private LocalOffice localOffice1, localOffice2;
+  private LocalOfficeDto localOfficeDto1, localOfficeDto2;
 
   @BeforeEach
   public void setup() {
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
+    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeServiceMock,
+        localOfficeMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
 
   @BeforeEach
   public void initData() {
-    grade1 = new Grade();
-    grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    grade1.setLabel(DEFAULT_LABEL_1);
+    localOffice1 = new LocalOffice();
+    localOffice1.setId(DEFAULT_ID_1);
+    localOffice1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
+    localOffice1.setLabel(DEFAULT_LABEL_1);
+    localOffice1.setEntityId(DEFAULT_ENTITY_ID_1);
 
-    grade2 = new Grade();
-    grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    grade2.setLabel(DEFAULT_LABEL_2);
+    localOffice2 = new LocalOffice();
+    localOffice2.setId(DEFAULT_ID_2);
+    localOffice2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
+    localOffice2.setLabel(DEFAULT_LABEL_2);
+    localOffice2.setEntityId(DEFAULT_ENTITY_ID_2);
 
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
+    localOfficeDto1 = new LocalOfficeDto();
+    localOfficeDto1.setId(DEFAULT_ID_1);
+    localOfficeDto1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
+    localOfficeDto1.setLabel(DEFAULT_LABEL_1);
+    localOfficeDto1.setEntityId(DEFAULT_ENTITY_ID_1);
 
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
+    localOfficeDto2 = new LocalOfficeDto();
+    localOfficeDto2.setId(DEFAULT_ID_2);
+    localOfficeDto2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
+    localOfficeDto2.setLabel(DEFAULT_LABEL_2);
+    localOfficeDto2.setEntityId(DEFAULT_ENTITY_ID_2);
   }
 
   @Test
-  void testGetAllGrades() throws Exception {
-    List<Grade> grades = new ArrayList<>();
-    grades.add(grade1);
-    grades.add(grade2);
-    List<GradeDto> gradeDtos = new ArrayList<>();
-    gradeDtos.add(gradeDto1);
-    gradeDtos.add(gradeDto2);
-    when(gradeServiceMock.getAllGrades()).thenReturn(grades);
-    when(gradeMapperMock.toDtos(grades)).thenReturn(gradeDtos);
-    this.mockMvc.perform(get("/api/grade")
+  void testGetAllLocalOffices() throws Exception {
+    List<LocalOffice> localOffices = new ArrayList<>();
+    localOffices.add(localOffice1);
+    localOffices.add(localOffice2);
+    List<LocalOfficeDto> localOfficeDtos = new ArrayList<>();
+    localOfficeDtos.add(localOfficeDto1);
+    localOfficeDtos.add(localOfficeDto2);
+    when(localOfficeServiceMock.getLocalOffice()).thenReturn(localOffices);
+    when(localOfficeMapperMock.toDtos(localOffices)).thenReturn(localOfficeDtos);
+    this.mockMvc.perform(get("/api/localoffice")
         .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(gradeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(localOfficeDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }

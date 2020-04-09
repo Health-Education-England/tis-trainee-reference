@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,14 +42,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Grade;
-import uk.nhs.hee.tis.trainee.reference.service.GradeService;
+import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
+import uk.nhs.hee.tis.trainee.reference.model.College;
+import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = GradeResource.class)
-public class GradeResourceTest {
+@WebMvcTest(controllers = CollegeResource.class)
+public class CollegeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -58,11 +57,9 @@ public class GradeResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
+  private static final String DEFAULT_LABEL_1 = "Faculty Of Dental Surgery";
+  private static final String DEFAULT_LABEL_2 = "Faculty of Intensive Care Medicine";
 
-  private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
-  private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,65 +67,60 @@ public class GradeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GradeService gradeServiceMock;
+  private CollegeService collegeServiceMock;
 
   @MockBean
-  private GradeMapper gradeMapperMock;
+  private CollegeMapper collageMapperMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private College college1, college2;
+  private CollegeDto collegeDto1, collegeDto2;
 
   @BeforeEach
   public void setup() {
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
+    CollegeResource collegeResource = new CollegeResource(collegeServiceMock, collageMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(collegeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
 
   @BeforeEach
   public void initData() {
-    grade1 = new Grade();
-    grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    grade1.setLabel(DEFAULT_LABEL_1);
+    college1 = new College();
+    college1.setId(DEFAULT_ID_1);
+    college1.setCollegeTisId(DEFAULT_TIS_ID_1);
+    college1.setLabel(DEFAULT_LABEL_1);
 
-    grade2 = new Grade();
-    grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    grade2.setLabel(DEFAULT_LABEL_2);
+    college2 = new College();
+    college2.setId(DEFAULT_ID_2);
+    college2.setCollegeTisId(DEFAULT_TIS_ID_2);
+    college2.setLabel(DEFAULT_LABEL_2);
 
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
+    collegeDto1 = new CollegeDto();
+    collegeDto1.setId(DEFAULT_ID_1);
+    collegeDto1.setCollegeTisId(DEFAULT_TIS_ID_1);
+    collegeDto1.setLabel(DEFAULT_LABEL_1);
 
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
+    collegeDto2 = new CollegeDto();
+    collegeDto2.setId(DEFAULT_ID_2);
+    collegeDto2.setCollegeTisId(DEFAULT_TIS_ID_2);
+    collegeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllGrades() throws Exception {
-    List<Grade> grades = new ArrayList<>();
-    grades.add(grade1);
-    grades.add(grade2);
-    List<GradeDto> gradeDtos = new ArrayList<>();
-    gradeDtos.add(gradeDto1);
-    gradeDtos.add(gradeDto2);
-    when(gradeServiceMock.getAllGrades()).thenReturn(grades);
-    when(gradeMapperMock.toDtos(grades)).thenReturn(gradeDtos);
-    this.mockMvc.perform(get("/api/grade")
+  void testGetAllColleges() throws Exception {
+    List<College> colleges = new ArrayList<>();
+    colleges.add(college1);
+    colleges.add(college2);
+    List<CollegeDto> collegeDtos = new ArrayList<>();
+    collegeDtos.add(collegeDto1);
+    collegeDtos.add(collegeDto2);
+    when(collegeServiceMock.getCollege()).thenReturn(colleges);
+    when(collageMapperMock.toDtos(colleges)).thenReturn(collegeDtos);
+    this.mockMvc.perform(get("/api/college")
         .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(gradeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(collegeDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }
