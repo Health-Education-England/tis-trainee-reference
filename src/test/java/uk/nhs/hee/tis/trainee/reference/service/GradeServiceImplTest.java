@@ -41,11 +41,11 @@ import uk.nhs.hee.tis.trainee.reference.service.impl.GradeServiceImpl;
 @ExtendWith(MockitoExtension.class)
 public class GradeServiceImplTest {
 
-  private static final String DEFAULT_ID_1 = "5e8a3e8f1f96795a081be04d";
-  private static final String DEFAULT_ID_2 = "5e8a3ea01f96795a081be04e";
+  private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
+  private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
 
-  private static final String DEFAULT_TIS_ID_1 = "279";
-  private static final String DEFAULT_TIS_ID_2 = "282";
+  private static final String DEFAULT_TIS_ID_1 = "1";
+  private static final String DEFAULT_TIS_ID_2 = "2";
 
   private static final String DEFAULT_ABBREVIATION_1 = "F1";
   private static final String DEFAULT_ABBREVIATION_2 = "CT2";
