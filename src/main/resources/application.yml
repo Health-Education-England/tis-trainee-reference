@@ -1,5 +1,7 @@
 server:
   port: 8205
+  servlet:
+    context-path: /reference
 
 spring:
   data:
