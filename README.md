@@ -1,3 +1,6 @@
+Master Branch Status: ![CI/CD Workflow](https://github.com/Health-Education-England/tis-trainee-forms/workflows/CI/CD%20Workflow/badge.svg?branch=master)  
+Deployment Status: ![CI/CD Workflow](https://github.com/Health-Education-England/tis-trainee-forms/workflows/CI/CD%20Workflow/badge.svg?branch=master&event=deployment_status)  
+
 # TIS Trainee Reference
 
 ## About
