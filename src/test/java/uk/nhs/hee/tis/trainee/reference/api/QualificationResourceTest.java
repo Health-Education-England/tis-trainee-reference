@@ -71,9 +71,14 @@ public class QualificationResourceTest {
   @MockBean
   private QualificationMapper qualificationMapperMock;
 
-  private Qualification qualification1, qualification2;
-  private QualificationDto qualificationDto1, qualificationDto2;
+  private Qualification qualification1;
+  private Qualification qualification2;
+  private QualificationDto qualificationDto1;
+  private QualificationDto qualificationDto2;
 
+  /**
+   * Set up mocks before each test.
+   */
   @BeforeEach
   public void setup() {
     QualificationResource qualificationResource = new QualificationResource(
@@ -83,6 +88,9 @@ public class QualificationResourceTest {
         .build();
   }
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     qualification1 = new Qualification();

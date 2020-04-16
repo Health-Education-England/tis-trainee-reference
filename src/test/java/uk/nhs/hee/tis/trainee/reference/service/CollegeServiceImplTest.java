@@ -56,9 +56,14 @@ public class CollegeServiceImplTest {
   @Mock
   private CollegeRepository collegeRepositoryMock;
 
-  private College college1, college2;
-  private CollegeDto collegeDto1, collegeDto2;
+  private College college1;
+  private College college2;
+  private CollegeDto collegeDto1;
+  private CollegeDto collegeDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     college1 = new College();

@@ -56,9 +56,14 @@ public class GenderServiceImplTest {
   @Mock
   private GenderRepository genderRepositoryMock;
 
-  private Gender gender1, gender2;
-  private GenderDto genderDto1, genderDto2;
+  private Gender gender1;
+  private Gender gender2;
+  private GenderDto genderDto1;
+  private GenderDto genderDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     gender1 = new Gender();

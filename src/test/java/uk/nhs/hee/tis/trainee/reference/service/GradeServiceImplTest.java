@@ -59,9 +59,14 @@ public class GradeServiceImplTest {
   @Mock
   private GradeRepository gradeRepositoryMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private Grade grade1;
+  private Grade grade2;
+  private GradeDto gradeDto1;
+  private GradeDto gradeDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     grade1 = new Grade();

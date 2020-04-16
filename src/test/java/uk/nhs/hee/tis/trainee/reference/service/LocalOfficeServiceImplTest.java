@@ -48,7 +48,8 @@ public class LocalOfficeServiceImplTest {
   private static final String DEFAULT_TIS_ID_2 = "2";
 
   private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
-  private static final String DEFAULT_LABEL_2 = "Northern Ireland Medical and Dental Training Agency";
+  private static final String DEFAULT_LABEL_2 =
+      "Northern Ireland Medical and Dental Training Agency";
 
   private static final String DEFAULT_ENTITY_ID_1 = "1";
   private static final String DEFAULT_ENTITY_ID_2 = "2";
@@ -59,9 +60,14 @@ public class LocalOfficeServiceImplTest {
   @Mock
   private LocalOfficeRepository localOfficeRepositoryMock;
 
-  private LocalOffice localOffice1, localOffice2;
-  private LocalOfficeDto localOfficeDto1, localOfficeDto2;
+  private LocalOffice localOffice1;
+  private LocalOffice localOffice2;
+  private LocalOfficeDto localOfficeDto1;
+  private LocalOfficeDto localOfficeDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     localOffice1 = new LocalOffice();

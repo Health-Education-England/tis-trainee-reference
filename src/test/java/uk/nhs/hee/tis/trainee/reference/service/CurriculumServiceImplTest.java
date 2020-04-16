@@ -55,9 +55,14 @@ public class CurriculumServiceImplTest {
   @Mock
   private CurriculumRepository curriculumRepositoryMock;
 
-  private Curriculum curriculum1, curriculum2;
-  private CurriculumDto curriculumDto1, curriculumDto2;
+  private Curriculum curriculum1;
+  private Curriculum curriculum2;
+  private CurriculumDto curriculumDto1;
+  private CurriculumDto curriculumDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     curriculum1 = new Curriculum();
@@ -90,8 +95,8 @@ public class CurriculumServiceImplTest {
     List<Curriculum> allCurricula = curriculumServiceImpl.getCurricula();
     MatcherAssert.assertThat("The size of returned curriculum list do not match the expected value",
         allCurricula.size(), CoreMatchers.equalTo(curricula.size()));
-    MatcherAssert.assertThat("The returned getCurricula();\n"
-            + "    MatcherAssert.assertThat(\"The size of returned curriculum list doesn't not contain the expected curriculum",
-        allCurricula, CoreMatchers.hasItem(curriculum1));
+    MatcherAssert
+        .assertThat("The returned local office list doesn't not contain the expected local office",
+            allCurricula, CoreMatchers.hasItem(curriculum1));
   }
 }

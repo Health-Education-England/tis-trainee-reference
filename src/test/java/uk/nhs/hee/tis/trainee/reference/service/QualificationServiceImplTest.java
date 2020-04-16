@@ -56,9 +56,14 @@ public class QualificationServiceImplTest {
   @Mock
   private QualificationRepository qualificationRepositoryMock;
 
-  private Qualification qualification1, qualification2;
-  private QualificationDto qualificationDto1, qualificationDto2;
+  private Qualification qualification1;
+  private Qualification qualification2;
+  private QualificationDto qualificationDto1;
+  private QualificationDto qualificationDto2;
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     qualification1 = new Qualification();

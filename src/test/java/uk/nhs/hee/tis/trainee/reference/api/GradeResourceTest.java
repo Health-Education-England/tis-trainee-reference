@@ -75,9 +75,14 @@ public class GradeResourceTest {
   @MockBean
   private GradeMapper gradeMapperMock;
 
-  private Grade grade1, grade2;
-  private GradeDto gradeDto1, gradeDto2;
+  private Grade grade1;
+  private Grade grade2;
+  private GradeDto gradeDto1;
+  private GradeDto gradeDto2;
 
+  /**
+   * Set up mocks before each test.
+   */
   @BeforeEach
   public void setup() {
     GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
@@ -86,6 +91,9 @@ public class GradeResourceTest {
         .build();
   }
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     grade1 = new Grade();

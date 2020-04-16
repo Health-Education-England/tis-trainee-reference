@@ -70,9 +70,14 @@ public class CurriculumResourceTest {
   @MockBean
   private CurriculumMapper curriculumMapperMock;
 
-  private Curriculum curriculum1, curriculum2;
-  private CurriculumDto curriculumDto1, curriculumDto2;
+  private Curriculum curriculum1;
+  private Curriculum curriculum2;
+  private CurriculumDto curriculumDto1;
+  private CurriculumDto curriculumDto2;
 
+  /**
+   * Set up mocks before each test.
+   */
   @BeforeEach
   public void setup() {
     CurriculumResource curriculumResource = new CurriculumResource(curriculumServiceMock,
@@ -82,6 +87,9 @@ public class CurriculumResourceTest {
         .build();
   }
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     curriculum1 = new Curriculum();
