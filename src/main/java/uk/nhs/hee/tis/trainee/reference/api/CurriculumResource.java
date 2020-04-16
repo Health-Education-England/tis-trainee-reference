@@ -52,9 +52,9 @@ public class CurriculumResource {
    * @return list of Curricula.
    */
   @GetMapping("/curriculum")
-  public List<CurriculumDto> getCurriculum() {
+  public List<CurriculumDto> getCurricula() {
     log.trace("Get all Curricula");
-    List<Curriculum> curricula = curriculumService.getCurriculum();
+    List<Curriculum> curricula = curriculumService.getCurricula();
     return curriculumMapper.toDtos(curricula);
   }
 }

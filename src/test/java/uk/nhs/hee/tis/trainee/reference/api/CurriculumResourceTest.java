@@ -113,7 +113,7 @@ public class CurriculumResourceTest {
     List<CurriculumDto> curriculumDtos = new ArrayList<>();
     curriculumDtos.add(curriculumDto1);
     curriculumDtos.add(curriculumDto2);
-    when(curriculumServiceMock.getCurriculum()).thenReturn(curricula);
+    when(curriculumServiceMock.getCurricula()).thenReturn(curricula);
     when(curriculumMapperMock.toDtos(curricula)).thenReturn(curriculumDtos);
     this.mockMvc.perform(get("/api/curriculum")
         .contentType(MediaType.APPLICATION_JSON))

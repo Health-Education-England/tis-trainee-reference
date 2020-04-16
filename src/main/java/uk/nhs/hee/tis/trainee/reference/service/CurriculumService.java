@@ -25,5 +25,5 @@ import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 
 public interface CurriculumService {
 
-  List<Curriculum> getCurriculum();
+  List<Curriculum> getCurricula();
 }

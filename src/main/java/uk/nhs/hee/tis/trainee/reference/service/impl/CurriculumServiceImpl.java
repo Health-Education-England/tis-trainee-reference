@@ -35,7 +35,7 @@ public class CurriculumServiceImpl implements CurriculumService {
     this.curriculumRepository = curriculumRepository;
   }
 
-  public List<Curriculum> getCurriculum() {
+  public List<Curriculum> getCurricula() {
     return curriculumRepository.findAll();
   }
 }

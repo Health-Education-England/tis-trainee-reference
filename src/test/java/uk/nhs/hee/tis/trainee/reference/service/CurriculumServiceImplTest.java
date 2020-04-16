@@ -87,10 +87,10 @@ public class CurriculumServiceImplTest {
     curricula.add(curriculum1);
     curricula.add(curriculum2);
     when(curriculumRepositoryMock.findAll()).thenReturn(curricula);
-    List<Curriculum> allCurricula = curriculumServiceImpl.getCurriculum();
+    List<Curriculum> allCurricula = curriculumServiceImpl.getCurricula();
     MatcherAssert.assertThat("The size of returned curriculum list do not match the expected value",
         allCurricula.size(), CoreMatchers.equalTo(curricula.size()));
-    MatcherAssert.assertThat("The returned getCurriculum();\n"
+    MatcherAssert.assertThat("The returned getCurricula();\n"
             + "    MatcherAssert.assertThat(\"The size of returned curriculum list doesn't not contain the expected curriculum",
         allCurricula, CoreMatchers.hasItem(curriculum1));
   }
