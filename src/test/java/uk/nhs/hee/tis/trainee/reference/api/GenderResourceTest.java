@@ -71,9 +71,14 @@ public class GenderResourceTest {
   @MockBean
   private GenderMapper genderMapperMock;
 
-  private Gender gender1, gender2;
-  private GenderDto genderDto1, genderDto2;
+  private Gender gender1;
+  private Gender gender2;
+  private GenderDto genderDto1;
+  private GenderDto genderDto2;
 
+  /**
+   * Set up mocks before each test.
+   */
   @BeforeEach
   public void setup() {
     GenderResource genderResource = new GenderResource(genderServiceMock, genderMapperMock);
@@ -82,6 +87,9 @@ public class GenderResourceTest {
         .build();
   }
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     gender1 = new Gender();

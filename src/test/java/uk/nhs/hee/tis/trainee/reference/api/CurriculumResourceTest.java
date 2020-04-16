@@ -1,6 +1,5 @@
 /*
  * The MIT License (MIT)
- *
  * Copyright 2020 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -42,14 +41,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.QualificationDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.QualificationMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Qualification;
-import uk.nhs.hee.tis.trainee.reference.service.QualificationService;
+import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
+import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
+import uk.nhs.hee.tis.trainee.reference.service.CurriculumService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = QualificationResource.class)
-public class QualificationResourceTest {
+@WebMvcTest(controllers = CurriculumResource.class)
+public class CurriculumResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -57,8 +56,8 @@ public class QualificationResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_LABEL_1 = "Academic Degree in Medicine";
-  private static final String DEFAULT_LABEL_2 = "B Med and Surgery";
+  private static final String DEFAULT_LABEL_1 = "GP Returner";
+  private static final String DEFAULT_LABEL_2 = "Paediatrics";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -66,24 +65,24 @@ public class QualificationResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private QualificationService qualificationServiceMock;
+  private CurriculumService curriculumServiceMock;
 
   @MockBean
-  private QualificationMapper qualificationMapperMock;
+  private CurriculumMapper curriculumMapperMock;
 
-  private Qualification qualification1;
-  private Qualification qualification2;
-  private QualificationDto qualificationDto1;
-  private QualificationDto qualificationDto2;
+  private Curriculum curriculum1;
+  private Curriculum curriculum2;
+  private CurriculumDto curriculumDto1;
+  private CurriculumDto curriculumDto2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
   public void setup() {
-    QualificationResource qualificationResource = new QualificationResource(
-        qualificationServiceMock, qualificationMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(qualificationResource)
+    CurriculumResource curriculumResource = new CurriculumResource(curriculumServiceMock,
+        curriculumMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(curriculumResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
@@ -93,42 +92,42 @@ public class QualificationResourceTest {
    */
   @BeforeEach
   public void initData() {
-    qualification1 = new Qualification();
-    qualification1.setId(DEFAULT_ID_1);
-    qualification1.setQualificationTisId(DEFAULT_TIS_ID_1);
-    qualification1.setLabel(DEFAULT_LABEL_1);
+    curriculum1 = new Curriculum();
+    curriculum1.setId(DEFAULT_ID_1);
+    curriculum1.setCurriculumTisId(DEFAULT_TIS_ID_1);
+    curriculum1.setLabel(DEFAULT_LABEL_1);
 
-    qualification2 = new Qualification();
-    qualification2.setId(DEFAULT_ID_2);
-    qualification2.setQualificationTisId(DEFAULT_TIS_ID_2);
-    qualification2.setLabel(DEFAULT_LABEL_2);
+    curriculum2 = new Curriculum();
+    curriculum2.setId(DEFAULT_ID_2);
+    curriculum2.setCurriculumTisId(DEFAULT_TIS_ID_2);
+    curriculum2.setLabel(DEFAULT_LABEL_2);
 
-    qualificationDto1 = new QualificationDto();
-    qualificationDto1.setId(DEFAULT_ID_1);
-    qualificationDto1.setQualificationTisId(DEFAULT_TIS_ID_1);
-    qualificationDto1.setLabel(DEFAULT_LABEL_1);
+    curriculumDto1 = new CurriculumDto();
+    curriculumDto1.setId(DEFAULT_ID_1);
+    curriculumDto1.setCurriculumTisId(DEFAULT_TIS_ID_1);
+    curriculumDto1.setLabel(DEFAULT_LABEL_1);
 
-    qualificationDto2 = new QualificationDto();
-    qualificationDto2.setId(DEFAULT_ID_2);
-    qualificationDto2.setQualificationTisId(DEFAULT_TIS_ID_2);
-    qualificationDto2.setLabel(DEFAULT_LABEL_2);
+    curriculumDto2 = new CurriculumDto();
+    curriculumDto2.setId(DEFAULT_ID_2);
+    curriculumDto2.setCurriculumTisId(DEFAULT_TIS_ID_2);
+    curriculumDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllQualifications() throws Exception {
-    List<Qualification> qualifications = new ArrayList<>();
-    qualifications.add(qualification1);
-    qualifications.add(qualification2);
-    List<QualificationDto> qualificationDtos = new ArrayList<>();
-    qualificationDtos.add(qualificationDto1);
-    qualificationDtos.add(qualificationDto2);
-    when(qualificationServiceMock.getQualification()).thenReturn(qualifications);
-    when(qualificationMapperMock.toDtos(qualifications)).thenReturn(qualificationDtos);
-    this.mockMvc.perform(get("/api/qualification")
+  void testGetAllCurricula() throws Exception {
+    List<Curriculum> curricula = new ArrayList<>();
+    curricula.add(curriculum1);
+    curricula.add(curriculum2);
+    List<CurriculumDto> curriculumDtos = new ArrayList<>();
+    curriculumDtos.add(curriculumDto1);
+    curriculumDtos.add(curriculumDto2);
+    when(curriculumServiceMock.getCurricula()).thenReturn(curricula);
+    when(curriculumMapperMock.toDtos(curricula)).thenReturn(curriculumDtos);
+    this.mockMvc.perform(get("/api/curriculum")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(qualificationDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(curriculumDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }

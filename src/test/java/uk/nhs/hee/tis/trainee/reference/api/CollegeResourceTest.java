@@ -72,9 +72,14 @@ public class CollegeResourceTest {
   @MockBean
   private CollegeMapper collageMapperMock;
 
-  private College college1, college2;
-  private CollegeDto collegeDto1, collegeDto2;
+  private College college1;
+  private College college2;
+  private CollegeDto collegeDto1;
+  private CollegeDto collegeDto2;
 
+  /**
+   * Set up mocks before each test.
+   */
   @BeforeEach
   public void setup() {
     CollegeResource collegeResource = new CollegeResource(collegeServiceMock, collageMapperMock);
@@ -83,6 +88,9 @@ public class CollegeResourceTest {
         .build();
   }
 
+  /**
+   * Set up data.
+   */
   @BeforeEach
   public void initData() {
     college1 = new College();
