@@ -1,6 +1,5 @@
 /*
  * The MIT License (MIT)
- *
  * Copyright 2020 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -27,35 +26,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
-import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
+import uk.nhs.hee.tis.trainee.reference.dto.ImmigrationStatusDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
+import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
+import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
 
 @RestController
 @RequestMapping("/api")
-public class LocalOfficeResource {
+public class ImmigrationStatusResource {
 
-  private static final Logger log = LoggerFactory.getLogger(LocalOfficeResource.class);
+  private static final Logger log = LoggerFactory.getLogger(ImmigrationStatusResource.class);
 
-  private LocalOfficeService localOfficeService;
-  private LocalOfficeMapper localOfficeMapper;
+  private ImmigrationStatusService immigrationStatusService;
+  private ImmigrationStatusMapper immigrationStatusMapper;
 
-  public LocalOfficeResource(LocalOfficeService localOfficeService,
-      LocalOfficeMapper localOfficeMapper) {
-    this.localOfficeService = localOfficeService;
-    this.localOfficeMapper = localOfficeMapper;
+  public ImmigrationStatusResource(ImmigrationStatusService immigrationStatusService,
+      ImmigrationStatusMapper immigrationStatusMapper) {
+    this.immigrationStatusService = immigrationStatusService;
+    this.immigrationStatusMapper = immigrationStatusMapper;
   }
 
   /**
-   * Get LocalOffice options from reference table.
+   * Get ImmigrationStatus options from reference table.
    *
-   * @return list of LocalOffices.
+   * @return list of ImmigrationStatus.
    */
-  @GetMapping("/local-office")
-  public List<LocalOfficeDto> getLocalOffice() {
-    log.trace("Get all LocalOffices");
-    List<LocalOffice> localOffices = localOfficeService.getLocalOffice();
-    return localOfficeMapper.toDtos(localOffices);
+  @GetMapping("/immigration-status")
+  public List<ImmigrationStatusDto> getImmigrationStatus() {
+    log.trace("Get all ImmigrationStatus");
+    List<ImmigrationStatus> immigrationStatus = immigrationStatusService.getImmigrationStatus();
+    return immigrationStatusMapper.toDtos(immigrationStatus);
   }
 }
