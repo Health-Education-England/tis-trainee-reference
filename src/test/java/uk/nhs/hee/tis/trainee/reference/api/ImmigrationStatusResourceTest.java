@@ -1,6 +1,5 @@
 /*
  * The MIT License (MIT)
- *
  * Copyright 2020 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -34,6 +33,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,27 +42,20 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
-import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
+import uk.nhs.hee.tis.trainee.reference.dto.ImmigrationStatusDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
+import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
+import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = LocalOfficeResource.class)
-public class LocalOfficeResourceTest {
+@WebMvcTest(controllers = ImmigrationStatusResource.class)
+public class ImmigrationStatusResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
 
-  private static final String DEFAULT_TIS_ID_1 = "1";
-  private static final String DEFAULT_TIS_ID_2 = "2";
-
-  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
-  private static final String DEFAULT_LABEL_2 =
-      "Northern Ireland Medical and Dental Training Agency";
-
-  private static final String DEFAULT_ENTITY_ID_1 = "1";
-  private static final String DEFAULT_ENTITY_ID_2 = "2";
+  private static final String DEFAULT_LABEL_1 = "EEA Resident";
+  private static final String DEFAULT_LABEL_2 = "Settled";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,24 +63,24 @@ public class LocalOfficeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private LocalOfficeService localOfficeServiceMock;
+  private ImmigrationStatusService immigrationStatusServiceMock;
 
   @MockBean
-  private LocalOfficeMapper localOfficeMapperMock;
+  private ImmigrationStatusMapper immigrationStatusMapperMock;
 
-  private LocalOffice localOffice1;
-  private LocalOffice localOffice2;
-  private LocalOfficeDto localOfficeDto1;
-  private LocalOfficeDto localOfficeDto2;
+  private ImmigrationStatus immigrationStatus1;
+  private ImmigrationStatus immigrationStatus2;
+  private ImmigrationStatusDto immigrationStatusDto1;
+  private ImmigrationStatusDto immigrationStatusDto2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
   public void setup() {
-    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeServiceMock,
-        localOfficeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
+    ImmigrationStatusResource immigrationStatusResource =
+        new ImmigrationStatusResource(immigrationStatusServiceMock, immigrationStatusMapperMock);
+    mockMvc = MockMvcBuilders.standaloneSetup(immigrationStatusResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
   }
@@ -97,46 +90,38 @@ public class LocalOfficeResourceTest {
    */
   @BeforeEach
   public void initData() {
-    localOffice1 = new LocalOffice();
-    localOffice1.setId(DEFAULT_ID_1);
-    localOffice1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
-    localOffice1.setLabel(DEFAULT_LABEL_1);
-    localOffice1.setEntityId(DEFAULT_ENTITY_ID_1);
+    immigrationStatus1 = new ImmigrationStatus();
+    immigrationStatus1.setId(DEFAULT_ID_1);
+    immigrationStatus1.setLabel(DEFAULT_LABEL_1);
 
-    localOffice2 = new LocalOffice();
-    localOffice2.setId(DEFAULT_ID_2);
-    localOffice2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
-    localOffice2.setLabel(DEFAULT_LABEL_2);
-    localOffice2.setEntityId(DEFAULT_ENTITY_ID_2);
+    immigrationStatus2 = new ImmigrationStatus();
+    immigrationStatus2.setId(DEFAULT_ID_2);
+    immigrationStatus2.setLabel(DEFAULT_LABEL_2);
 
-    localOfficeDto1 = new LocalOfficeDto();
-    localOfficeDto1.setId(DEFAULT_ID_1);
-    localOfficeDto1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
-    localOfficeDto1.setLabel(DEFAULT_LABEL_1);
-    localOfficeDto1.setEntityId(DEFAULT_ENTITY_ID_1);
+    immigrationStatusDto1 = new ImmigrationStatusDto();
+    immigrationStatusDto1.setId(DEFAULT_ID_1);
+    immigrationStatusDto1.setLabel(DEFAULT_LABEL_1);
 
-    localOfficeDto2 = new LocalOfficeDto();
-    localOfficeDto2.setId(DEFAULT_ID_2);
-    localOfficeDto2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
-    localOfficeDto2.setLabel(DEFAULT_LABEL_2);
-    localOfficeDto2.setEntityId(DEFAULT_ENTITY_ID_2);
+    immigrationStatusDto2 = new ImmigrationStatusDto();
+    immigrationStatusDto2.setId(DEFAULT_ID_2);
+    immigrationStatusDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllLocalOffices() throws Exception {
-    List<LocalOffice> localOffices = new ArrayList<>();
-    localOffices.add(localOffice1);
-    localOffices.add(localOffice2);
-    List<LocalOfficeDto> localOfficeDtos = new ArrayList<>();
-    localOfficeDtos.add(localOfficeDto1);
-    localOfficeDtos.add(localOfficeDto2);
-    when(localOfficeServiceMock.getLocalOffice()).thenReturn(localOffices);
-    when(localOfficeMapperMock.toDtos(localOffices)).thenReturn(localOfficeDtos);
-    this.mockMvc.perform(get("/api/local-office")
+  void testGetAllImmigrationStatus() throws Exception {
+    List<ImmigrationStatus> immigrationStatus = new ArrayList<>();
+    immigrationStatus.add(immigrationStatus1);
+    immigrationStatus.add(immigrationStatus2);
+    List<ImmigrationStatusDto> immigrationStatusDtos = new ArrayList<>();
+    immigrationStatusDtos.add(immigrationStatusDto1);
+    immigrationStatusDtos.add(immigrationStatusDto2);
+    when(immigrationStatusServiceMock.getImmigrationStatus()).thenReturn(immigrationStatus);
+    when(immigrationStatusMapperMock.toDtos(immigrationStatus)).thenReturn(immigrationStatusDtos);
+    this.mockMvc.perform(get("/api/immigration-status")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(localOfficeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(immigrationStatusDtos.size())))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
   }
