@@ -21,18 +21,23 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.GradeServiceImpl;
@@ -46,17 +51,13 @@ public class GradeServiceImplTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
-
   private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
   private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
 
-  @InjectMocks
-  private GradeServiceImpl gradeServiceImpl;
+  private GradeServiceImpl service;
 
   @Mock
-  private GradeRepository gradeRepositoryMock;
+  private GradeRepository repository;
 
   private Grade grade1;
   private Grade grade2;
@@ -65,7 +66,9 @@ public class GradeServiceImplTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
+    service = new GradeServiceImpl(repository, Mappers.getMapper(GradeMapper.class));
+
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);
     grade1.setTisId(DEFAULT_TIS_ID_1);
@@ -78,15 +81,70 @@ public class GradeServiceImplTest {
   }
 
   @Test
-  public void getAllGradesShouldReturnAllGrades() {
+  void getAllGradesShouldReturnAllGrades() {
     List<Grade> grades = new ArrayList<>();
     grades.add(grade1);
     grades.add(grade2);
-    when(gradeRepositoryMock.findAll()).thenReturn(grades);
-    List<Grade> allGrades = gradeServiceImpl.getAllGrades();
-    MatcherAssert.assertThat("The size of returned grade list do not match the expected value",
+    when(repository.findAll()).thenReturn(grades);
+    List<Grade> allGrades = service.getAllGrades();
+    assertThat("The size of returned grade list do not match the expected value",
         allGrades.size(), CoreMatchers.equalTo(grades.size()));
-    MatcherAssert.assertThat("The returned grade list doesn't not contain the expected grade",
+    assertThat("The returned grade list doesn't not contain the expected grade",
         allGrades, CoreMatchers.hasItem(grade1));
+  }
+
+  @Test
+  void createGradeShouldCreateGradeWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(Grade.class))).thenAnswer(returnsFirstArg());
+
+    Grade grade = service.createGrade(grade2);
+
+    assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", grade.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void createGradeShouldUpdateGradeWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(grade1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    Grade grade = service.createGrade(grade2);
+
+    assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", grade.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateGradeShouldCreateGradeWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(Grade.class))).thenAnswer(returnsFirstArg());
+
+    Grade grade = service.updateGrade(grade2);
+
+    assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", grade.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateGradeShouldUpdateGradeWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(grade1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    Grade grade = service.updateGrade(grade2);
+
+    assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", grade.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void shouldDeleteGradesByTisId() {
+    service.deleteGrade(DEFAULT_TIS_ID_1);
+
+    verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

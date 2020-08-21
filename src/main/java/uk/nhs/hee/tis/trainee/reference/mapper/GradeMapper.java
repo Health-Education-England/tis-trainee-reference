@@ -23,6 +23,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 
@@ -36,4 +38,8 @@ public interface GradeMapper {
   Grade toEntity(GradeDto gradeDto);
 
   List<Grade> toEntities(List<GradeDto> gradeDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  Grade update(@MappingTarget Grade target, Grade source);
 }

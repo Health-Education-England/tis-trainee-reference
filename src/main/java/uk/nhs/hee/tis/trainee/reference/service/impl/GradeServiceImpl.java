@@ -23,6 +23,7 @@ package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.GradeService;
@@ -30,14 +31,44 @@ import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 @Service
 public class GradeServiceImpl implements GradeService {
 
-  GradeRepository gradeRepository;
+  private final GradeRepository repository;
+  private final GradeMapper mapper;
 
-  public GradeServiceImpl(GradeRepository gradeRepository) {
-    this.gradeRepository = gradeRepository;
+  public GradeServiceImpl(GradeRepository repository, GradeMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   @Override
   public List<Grade> getAllGrades() {
-    return gradeRepository.findAll();
+    return repository.findAll();
+  }
+
+  @Override
+  public Grade updateGrade(Grade grade) {
+    Grade persistedGrade = repository.findByTisId(grade.getTisId());
+
+    if (persistedGrade == null) {
+      return createGrade(grade);
+    }
+
+    persistedGrade = mapper.update(persistedGrade, grade);
+    return repository.save(persistedGrade);
+  }
+
+  @Override
+  public Grade createGrade(Grade grade) {
+    Grade persistedGrade = repository.findByTisId(grade.getTisId());
+
+    if (persistedGrade != null) {
+      return updateGrade(grade);
+    }
+
+    return repository.insert(grade);
+  }
+
+  @Override
+  public void deleteGrade(String tisId) {
+    repository.deleteByTisId(tisId);
   }
 }

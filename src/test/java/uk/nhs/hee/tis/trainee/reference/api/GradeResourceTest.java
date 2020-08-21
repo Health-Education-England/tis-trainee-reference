@@ -23,33 +23,40 @@ package uk.nhs.hee.tis.trainee.reference.api;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 
+@ContextConfiguration(classes = {GradeMapper.class})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = GradeResource.class)
+@WebMvcTest(GradeResource.class)
 public class GradeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -58,34 +65,30 @@ public class GradeResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_ABBREVIATION_1 = "F1";
-  private static final String DEFAULT_ABBREVIATION_2 = "CT2";
-
   private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
   private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
+  @Autowired
+  private ObjectMapper mapper;
+
   private MockMvc mockMvc;
 
   @MockBean
   private GradeService gradeServiceMock;
 
-  @MockBean
-  private GradeMapper gradeMapperMock;
-
   private Grade grade1;
   private Grade grade2;
-  private GradeDto gradeDto1;
-  private GradeDto gradeDto2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
   public void setup() {
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, gradeMapperMock);
+    GradeMapper mapper = Mappers.getMapper(GradeMapper.class);
+    GradeResource gradeResource = new GradeResource(gradeServiceMock, mapper);
     mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -105,16 +108,6 @@ public class GradeResourceTest {
     grade2.setId(DEFAULT_ID_2);
     grade2.setTisId(DEFAULT_TIS_ID_2);
     grade2.setLabel(DEFAULT_LABEL_2);
-
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
-
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -122,18 +115,51 @@ public class GradeResourceTest {
     List<Grade> grades = new ArrayList<>();
     grades.add(grade1);
     grades.add(grade2);
-    List<GradeDto> gradeDtos = new ArrayList<>();
-    gradeDtos.add(gradeDto1);
-    gradeDtos.add(gradeDto2);
     when(gradeServiceMock.getAllGrades()).thenReturn(grades);
-    when(gradeMapperMock.toDtos(grades)).thenReturn(gradeDtos);
-    this.mockMvc.perform(get("/api/grade")
+    mockMvc.perform(get("/api/grade")
         .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(gradeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(2)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  }
+
+  @Test
+  void testCreateGrade() throws Exception {
+    when(gradeServiceMock.createGrade(grade1)).thenReturn(grade1);
+
+    mockMvc.perform(post("/api/grade")
+        .content(mapper.writeValueAsBytes(grade1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testUpdateGrade() throws Exception {
+    when(gradeServiceMock.updateGrade(grade1)).thenReturn(grade1);
+
+    mockMvc.perform(put("/api/grade")
+        .content(mapper.writeValueAsBytes(grade1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testDeleteGrade() throws Exception {
+    mockMvc.perform(delete("/api/grade/{tisId}", DEFAULT_TIS_ID_1)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(gradeServiceMock).deleteGrade(DEFAULT_TIS_ID_1);
   }
 }
