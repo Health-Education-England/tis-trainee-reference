@@ -30,7 +30,6 @@ import lombok.Data;
 public class LocalOfficeDto {
 
   private String id;
-  private String localOfficeTisId;
+  private String tisId;
   private String label;
-  private String entityId;
 }

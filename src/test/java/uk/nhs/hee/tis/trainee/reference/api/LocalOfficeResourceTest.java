@@ -99,27 +99,23 @@ public class LocalOfficeResourceTest {
   public void initData() {
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);
-    localOffice1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
+    localOffice1.setTisId(DEFAULT_TIS_ID_1);
     localOffice1.setLabel(DEFAULT_LABEL_1);
-    localOffice1.setEntityId(DEFAULT_ENTITY_ID_1);
 
     localOffice2 = new LocalOffice();
     localOffice2.setId(DEFAULT_ID_2);
-    localOffice2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
+    localOffice2.setTisId(DEFAULT_TIS_ID_2);
     localOffice2.setLabel(DEFAULT_LABEL_2);
-    localOffice2.setEntityId(DEFAULT_ENTITY_ID_2);
 
     localOfficeDto1 = new LocalOfficeDto();
     localOfficeDto1.setId(DEFAULT_ID_1);
-    localOfficeDto1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
+    localOfficeDto1.setTisId(DEFAULT_TIS_ID_1);
     localOfficeDto1.setLabel(DEFAULT_LABEL_1);
-    localOfficeDto1.setEntityId(DEFAULT_ENTITY_ID_1);
 
     localOfficeDto2 = new LocalOfficeDto();
     localOfficeDto2.setId(DEFAULT_ID_2);
-    localOfficeDto2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
+    localOfficeDto2.setTisId(DEFAULT_TIS_ID_2);
     localOfficeDto2.setLabel(DEFAULT_LABEL_2);
-    localOfficeDto2.setEntityId(DEFAULT_ENTITY_ID_2);
   }
 
   @Test

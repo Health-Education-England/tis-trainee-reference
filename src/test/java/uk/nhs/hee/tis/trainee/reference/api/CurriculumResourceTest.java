@@ -94,22 +94,22 @@ public class CurriculumResourceTest {
   public void initData() {
     curriculum1 = new Curriculum();
     curriculum1.setId(DEFAULT_ID_1);
-    curriculum1.setCurriculumTisId(DEFAULT_TIS_ID_1);
+    curriculum1.setTisId(DEFAULT_TIS_ID_1);
     curriculum1.setLabel(DEFAULT_LABEL_1);
 
     curriculum2 = new Curriculum();
     curriculum2.setId(DEFAULT_ID_2);
-    curriculum2.setCurriculumTisId(DEFAULT_TIS_ID_2);
+    curriculum2.setTisId(DEFAULT_TIS_ID_2);
     curriculum2.setLabel(DEFAULT_LABEL_2);
 
     curriculumDto1 = new CurriculumDto();
     curriculumDto1.setId(DEFAULT_ID_1);
-    curriculumDto1.setCurriculumTisId(DEFAULT_TIS_ID_1);
+    curriculumDto1.setTisId(DEFAULT_TIS_ID_1);
     curriculumDto1.setLabel(DEFAULT_LABEL_1);
 
     curriculumDto2 = new CurriculumDto();
     curriculumDto2.setId(DEFAULT_ID_2);
-    curriculumDto2.setCurriculumTisId(DEFAULT_TIS_ID_2);
+    curriculumDto2.setTisId(DEFAULT_TIS_ID_2);
     curriculumDto2.setLabel(DEFAULT_LABEL_2);
   }
 

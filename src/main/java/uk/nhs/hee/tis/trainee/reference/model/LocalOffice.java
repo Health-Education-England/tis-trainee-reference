@@ -25,7 +25,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "LocalOffice")
 @Data
@@ -35,8 +34,6 @@ public class LocalOffice {
   private String id;
 
   @Indexed(unique = true)
-  @Field(value = "localOfficeTisId")
-  private String localOfficeTisId;
+  private String tisId;
   private String label;
-  private String entityId;
 }

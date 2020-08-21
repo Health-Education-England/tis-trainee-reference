@@ -95,22 +95,22 @@ public class CollegeResourceTest {
   public void initData() {
     college1 = new College();
     college1.setId(DEFAULT_ID_1);
-    college1.setCollegeTisId(DEFAULT_TIS_ID_1);
+    college1.setTisId(DEFAULT_TIS_ID_1);
     college1.setLabel(DEFAULT_LABEL_1);
 
     college2 = new College();
     college2.setId(DEFAULT_ID_2);
-    college2.setCollegeTisId(DEFAULT_TIS_ID_2);
+    college2.setTisId(DEFAULT_TIS_ID_2);
     college2.setLabel(DEFAULT_LABEL_2);
 
     collegeDto1 = new CollegeDto();
     collegeDto1.setId(DEFAULT_ID_1);
-    collegeDto1.setCollegeTisId(DEFAULT_TIS_ID_1);
+    collegeDto1.setTisId(DEFAULT_TIS_ID_1);
     collegeDto1.setLabel(DEFAULT_LABEL_1);
 
     collegeDto2 = new CollegeDto();
     collegeDto2.setId(DEFAULT_ID_2);
-    collegeDto2.setCollegeTisId(DEFAULT_TIS_ID_2);
+    collegeDto2.setTisId(DEFAULT_TIS_ID_2);
     collegeDto2.setLabel(DEFAULT_LABEL_2);
   }
 

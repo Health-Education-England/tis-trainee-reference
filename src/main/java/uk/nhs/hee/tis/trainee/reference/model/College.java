@@ -25,7 +25,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "College")
 @Data
@@ -35,7 +34,6 @@ public class College {
   private String id;
 
   @Indexed(unique = true)
-  @Field(value = "collegeTisId")
-  private String collegeTisId;
+  private String tisId;
   private String label;
 }

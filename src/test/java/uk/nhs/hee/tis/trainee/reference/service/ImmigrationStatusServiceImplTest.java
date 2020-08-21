@@ -32,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.ImmigrationStatusDto;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.ImmigrationStatusServiceImpl;
@@ -54,8 +53,6 @@ public class ImmigrationStatusServiceImplTest {
 
   private ImmigrationStatus immigrationStatus1;
   private ImmigrationStatus immigrationStatus2;
-  private ImmigrationStatusDto immigrationStatusDto1;
-  private ImmigrationStatusDto immigrationStatusDto2;
 
   /**
    * Set up data.
@@ -69,14 +66,6 @@ public class ImmigrationStatusServiceImplTest {
     immigrationStatus2 = new ImmigrationStatus();
     immigrationStatus2.setId(DEFAULT_ID_2);
     immigrationStatus2.setLabel(DEFAULT_LABEL_2);
-
-    immigrationStatusDto1 = new ImmigrationStatusDto();
-    immigrationStatusDto1.setId(DEFAULT_ID_1);
-    immigrationStatusDto1.setLabel(DEFAULT_LABEL_1);
-
-    immigrationStatusDto2 = new ImmigrationStatusDto();
-    immigrationStatusDto2.setId(DEFAULT_ID_2);
-    immigrationStatusDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test

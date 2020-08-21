@@ -30,6 +30,6 @@ import lombok.Data;
 public class GenderDto {
 
   private String id;
-  private String genderTisId;
+  private String tisId;
   private String label;
 }

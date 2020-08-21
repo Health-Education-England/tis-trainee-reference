@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.GradeServiceImpl;
@@ -61,8 +60,6 @@ public class GradeServiceImplTest {
 
   private Grade grade1;
   private Grade grade2;
-  private GradeDto gradeDto1;
-  private GradeDto gradeDto2;
 
   /**
    * Set up data.
@@ -71,27 +68,13 @@ public class GradeServiceImplTest {
   public void initData() {
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
+    grade1.setTisId(DEFAULT_TIS_ID_1);
     grade1.setLabel(DEFAULT_LABEL_1);
 
     grade2 = new Grade();
     grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
+    grade2.setTisId(DEFAULT_TIS_ID_2);
     grade2.setLabel(DEFAULT_LABEL_2);
-
-    gradeDto1 = new GradeDto();
-    gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
-    gradeDto1.setLabel(DEFAULT_LABEL_1);
-
-    gradeDto2 = new GradeDto();
-    gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
-    gradeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test

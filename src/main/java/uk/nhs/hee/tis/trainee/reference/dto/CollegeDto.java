@@ -30,6 +30,6 @@ import lombok.Data;
 public class CollegeDto {
 
   private String id;
-  private String collegeTisId;
+  private String tisId;
   private String label;
 }

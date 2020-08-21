@@ -32,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.CurriculumServiceImpl;
@@ -57,8 +56,6 @@ public class CurriculumServiceImplTest {
 
   private Curriculum curriculum1;
   private Curriculum curriculum2;
-  private CurriculumDto curriculumDto1;
-  private CurriculumDto curriculumDto2;
 
   /**
    * Set up data.
@@ -67,23 +64,13 @@ public class CurriculumServiceImplTest {
   public void initData() {
     curriculum1 = new Curriculum();
     curriculum1.setId(DEFAULT_ID_1);
-    curriculum1.setCurriculumTisId(DEFAULT_TIS_ID_1);
+    curriculum1.setTisId(DEFAULT_TIS_ID_1);
     curriculum1.setLabel(DEFAULT_LABEL_1);
 
     curriculum2 = new Curriculum();
     curriculum2.setId(DEFAULT_ID_2);
-    curriculum2.setCurriculumTisId(DEFAULT_TIS_ID_2);
+    curriculum2.setTisId(DEFAULT_TIS_ID_2);
     curriculum2.setLabel(DEFAULT_LABEL_2);
-
-    curriculumDto1 = new CurriculumDto();
-    curriculumDto1.setId(DEFAULT_ID_1);
-    curriculumDto1.setCurriculumTisId(DEFAULT_TIS_ID_1);
-    curriculumDto1.setLabel(DEFAULT_LABEL_1);
-
-    curriculumDto2 = new CurriculumDto();
-    curriculumDto2.setId(DEFAULT_ID_2);
-    curriculumDto2.setCurriculumTisId(DEFAULT_TIS_ID_2);
-    curriculumDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
