@@ -94,22 +94,22 @@ public class GenderResourceTest {
   public void initData() {
     gender1 = new Gender();
     gender1.setId(DEFAULT_ID_1);
-    gender1.setGenderTisId(DEFAULT_TIS_ID_1);
+    gender1.setTisId(DEFAULT_TIS_ID_1);
     gender1.setLabel(DEFAULT_LABEL_1);
 
     gender2 = new Gender();
     gender2.setId(DEFAULT_ID_2);
-    gender2.setGenderTisId(DEFAULT_TIS_ID_2);
+    gender2.setTisId(DEFAULT_TIS_ID_2);
     gender2.setLabel(DEFAULT_LABEL_2);
 
     genderDto1 = new GenderDto();
     genderDto1.setId(DEFAULT_ID_1);
-    genderDto1.setGenderTisId(DEFAULT_TIS_ID_1);
+    genderDto1.setTisId(DEFAULT_TIS_ID_1);
     genderDto1.setLabel(DEFAULT_LABEL_1);
 
     genderDto2 = new GenderDto();
     genderDto2.setId(DEFAULT_ID_2);
-    genderDto2.setGenderTisId(DEFAULT_TIS_ID_2);
+    genderDto2.setTisId(DEFAULT_TIS_ID_2);
     genderDto2.setLabel(DEFAULT_LABEL_2);
   }
 

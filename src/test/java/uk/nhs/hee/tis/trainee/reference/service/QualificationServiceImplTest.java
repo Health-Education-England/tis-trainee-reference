@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.QualificationDto;
 import uk.nhs.hee.tis.trainee.reference.model.Qualification;
 import uk.nhs.hee.tis.trainee.reference.repository.QualificationRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.QualificationServiceImpl;
@@ -58,8 +57,6 @@ public class QualificationServiceImplTest {
 
   private Qualification qualification1;
   private Qualification qualification2;
-  private QualificationDto qualificationDto1;
-  private QualificationDto qualificationDto2;
 
   /**
    * Set up data.
@@ -68,23 +65,13 @@ public class QualificationServiceImplTest {
   public void initData() {
     qualification1 = new Qualification();
     qualification1.setId(DEFAULT_ID_1);
-    qualification1.setQualificationTisId(DEFAULT_TIS_ID_1);
+    qualification1.setTisId(DEFAULT_TIS_ID_1);
     qualification1.setLabel(DEFAULT_LABEL_1);
 
     qualification2 = new Qualification();
     qualification2.setId(DEFAULT_ID_2);
-    qualification2.setQualificationTisId(DEFAULT_TIS_ID_2);
+    qualification2.setTisId(DEFAULT_TIS_ID_2);
     qualification2.setLabel(DEFAULT_LABEL_2);
-
-    qualificationDto1 = new QualificationDto();
-    qualificationDto1.setId(DEFAULT_ID_1);
-    qualificationDto1.setQualificationTisId(DEFAULT_TIS_ID_1);
-    qualificationDto1.setLabel(DEFAULT_LABEL_1);
-
-    qualificationDto2 = new QualificationDto();
-    qualificationDto2.setId(DEFAULT_ID_2);
-    qualificationDto2.setQualificationTisId(DEFAULT_TIS_ID_2);
-    qualificationDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test

@@ -29,6 +29,6 @@ import lombok.Data;
 public class CurriculumDto {
 
   private String id;
-  private String curriculumTisId;
+  private String tisId;
   private String label;
 }

@@ -98,26 +98,22 @@ public class GradeResourceTest {
   public void initData() {
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);
-    grade1.setGradeTisId(DEFAULT_TIS_ID_1);
-    grade1.setAbbreviation(DEFAULT_ABBREVIATION_1);
+    grade1.setTisId(DEFAULT_TIS_ID_1);
     grade1.setLabel(DEFAULT_LABEL_1);
 
     grade2 = new Grade();
     grade2.setId(DEFAULT_ID_2);
-    grade2.setGradeTisId(DEFAULT_TIS_ID_2);
-    grade2.setAbbreviation(DEFAULT_ABBREVIATION_2);
+    grade2.setTisId(DEFAULT_TIS_ID_2);
     grade2.setLabel(DEFAULT_LABEL_2);
 
     gradeDto1 = new GradeDto();
     gradeDto1.setId(DEFAULT_ID_1);
-    gradeDto1.setGradeTisId(DEFAULT_TIS_ID_1);
-    gradeDto1.setAbbreviation(DEFAULT_ABBREVIATION_1);
+    gradeDto1.setTisId(DEFAULT_TIS_ID_1);
     gradeDto1.setLabel(DEFAULT_LABEL_1);
 
     gradeDto2 = new GradeDto();
     gradeDto2.setId(DEFAULT_ID_2);
-    gradeDto2.setGradeTisId(DEFAULT_TIS_ID_2);
-    gradeDto2.setAbbreviation(DEFAULT_ABBREVIATION_2);
+    gradeDto2.setTisId(DEFAULT_TIS_ID_2);
     gradeDto2.setLabel(DEFAULT_LABEL_2);
   }
 

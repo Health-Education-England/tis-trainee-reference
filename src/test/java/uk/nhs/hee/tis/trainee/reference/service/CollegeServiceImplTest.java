@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.CollegeServiceImpl;
@@ -58,8 +57,6 @@ public class CollegeServiceImplTest {
 
   private College college1;
   private College college2;
-  private CollegeDto collegeDto1;
-  private CollegeDto collegeDto2;
 
   /**
    * Set up data.
@@ -68,23 +65,13 @@ public class CollegeServiceImplTest {
   public void initData() {
     college1 = new College();
     college1.setId(DEFAULT_ID_1);
-    college1.setCollegeTisId(DEFAULT_TIS_ID_1);
+    college1.setTisId(DEFAULT_TIS_ID_1);
     college1.setLabel(DEFAULT_LABEL_1);
 
     college2 = new College();
     college2.setId(DEFAULT_ID_2);
-    college2.setCollegeTisId(DEFAULT_TIS_ID_2);
+    college2.setTisId(DEFAULT_TIS_ID_2);
     college2.setLabel(DEFAULT_LABEL_2);
-
-    collegeDto1 = new CollegeDto();
-    collegeDto1.setId(DEFAULT_ID_1);
-    collegeDto1.setCollegeTisId(DEFAULT_TIS_ID_1);
-    collegeDto1.setLabel(DEFAULT_LABEL_1);
-
-    collegeDto2 = new CollegeDto();
-    collegeDto2.setId(DEFAULT_ID_2);
-    collegeDto2.setCollegeTisId(DEFAULT_TIS_ID_2);
-    collegeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test

@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.GenderServiceImpl;
@@ -58,8 +57,6 @@ public class GenderServiceImplTest {
 
   private Gender gender1;
   private Gender gender2;
-  private GenderDto genderDto1;
-  private GenderDto genderDto2;
 
   /**
    * Set up data.
@@ -68,23 +65,13 @@ public class GenderServiceImplTest {
   public void initData() {
     gender1 = new Gender();
     gender1.setId(DEFAULT_ID_1);
-    gender1.setGenderTisId(DEFAULT_TIS_ID_1);
+    gender1.setTisId(DEFAULT_TIS_ID_1);
     gender1.setLabel(DEFAULT_LABEL_1);
 
     gender2 = new Gender();
     gender2.setId(DEFAULT_ID_2);
-    gender2.setGenderTisId(DEFAULT_TIS_ID_2);
+    gender2.setTisId(DEFAULT_TIS_ID_2);
     gender2.setLabel(DEFAULT_LABEL_2);
-
-    genderDto1 = new GenderDto();
-    genderDto1.setId(DEFAULT_ID_1);
-    genderDto1.setGenderTisId(DEFAULT_TIS_ID_1);
-    genderDto1.setLabel(DEFAULT_LABEL_1);
-
-    genderDto2 = new GenderDto();
-    genderDto2.setId(DEFAULT_ID_2);
-    genderDto2.setGenderTisId(DEFAULT_TIS_ID_2);
-    genderDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test

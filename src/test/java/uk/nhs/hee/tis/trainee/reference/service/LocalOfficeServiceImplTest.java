@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.LocalOfficeServiceImpl;
@@ -51,9 +50,6 @@ public class LocalOfficeServiceImplTest {
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
-  private static final String DEFAULT_ENTITY_ID_1 = "1";
-  private static final String DEFAULT_ENTITY_ID_2 = "2";
-
   @InjectMocks
   private LocalOfficeServiceImpl localOfficeServiceImpl;
 
@@ -62,8 +58,6 @@ public class LocalOfficeServiceImplTest {
 
   private LocalOffice localOffice1;
   private LocalOffice localOffice2;
-  private LocalOfficeDto localOfficeDto1;
-  private LocalOfficeDto localOfficeDto2;
 
   /**
    * Set up data.
@@ -72,27 +66,13 @@ public class LocalOfficeServiceImplTest {
   public void initData() {
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);
-    localOffice1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
+    localOffice1.setTisId(DEFAULT_TIS_ID_1);
     localOffice1.setLabel(DEFAULT_LABEL_1);
-    localOffice1.setEntityId(DEFAULT_ENTITY_ID_1);
 
     localOffice2 = new LocalOffice();
     localOffice2.setId(DEFAULT_ID_2);
-    localOffice2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
+    localOffice2.setTisId(DEFAULT_TIS_ID_2);
     localOffice2.setLabel(DEFAULT_LABEL_2);
-    localOffice2.setEntityId(DEFAULT_ENTITY_ID_2);
-
-    localOfficeDto1 = new LocalOfficeDto();
-    localOfficeDto1.setId(DEFAULT_ID_1);
-    localOfficeDto1.setLocalOfficeTisId(DEFAULT_TIS_ID_1);
-    localOfficeDto1.setLabel(DEFAULT_LABEL_1);
-    localOfficeDto1.setEntityId(DEFAULT_ENTITY_ID_1);
-
-    localOfficeDto2 = new LocalOfficeDto();
-    localOfficeDto2.setId(DEFAULT_ID_2);
-    localOfficeDto2.setLocalOfficeTisId(DEFAULT_TIS_ID_2);
-    localOfficeDto2.setLabel(DEFAULT_LABEL_2);
-    localOfficeDto2.setEntityId(DEFAULT_ENTITY_ID_2);
   }
 
   @Test
