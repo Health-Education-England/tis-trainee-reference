@@ -22,6 +22,7 @@ package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
 import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
@@ -29,13 +30,46 @@ import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
 @Service
 public class ImmigrationStatusServiceImpl implements ImmigrationStatusService {
 
-  ImmigrationStatusRepository immigrationStatusRepository;
+  private final ImmigrationStatusRepository repository;
+  private final ImmigrationStatusMapper mapper;
 
-  public ImmigrationStatusServiceImpl(ImmigrationStatusRepository immigrationStatusRepository) {
-    this.immigrationStatusRepository = immigrationStatusRepository;
+  public ImmigrationStatusServiceImpl(ImmigrationStatusRepository repository,
+      ImmigrationStatusMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   public List<ImmigrationStatus> getImmigrationStatus() {
-    return immigrationStatusRepository.findAll();
+    return repository.findAll();
+  }
+
+  @Override
+  public ImmigrationStatus updateImmigrationStatus(ImmigrationStatus immigrationStatus) {
+    ImmigrationStatus persistedImmigrationStatus = repository
+        .findByTisId(immigrationStatus.getTisId());
+
+    if (persistedImmigrationStatus == null) {
+      return createImmigrationStatus(immigrationStatus);
+    }
+
+    persistedImmigrationStatus = mapper.update(persistedImmigrationStatus, immigrationStatus);
+    return repository.save(persistedImmigrationStatus);
+  }
+
+  @Override
+  public ImmigrationStatus createImmigrationStatus(ImmigrationStatus immigrationStatus) {
+    ImmigrationStatus persistedImmigrationStatus = repository
+        .findByTisId(immigrationStatus.getTisId());
+
+    if (persistedImmigrationStatus != null) {
+      return updateImmigrationStatus(immigrationStatus);
+    }
+
+    return repository.insert(immigrationStatus);
+  }
+
+  @Override
+  public void deleteImmigrationStatus(String tisId) {
+    repository.deleteByTisId(tisId);
   }
 }

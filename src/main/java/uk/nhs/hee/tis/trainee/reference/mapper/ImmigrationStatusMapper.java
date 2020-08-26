@@ -22,6 +22,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.ImmigrationStatusDto;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 
@@ -35,4 +37,8 @@ public interface ImmigrationStatusMapper {
   ImmigrationStatus toEntity(ImmigrationStatusDto immigrationStatusDto);
 
   List<ImmigrationStatus> toEntities(List<ImmigrationStatusDto> immigrationStatusDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  ImmigrationStatus update(@MappingTarget ImmigrationStatus target, ImmigrationStatus source);
 }

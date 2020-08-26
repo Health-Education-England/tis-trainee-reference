@@ -26,4 +26,10 @@ import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 public interface ImmigrationStatusService {
 
   List<ImmigrationStatus> getImmigrationStatus();
+
+  ImmigrationStatus updateImmigrationStatus(ImmigrationStatus immigrationStatus);
+
+  ImmigrationStatus createImmigrationStatus(ImmigrationStatus immigrationStatus);
+
+  void deleteImmigrationStatus(String tisId);
 }
