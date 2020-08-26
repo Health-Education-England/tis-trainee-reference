@@ -28,4 +28,7 @@ import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 @Repository
 public interface LocalOfficeRepository extends MongoRepository<LocalOffice, String> {
 
+  void deleteByTisId(String tisId);
+
+  LocalOffice findByTisId(String tisId);
 }

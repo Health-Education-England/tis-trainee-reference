@@ -23,6 +23,7 @@ package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
@@ -30,13 +31,43 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 @Service
 public class LocalOfficeServiceImpl implements LocalOfficeService {
 
-  LocalOfficeRepository localOfficeRepository;
+  private final LocalOfficeRepository repository;
+  private final LocalOfficeMapper mapper;
 
-  public LocalOfficeServiceImpl(LocalOfficeRepository localOfficeRepository) {
-    this.localOfficeRepository = localOfficeRepository;
+  public LocalOfficeServiceImpl(LocalOfficeRepository repository, LocalOfficeMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   public List<LocalOffice> getLocalOffice() {
-    return localOfficeRepository.findAll();
+    return repository.findAll();
+  }
+
+  @Override
+  public LocalOffice updateLocalOffice(LocalOffice localOffice) {
+    LocalOffice persistedLocalOffice = repository.findByTisId(localOffice.getTisId());
+
+    if (persistedLocalOffice == null) {
+      return createLocalOffice(localOffice);
+    }
+
+    persistedLocalOffice = mapper.update(persistedLocalOffice, localOffice);
+    return repository.save(persistedLocalOffice);
+  }
+
+  @Override
+  public LocalOffice createLocalOffice(LocalOffice localOffice) {
+    LocalOffice persistedLocalOffice = repository.findByTisId(localOffice.getTisId());
+
+    if (persistedLocalOffice != null) {
+      return updateLocalOffice(localOffice);
+    }
+
+    return repository.insert(localOffice);
+  }
+
+  @Override
+  public void deleteLocalOffice(String tisId) {
+    repository.deleteByTisId(tisId);
   }
 }

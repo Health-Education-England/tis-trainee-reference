@@ -27,4 +27,10 @@ import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 public interface LocalOfficeService {
 
   List<LocalOffice> getLocalOffice();
+
+  LocalOffice updateLocalOffice(LocalOffice localOffice);
+
+  LocalOffice createLocalOffice(LocalOffice localOffice);
+
+  void deleteLocalOffice(String tisId);
 }

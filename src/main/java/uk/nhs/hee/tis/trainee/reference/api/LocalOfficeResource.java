@@ -21,10 +21,16 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
+import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
@@ -32,19 +38,17 @@ import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class LocalOfficeResource {
 
-  private static final Logger log = LoggerFactory.getLogger(LocalOfficeResource.class);
+  private LocalOfficeService service;
+  private LocalOfficeMapper mapper;
 
-  private LocalOfficeService localOfficeService;
-  private LocalOfficeMapper localOfficeMapper;
-
-  public LocalOfficeResource(LocalOfficeService localOfficeService,
-      LocalOfficeMapper localOfficeMapper) {
-    this.localOfficeService = localOfficeService;
-    this.localOfficeMapper = localOfficeMapper;
+  public LocalOfficeResource(LocalOfficeService service, LocalOfficeMapper mapper) {
+    this.service = service;
+    this.mapper = mapper;
   }
 
   /**
@@ -55,7 +59,47 @@ public class LocalOfficeResource {
   @GetMapping("/local-office")
   public List<LocalOfficeDto> getLocalOffice() {
     log.trace("Get all LocalOffices");
-    List<LocalOffice> localOffices = localOfficeService.getLocalOffice();
-    return localOfficeMapper.toDtos(localOffices);
+    List<LocalOffice> localOffices = service.getLocalOffice();
+    return mapper.toDtos(localOffices);
+  }
+
+  /**
+   * Create a LocalOffice, or update an existing LocalOffice if the tisID matches.
+   *
+   * @param localOfficeDto The LocalOffice to create.
+   * @return The created (or updated) LocalOffice.
+   */
+  @PostMapping("/localOffice")
+  public ResponseEntity<LocalOfficeDto> createLocalOffice(
+      @RequestBody LocalOfficeDto localOfficeDto) {
+    LocalOffice localOffice = mapper.toEntity(localOfficeDto);
+    localOffice = service.createLocalOffice(localOffice);
+    return ResponseEntity.created(URI.create("/api/localOffice")).body(mapper.toDto(localOffice));
+  }
+
+  /**
+   * Update a LocalOffice with a matching tisId value, or creates a new LocalOffice if the ID was
+   * not found.
+   *
+   * @param localOfficeDto The LocalOffice details to update.
+   * @return The updated (or created) LocalOffice.
+   */
+  @PutMapping("/localOffice")
+  public ResponseEntity<LocalOfficeDto> updateLocalOffice(
+      @RequestBody LocalOfficeDto localOfficeDto) {
+    LocalOffice localOffice = mapper.toEntity(localOfficeDto);
+    localOffice = service.updateLocalOffice(localOffice);
+    return ResponseEntity.ok(mapper.toDto(localOffice));
+  }
+
+  /**
+   * Delete the LocalOffice with the given tisId.
+   *
+   * @param tisId The tisId of the LocalOffice to delete.
+   */
+  @DeleteMapping("/localOffice/{tisId}")
+  public ResponseEntity<Void> deleteLocalOffice(@PathVariable String tisId) {
+    service.deleteLocalOffice(tisId);
+    return ResponseEntity.noContent().build();
   }
 }
