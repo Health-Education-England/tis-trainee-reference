@@ -21,10 +21,16 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
+import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
@@ -32,18 +38,17 @@ import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class CollegeResource {
 
-  private static final Logger log = LoggerFactory.getLogger(CollegeResource.class);
+  private CollegeService service;
+  private CollegeMapper mapper;
 
-  private CollegeService collegeService;
-  private CollegeMapper collegeMapper;
-
-  public CollegeResource(CollegeService collegeService, CollegeMapper collegeMapper) {
-    this.collegeService = collegeService;
-    this.collegeMapper = collegeMapper;
+  public CollegeResource(CollegeService service, CollegeMapper mapper) {
+    this.service = service;
+    this.mapper = mapper;
   }
 
   /**
@@ -54,7 +59,45 @@ public class CollegeResource {
   @GetMapping("/college")
   public List<CollegeDto> getCollege() {
     log.trace("Get all College");
-    List<College> colleges = collegeService.getCollege();
-    return collegeMapper.toDtos(colleges);
+    List<College> colleges = service.getCollege();
+    return mapper.toDtos(colleges);
+  }
+
+  /**
+   * Create a College, or update an existing College if the tisID matches.
+   *
+   * @param collegeDto The College to create.
+   * @return The created (or updated) College.
+   */
+  @PostMapping("/college")
+  public ResponseEntity<CollegeDto> createCollege(@RequestBody CollegeDto collegeDto) {
+    College college = mapper.toEntity(collegeDto);
+    college = service.createCollege(college);
+    return ResponseEntity.created(URI.create("/api/college")).body(mapper.toDto(college));
+  }
+
+  /**
+   * Update a College with a matching tisId value, or creates a new College if the ID was not
+   * found.
+   *
+   * @param collegeDto The College details to update.
+   * @return The updated (or created) College.
+   */
+  @PutMapping("/college")
+  public ResponseEntity<CollegeDto> updateCollege(@RequestBody CollegeDto collegeDto) {
+    College college = mapper.toEntity(collegeDto);
+    college = service.updateCollege(college);
+    return ResponseEntity.ok(mapper.toDto(college));
+  }
+
+  /**
+   * Delete the College with the given tisId.
+   *
+   * @param tisId The tisId of the College to delete.
+   */
+  @DeleteMapping("/college/{tisId}")
+  public ResponseEntity<Void> deleteCollege(@PathVariable String tisId) {
+    service.deleteCollege(tisId);
+    return ResponseEntity.noContent().build();
   }
 }

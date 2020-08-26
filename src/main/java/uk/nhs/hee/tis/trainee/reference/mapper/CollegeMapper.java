@@ -23,6 +23,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 
@@ -36,4 +38,8 @@ public interface CollegeMapper {
   College toEntity(CollegeDto collegeDto);
 
   List<College> toEntities(List<CollegeDto> collegeDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  College update(@MappingTarget College target, College source);
 }
