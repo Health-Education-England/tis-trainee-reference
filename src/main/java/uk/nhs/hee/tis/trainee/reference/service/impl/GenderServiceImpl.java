@@ -23,6 +23,7 @@ package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
 import uk.nhs.hee.tis.trainee.reference.service.GenderService;
@@ -30,13 +31,43 @@ import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 @Service
 public class GenderServiceImpl implements GenderService {
 
-  GenderRepository genderRepository;
+  private final GenderRepository repository;
+  private final GenderMapper mapper;
 
-  public GenderServiceImpl(GenderRepository genderRepository) {
-    this.genderRepository = genderRepository;
+  public GenderServiceImpl(GenderRepository repository, GenderMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   public List<Gender> getGender() {
-    return genderRepository.findAll();
+    return repository.findAll();
+  }
+
+  @Override
+  public Gender updateGender(Gender gender) {
+    Gender persistedGender = repository.findByTisId(gender.getTisId());
+
+    if (persistedGender == null) {
+      return createGender(gender);
+    }
+
+    persistedGender = mapper.update(persistedGender, gender);
+    return repository.save(persistedGender);
+  }
+
+  @Override
+  public Gender createGender(Gender gender) {
+    Gender persistedGender = repository.findByTisId(gender.getTisId());
+
+    if (persistedGender != null) {
+      return updateGender(gender);
+    }
+
+    return repository.insert(gender);
+  }
+
+  @Override
+  public void deleteGender(String tisId) {
+    repository.deleteByTisId(tisId);
   }
 }

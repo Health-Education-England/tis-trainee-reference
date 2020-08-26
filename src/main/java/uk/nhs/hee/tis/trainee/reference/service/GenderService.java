@@ -27,4 +27,10 @@ import uk.nhs.hee.tis.trainee.reference.model.Gender;
 public interface GenderService {
 
   List<Gender> getGender();
+
+  Gender updateGender(Gender gender);
+
+  Gender createGender(Gender gender);
+
+  void deleteGender(String tisId);
 }

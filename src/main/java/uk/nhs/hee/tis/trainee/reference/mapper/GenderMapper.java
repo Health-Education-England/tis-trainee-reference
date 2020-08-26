@@ -23,6 +23,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 
@@ -36,4 +38,8 @@ public interface GenderMapper {
   Gender toEntity(GenderDto genderDto);
 
   List<Gender> toEntities(List<GenderDto> genderDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  Gender update(@MappingTarget Gender target, Gender source);
 }
