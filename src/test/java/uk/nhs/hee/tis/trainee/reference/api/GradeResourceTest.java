@@ -57,7 +57,7 @@ import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 @ContextConfiguration(classes = {GradeMapper.class})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(GradeResource.class)
-public class GradeResourceTest {
+class GradeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -86,7 +86,7 @@ public class GradeResourceTest {
    * Set up mocks before each test.
    */
   @BeforeEach
-  public void setup() {
+  void setup() {
     GradeMapper mapper = Mappers.getMapper(GradeMapper.class);
     GradeResource gradeResource = new GradeResource(gradeServiceMock, mapper);
     mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
@@ -98,7 +98,7 @@ public class GradeResourceTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);
     grade1.setTisId(DEFAULT_TIS_ID_1);

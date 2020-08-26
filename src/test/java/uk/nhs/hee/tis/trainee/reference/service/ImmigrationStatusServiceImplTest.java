@@ -20,6 +20,11 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -29,27 +34,30 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.ImmigrationStatusServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class ImmigrationStatusServiceImplTest {
+class ImmigrationStatusServiceImplTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
 
+  private static final String DEFAULT_TIS_ID_1 = "1";
+  private static final String DEFAULT_TIS_ID_2 = "2";
+
   private static final String DEFAULT_LABEL_1 = "EEA Resident";
   private static final String DEFAULT_LABEL_2 = "Settled";
 
-  @InjectMocks
-  private ImmigrationStatusServiceImpl immigrationStatusServiceImpl;
+  private ImmigrationStatusServiceImpl service;
 
   @Mock
-  private ImmigrationStatusRepository immigrationStatusRepositoryMock;
+  private ImmigrationStatusRepository repository;
 
   private ImmigrationStatus immigrationStatus1;
   private ImmigrationStatus immigrationStatus2;
@@ -58,29 +66,89 @@ public class ImmigrationStatusServiceImplTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
+    service = new ImmigrationStatusServiceImpl(repository,
+        Mappers.getMapper(ImmigrationStatusMapper.class));
+
     immigrationStatus1 = new ImmigrationStatus();
     immigrationStatus1.setId(DEFAULT_ID_1);
+    immigrationStatus1.setTisId(DEFAULT_TIS_ID_1);
     immigrationStatus1.setLabel(DEFAULT_LABEL_1);
 
     immigrationStatus2 = new ImmigrationStatus();
     immigrationStatus2.setId(DEFAULT_ID_2);
+    immigrationStatus2.setTisId(DEFAULT_TIS_ID_2);
     immigrationStatus2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  public void getAllImmigrationStatusShouldReturnAllImmigrationStatus() {
+  void getAllImmigrationStatusShouldReturnAllImmigrationStatus() {
     List<ImmigrationStatus> immigrationStatus = new ArrayList<>();
     immigrationStatus.add(immigrationStatus1);
     immigrationStatus.add(immigrationStatus2);
-    when(immigrationStatusRepositoryMock.findAll()).thenReturn(immigrationStatus);
+    when(repository.findAll()).thenReturn(immigrationStatus);
     List<ImmigrationStatus> allImmigrationStatus =
-        immigrationStatusServiceImpl.getImmigrationStatus();
+        service.getImmigrationStatus();
     MatcherAssert.assertThat(
         "The size of returned immigration status list do not match the expected value",
         allImmigrationStatus.size(), CoreMatchers.equalTo(immigrationStatus.size()));
     MatcherAssert.assertThat(
         "The returned immigration status list doesn't not contain the expected gender",
         allImmigrationStatus, CoreMatchers.hasItem(immigrationStatus1));
+  }
+
+  @Test
+  void createImmigrationStatusShouldCreateImmigrationStatusWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(ImmigrationStatus.class))).thenAnswer(returnsFirstArg());
+
+    ImmigrationStatus immigrationStatus = service.createImmigrationStatus(immigrationStatus2);
+
+    assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", immigrationStatus.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void createImmigrationStatusShouldUpdateImmigrationStatusWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(immigrationStatus1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    ImmigrationStatus immigrationStatus = service.createImmigrationStatus(immigrationStatus2);
+
+    assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", immigrationStatus.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateImmigrationStatusShouldCreateImmigrationStatusWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(ImmigrationStatus.class))).thenAnswer(returnsFirstArg());
+
+    ImmigrationStatus immigrationStatus = service.updateImmigrationStatus(immigrationStatus2);
+
+    assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", immigrationStatus.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateImmigrationStatusShouldUpdateImmigrationStatusWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(immigrationStatus1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    ImmigrationStatus immigrationStatus = service.updateImmigrationStatus(immigrationStatus2);
+
+    assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", immigrationStatus.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void shouldDeleteImmigrationStatussByTisId() {
+    service.deleteImmigrationStatus(DEFAULT_TIS_ID_1);
+
+    verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

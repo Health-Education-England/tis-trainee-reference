@@ -43,7 +43,7 @@ import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.GradeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class GradeServiceImplTest {
+class GradeServiceImplTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";

@@ -21,6 +21,11 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -30,15 +35,16 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.LocalOfficeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class LocalOfficeServiceImplTest {
+class LocalOfficeServiceImplTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -50,11 +56,10 @@ public class LocalOfficeServiceImplTest {
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
-  @InjectMocks
-  private LocalOfficeServiceImpl localOfficeServiceImpl;
+  private LocalOfficeServiceImpl service;
 
   @Mock
-  private LocalOfficeRepository localOfficeRepositoryMock;
+  private LocalOfficeRepository repository;
 
   private LocalOffice localOffice1;
   private LocalOffice localOffice2;
@@ -63,7 +68,9 @@ public class LocalOfficeServiceImplTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
+    service = new LocalOfficeServiceImpl(repository, Mappers.getMapper(LocalOfficeMapper.class));
+
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);
     localOffice1.setTisId(DEFAULT_TIS_ID_1);
@@ -76,17 +83,72 @@ public class LocalOfficeServiceImplTest {
   }
 
   @Test
-  public void getAllLocalOfficeShouldReturnAllLocalOffices() {
+  void getAllLocalOfficeShouldReturnAllLocalOffices() {
     List<LocalOffice> localOffices = new ArrayList<>();
     localOffices.add(localOffice1);
     localOffices.add(localOffice2);
-    when(localOfficeRepositoryMock.findAll()).thenReturn(localOffices);
-    List<LocalOffice> allLocalOffices = localOfficeServiceImpl.getLocalOffice();
+    when(repository.findAll()).thenReturn(localOffices);
+    List<LocalOffice> allLocalOffices = service.getLocalOffice();
     MatcherAssert
         .assertThat("The size of returned local office list do not match the expected value",
             allLocalOffices.size(), CoreMatchers.equalTo(localOffices.size()));
     MatcherAssert
         .assertThat("The returned local office list doesn't not contain the expected local office",
             allLocalOffices, CoreMatchers.hasItem(localOffice1));
+  }
+
+  @Test
+  void createLocalOfficeShouldCreateLocalOfficeWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(LocalOffice.class))).thenAnswer(returnsFirstArg());
+
+    LocalOffice localOffice = service.createLocalOffice(localOffice2);
+
+    assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void createLocalOfficeShouldUpdateLocalOfficeWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(localOffice1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    LocalOffice localOffice = service.createLocalOffice(localOffice2);
+
+    assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateLocalOfficeShouldCreateLocalOfficeWhenNewTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
+    when(repository.insert(any(LocalOffice.class))).thenAnswer(returnsFirstArg());
+
+    LocalOffice localOffice = service.updateLocalOffice(localOffice2);
+
+    assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void updateLocalOfficeShouldUpdateLocalOfficeWhenExistingTisId() {
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(localOffice1);
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+
+    LocalOffice localOffice = service.updateLocalOffice(localOffice2);
+
+    assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+  }
+
+  @Test
+  void shouldDeleteLocalOfficesByTisId() {
+    service.deleteLocalOffice(DEFAULT_TIS_ID_1);
+
+    verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

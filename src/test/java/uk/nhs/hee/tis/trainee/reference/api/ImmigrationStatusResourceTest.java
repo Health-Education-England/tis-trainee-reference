@@ -22,36 +22,47 @@ package uk.nhs.hee.tis.trainee.reference.api;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.ImmigrationStatusDto;
 import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
 
+@ContextConfiguration(classes = {ImmigrationStatusMapper.class})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = ImmigrationStatusResource.class)
-public class ImmigrationStatusResourceTest {
+@WebMvcTest(ImmigrationStatusResource.class)
+class ImmigrationStatusResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
+
+  private static final String DEFAULT_TIS_ID_1 = "1";
+  private static final String DEFAULT_TIS_ID_2 = "2";
 
   private static final String DEFAULT_LABEL_1 = "EEA Resident";
   private static final String DEFAULT_LABEL_2 = "Settled";
@@ -59,26 +70,25 @@ public class ImmigrationStatusResourceTest {
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
+  @Autowired
+  private ObjectMapper mapper;
+
   private MockMvc mockMvc;
 
   @MockBean
   private ImmigrationStatusService immigrationStatusServiceMock;
 
-  @MockBean
-  private ImmigrationStatusMapper immigrationStatusMapperMock;
-
   private ImmigrationStatus immigrationStatus1;
   private ImmigrationStatus immigrationStatus2;
-  private ImmigrationStatusDto immigrationStatusDto1;
-  private ImmigrationStatusDto immigrationStatusDto2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
-  public void setup() {
+  void setup() {
+    ImmigrationStatusMapper mapper = Mappers.getMapper(ImmigrationStatusMapper.class);
     ImmigrationStatusResource immigrationStatusResource =
-        new ImmigrationStatusResource(immigrationStatusServiceMock, immigrationStatusMapperMock);
+        new ImmigrationStatusResource(immigrationStatusServiceMock, mapper);
     mockMvc = MockMvcBuilders.standaloneSetup(immigrationStatusResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -88,22 +98,16 @@ public class ImmigrationStatusResourceTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     immigrationStatus1 = new ImmigrationStatus();
     immigrationStatus1.setId(DEFAULT_ID_1);
+    immigrationStatus1.setTisId(DEFAULT_TIS_ID_1);
     immigrationStatus1.setLabel(DEFAULT_LABEL_1);
 
     immigrationStatus2 = new ImmigrationStatus();
     immigrationStatus2.setId(DEFAULT_ID_2);
+    immigrationStatus2.setTisId(DEFAULT_TIS_ID_2);
     immigrationStatus2.setLabel(DEFAULT_LABEL_2);
-
-    immigrationStatusDto1 = new ImmigrationStatusDto();
-    immigrationStatusDto1.setId(DEFAULT_ID_1);
-    immigrationStatusDto1.setLabel(DEFAULT_LABEL_1);
-
-    immigrationStatusDto2 = new ImmigrationStatusDto();
-    immigrationStatusDto2.setId(DEFAULT_ID_2);
-    immigrationStatusDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -111,17 +115,53 @@ public class ImmigrationStatusResourceTest {
     List<ImmigrationStatus> immigrationStatus = new ArrayList<>();
     immigrationStatus.add(immigrationStatus1);
     immigrationStatus.add(immigrationStatus2);
-    List<ImmigrationStatusDto> immigrationStatusDtos = new ArrayList<>();
-    immigrationStatusDtos.add(immigrationStatusDto1);
-    immigrationStatusDtos.add(immigrationStatusDto2);
     when(immigrationStatusServiceMock.getImmigrationStatus()).thenReturn(immigrationStatus);
-    when(immigrationStatusMapperMock.toDtos(immigrationStatus)).thenReturn(immigrationStatusDtos);
     this.mockMvc.perform(get("/api/immigration-status")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(immigrationStatusDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(2)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  }
+
+  @Test
+  void testCreateImmigrationStatus() throws Exception {
+    when(immigrationStatusServiceMock.createImmigrationStatus(immigrationStatus1))
+        .thenReturn(immigrationStatus1);
+
+    mockMvc.perform(post("/api/immigrationStatus")
+        .content(mapper.writeValueAsBytes(immigrationStatus1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testUpdateImmigrationStatus() throws Exception {
+    when(immigrationStatusServiceMock.updateImmigrationStatus(immigrationStatus1))
+        .thenReturn(immigrationStatus1);
+
+    mockMvc.perform(put("/api/immigrationStatus")
+        .content(mapper.writeValueAsBytes(immigrationStatus1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testDeleteImmigrationStatus() throws Exception {
+    mockMvc.perform(delete("/api/immigrationStatus/{tisId}", DEFAULT_TIS_ID_1)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(immigrationStatusServiceMock).deleteImmigrationStatus(DEFAULT_TIS_ID_1);
   }
 }
