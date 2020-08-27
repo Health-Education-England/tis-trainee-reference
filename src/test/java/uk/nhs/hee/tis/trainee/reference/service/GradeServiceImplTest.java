@@ -37,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
@@ -85,7 +86,7 @@ class GradeServiceImplTest {
     List<Grade> grades = new ArrayList<>();
     grades.add(grade1);
     grades.add(grade2);
-    when(repository.findAll()).thenReturn(grades);
+    when(repository.findAll(Sort.by("label"))).thenReturn(grades);
     List<Grade> allGrades = service.getAllGrades();
     assertThat("The size of returned grade list do not match the expected value",
         allGrades.size(), CoreMatchers.equalTo(grades.size()));

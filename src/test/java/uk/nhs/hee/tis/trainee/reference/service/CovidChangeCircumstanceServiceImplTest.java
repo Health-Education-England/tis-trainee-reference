@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.dto.CovidChangeCircumstanceDto;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 import uk.nhs.hee.tis.trainee.reference.repository.CovidChangeCircumstanceRepository;
@@ -77,7 +78,7 @@ public class CovidChangeCircumstanceServiceImplTest {
     List<CovidChangeCircumstance> covidChangeCircs = new ArrayList<>();
     covidChangeCircs.add(covidChangeCirc1);
     covidChangeCircs.add(covidChangeCirc2);
-    when(covidChangeCircRepositoryMock.findAll()).thenReturn(covidChangeCircs);
+    when(covidChangeCircRepositoryMock.findAll(Sort.by("label"))).thenReturn(covidChangeCircs);
 
     List<CovidChangeCircumstance> allCovidChangeCircs = covidChangeCircServiceImpl
         .getCovidChangeCircumstances();

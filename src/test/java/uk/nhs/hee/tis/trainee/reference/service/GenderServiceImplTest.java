@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
@@ -86,7 +87,7 @@ class GenderServiceImplTest {
     List<Gender> genders = new ArrayList<>();
     genders.add(gender1);
     genders.add(gender2);
-    when(repository.findAll()).thenReturn(genders);
+    when(repository.findAll(Sort.by("label"))).thenReturn(genders);
     List<Gender> allGenders = service.getGender();
     MatcherAssert.assertThat("The size of returned gender list do not match the expected value",
         allGenders.size(), CoreMatchers.equalTo(genders.size()));

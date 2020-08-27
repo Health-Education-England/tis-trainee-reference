@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.Qualification;
 import uk.nhs.hee.tis.trainee.reference.repository.QualificationRepository;
@@ -37,6 +38,6 @@ public class QualificationServiceImpl implements QualificationService {
   }
 
   public List<Qualification> getQualification() {
-    return qualificationRepository.findAll();
+    return qualificationRepository.findAll(Sort.by("label"));
   }
 }

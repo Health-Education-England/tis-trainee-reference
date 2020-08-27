@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.dto.DeclarationTypeDto;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 import uk.nhs.hee.tis.trainee.reference.repository.DeclarationTypeRepository;
@@ -84,7 +85,7 @@ public class DeclarationTypeServiceImplTest {
     List<DeclarationType> declarationType = new ArrayList<>();
     declarationType.add(declarationType1);
     declarationType.add(declarationType2);
-    when(declarationTypeRepositoryMock.findAll()).thenReturn(declarationType);
+    when(declarationTypeRepositoryMock.findAll(Sort.by("label"))).thenReturn(declarationType);
     List<DeclarationType> allDeclarationType =
         declarationTypeServiceImpl.getDeclarationType();
     MatcherAssert.assertThat(

@@ -21,6 +21,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
@@ -36,6 +37,6 @@ public class CurriculumServiceImpl implements CurriculumService {
   }
 
   public List<Curriculum> getCurricula() {
-    return curriculumRepository.findAll();
+    return curriculumRepository.findAll(Sort.by("label"));
   }
 }

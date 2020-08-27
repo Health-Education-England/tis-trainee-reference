@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
@@ -87,7 +88,7 @@ class LocalOfficeServiceImplTest {
     List<LocalOffice> localOffices = new ArrayList<>();
     localOffices.add(localOffice1);
     localOffices.add(localOffice2);
-    when(repository.findAll()).thenReturn(localOffices);
+    when(repository.findAll(Sort.by("label"))).thenReturn(localOffices);
     List<LocalOffice> allLocalOffices = service.getLocalOffice();
     MatcherAssert
         .assertThat("The size of returned local office list do not match the expected value",

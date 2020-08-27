@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.model.Qualification;
 import uk.nhs.hee.tis.trainee.reference.repository.QualificationRepository;
 import uk.nhs.hee.tis.trainee.reference.service.impl.QualificationServiceImpl;
@@ -79,7 +80,7 @@ public class QualificationServiceImplTest {
     List<Qualification> qualifications = new ArrayList<>();
     qualifications.add(qualification1);
     qualifications.add(qualification2);
-    when(qualificationRepositoryMock.findAll()).thenReturn(qualifications);
+    when(qualificationRepositoryMock.findAll(Sort.by("label"))).thenReturn(qualifications);
     List<Qualification> allQualifications = qualificationServiceImpl.getQualification();
     MatcherAssert
         .assertThat("The size of returned qualification list do not match the expected value",
