@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
@@ -86,7 +87,7 @@ class CollegeServiceImplTest {
     List<College> colleges = new ArrayList<>();
     colleges.add(college1);
     colleges.add(college2);
-    when(repository.findAll()).thenReturn(colleges);
+    when(repository.findAll(Sort.by("label"))).thenReturn(colleges);
     List<College> allColleges = service.getCollege();
     MatcherAssert.assertThat("The size of returned college list do not match the expected value",
         allColleges.size(), CoreMatchers.equalTo(colleges.size()));

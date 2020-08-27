@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 import uk.nhs.hee.tis.trainee.reference.repository.CovidChangeCircumstanceRepository;
@@ -38,6 +39,6 @@ public class CovidChangeCircumstanceServiceImpl implements CovidChangeCircumstan
   }
 
   public List<CovidChangeCircumstance> getCovidChangeCircumstances() {
-    return changeCircumstanceRepository.findAll();
+    return changeCircumstanceRepository.findAll(Sort.by("label"));
   }
 }

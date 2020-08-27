@@ -21,6 +21,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
@@ -40,7 +41,7 @@ public class ImmigrationStatusServiceImpl implements ImmigrationStatusService {
   }
 
   public List<ImmigrationStatus> getImmigrationStatus() {
-    return repository.findAll();
+    return repository.findAll(Sort.by("label"));
   }
 
   @Override

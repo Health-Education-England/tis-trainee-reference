@@ -21,6 +21,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 import uk.nhs.hee.tis.trainee.reference.repository.DeclarationTypeRepository;
@@ -36,6 +37,6 @@ public class DeclarationTypeServiceImpl implements DeclarationTypeService {
   }
 
   public List<DeclarationType> getDeclarationType() {
-    return declarationTypeRepository.findAll();
+    return declarationTypeRepository.findAll(Sort.by("label"));
   }
 }

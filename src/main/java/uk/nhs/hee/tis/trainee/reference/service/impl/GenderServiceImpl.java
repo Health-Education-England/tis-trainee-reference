@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
@@ -40,7 +41,7 @@ public class GenderServiceImpl implements GenderService {
   }
 
   public List<Gender> getGender() {
-    return repository.findAll();
+    return repository.findAll(Sort.by("label"));
   }
 
   @Override

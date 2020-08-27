@@ -37,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
@@ -86,7 +87,7 @@ class ImmigrationStatusServiceImplTest {
     List<ImmigrationStatus> immigrationStatus = new ArrayList<>();
     immigrationStatus.add(immigrationStatus1);
     immigrationStatus.add(immigrationStatus2);
-    when(repository.findAll()).thenReturn(immigrationStatus);
+    when(repository.findAll(Sort.by("label"))).thenReturn(immigrationStatus);
     List<ImmigrationStatus> allImmigrationStatus =
         service.getImmigrationStatus();
     MatcherAssert.assertThat(
