@@ -69,7 +69,7 @@ public class ImmigrationStatusResource {
    * @param immigrationStatusDto The ImmigrationStatus to create.
    * @return The created (or updated) ImmigrationStatus.
    */
-  @PostMapping("/immigrationStatus")
+  @PostMapping("/immigration-status")
   public ResponseEntity<ImmigrationStatusDto> createImmigrationStatus(
       @RequestBody ImmigrationStatusDto immigrationStatusDto) {
     ImmigrationStatus immigrationStatus = mapper.toEntity(immigrationStatusDto);
@@ -85,7 +85,7 @@ public class ImmigrationStatusResource {
    * @param immigrationStatusDto The ImmigrationStatus details to update.
    * @return The updated (or created) ImmigrationStatus.
    */
-  @PutMapping("/immigrationStatus")
+  @PutMapping("/immigration-status")
   public ResponseEntity<ImmigrationStatusDto> updateImmigrationStatus(
       @RequestBody ImmigrationStatusDto immigrationStatusDto) {
     ImmigrationStatus immigrationStatus = mapper.toEntity(immigrationStatusDto);
@@ -98,7 +98,7 @@ public class ImmigrationStatusResource {
    *
    * @param tisId The tisId of the ImmigrationStatus to delete.
    */
-  @DeleteMapping("/immigrationStatus/{tisId}")
+  @DeleteMapping("/immigration-status/{tisId}")
   public ResponseEntity<Void> deleteImmigrationStatus(@PathVariable String tisId) {
     service.deleteImmigrationStatus(tisId);
     return ResponseEntity.noContent().build();

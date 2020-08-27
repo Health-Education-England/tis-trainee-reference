@@ -130,7 +130,7 @@ class ImmigrationStatusResourceTest {
     when(immigrationStatusServiceMock.createImmigrationStatus(immigrationStatus1))
         .thenReturn(immigrationStatus1);
 
-    mockMvc.perform(post("/api/immigrationStatus")
+    mockMvc.perform(post("/api/immigration-status")
         .content(mapper.writeValueAsBytes(immigrationStatus1))
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
@@ -145,7 +145,7 @@ class ImmigrationStatusResourceTest {
     when(immigrationStatusServiceMock.updateImmigrationStatus(immigrationStatus1))
         .thenReturn(immigrationStatus1);
 
-    mockMvc.perform(put("/api/immigrationStatus")
+    mockMvc.perform(put("/api/immigration-status")
         .content(mapper.writeValueAsBytes(immigrationStatus1))
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -157,7 +157,7 @@ class ImmigrationStatusResourceTest {
 
   @Test
   void testDeleteImmigrationStatus() throws Exception {
-    mockMvc.perform(delete("/api/immigrationStatus/{tisId}", DEFAULT_TIS_ID_1)
+    mockMvc.perform(delete("/api/immigration-status/{tisId}", DEFAULT_TIS_ID_1)
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());

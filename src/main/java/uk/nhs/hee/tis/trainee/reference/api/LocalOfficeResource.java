@@ -69,7 +69,7 @@ public class LocalOfficeResource {
    * @param localOfficeDto The LocalOffice to create.
    * @return The created (or updated) LocalOffice.
    */
-  @PostMapping("/localOffice")
+  @PostMapping("/local-office")
   public ResponseEntity<LocalOfficeDto> createLocalOffice(
       @RequestBody LocalOfficeDto localOfficeDto) {
     LocalOffice localOffice = mapper.toEntity(localOfficeDto);
@@ -84,7 +84,7 @@ public class LocalOfficeResource {
    * @param localOfficeDto The LocalOffice details to update.
    * @return The updated (or created) LocalOffice.
    */
-  @PutMapping("/localOffice")
+  @PutMapping("/local-office")
   public ResponseEntity<LocalOfficeDto> updateLocalOffice(
       @RequestBody LocalOfficeDto localOfficeDto) {
     LocalOffice localOffice = mapper.toEntity(localOfficeDto);
@@ -97,7 +97,7 @@ public class LocalOfficeResource {
    *
    * @param tisId The tisId of the LocalOffice to delete.
    */
-  @DeleteMapping("/localOffice/{tisId}")
+  @DeleteMapping("/local-office/{tisId}")
   public ResponseEntity<Void> deleteLocalOffice(@PathVariable String tisId) {
     service.deleteLocalOffice(tisId);
     return ResponseEntity.noContent().build();
