@@ -27,4 +27,7 @@ import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 @Repository
 public interface ImmigrationStatusRepository extends MongoRepository<ImmigrationStatus, String> {
 
+  void deleteByTisId(String tisId);
+
+  ImmigrationStatus findByTisId(String tisId);
 }

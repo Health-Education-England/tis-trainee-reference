@@ -28,4 +28,7 @@ import uk.nhs.hee.tis.trainee.reference.model.Grade;
 @Repository
 public interface GradeRepository extends MongoRepository<Grade, String> {
 
+  void deleteByTisId(String tisId);
+
+  Grade findByTisId(String tisId);
 }

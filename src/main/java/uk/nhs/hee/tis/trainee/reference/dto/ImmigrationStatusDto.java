@@ -29,5 +29,6 @@ import lombok.Data;
 public class ImmigrationStatusDto {
 
   private String id;
+  private String tisId;
   private String label;
 }

@@ -27,4 +27,10 @@ import uk.nhs.hee.tis.trainee.reference.model.College;
 public interface CollegeService {
 
   List<College> getCollege();
+
+  College updateCollege(College college);
+
+  College createCollege(College college);
+
+  void deleteCollege(String tisId);
 }

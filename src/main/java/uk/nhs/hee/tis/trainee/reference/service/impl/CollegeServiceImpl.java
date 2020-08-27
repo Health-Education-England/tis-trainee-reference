@@ -23,6 +23,7 @@ package uk.nhs.hee.tis.trainee.reference.service.impl;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
@@ -30,13 +31,43 @@ import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 @Service
 public class CollegeServiceImpl implements CollegeService {
 
-  CollegeRepository collegeRepository;
+  private final CollegeRepository repository;
+  private final CollegeMapper mapper;
 
-  public CollegeServiceImpl(CollegeRepository collegeRepository) {
-    this.collegeRepository = collegeRepository;
+  public CollegeServiceImpl(CollegeRepository repository, CollegeMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   public List<College> getCollege() {
-    return collegeRepository.findAll();
+    return repository.findAll();
+  }
+
+  @Override
+  public College updateCollege(College college) {
+    College persistedCollege = repository.findByTisId(college.getTisId());
+
+    if (persistedCollege == null) {
+      return createCollege(college);
+    }
+
+    persistedCollege = mapper.update(persistedCollege, college);
+    return repository.save(persistedCollege);
+  }
+
+  @Override
+  public College createCollege(College college) {
+    College persistedCollege = repository.findByTisId(college.getTisId());
+
+    if (persistedCollege != null) {
+      return updateCollege(college);
+    }
+
+    return repository.insert(college);
+  }
+
+  @Override
+  public void deleteCollege(String tisId) {
+    repository.deleteByTisId(tisId);
   }
 }

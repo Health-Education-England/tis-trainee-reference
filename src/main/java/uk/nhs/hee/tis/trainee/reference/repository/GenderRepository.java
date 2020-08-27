@@ -28,4 +28,7 @@ import uk.nhs.hee.tis.trainee.reference.model.Gender;
 @Repository
 public interface GenderRepository extends MongoRepository<Gender, String> {
 
+  void deleteByTisId(String tisId);
+
+  Gender findByTisId(String tisId);
 }

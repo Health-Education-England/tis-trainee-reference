@@ -30,6 +30,6 @@ public class ImmigrationStatus {
 
   @Id
   private String id;
-
+  private String tisId;
   private String label;
 }

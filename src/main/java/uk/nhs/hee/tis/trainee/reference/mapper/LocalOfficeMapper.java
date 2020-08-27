@@ -23,6 +23,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 
@@ -36,4 +38,8 @@ public interface LocalOfficeMapper {
   LocalOffice toEntity(LocalOfficeDto localOfficeDto);
 
   List<LocalOffice> toEntities(List<LocalOfficeDto> localOfficeDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  LocalOffice update(@MappingTarget LocalOffice target, LocalOffice source);
 }

@@ -27,4 +27,10 @@ import uk.nhs.hee.tis.trainee.reference.model.Grade;
 public interface GradeService {
 
   List<Grade> getAllGrades();
+
+  Grade updateGrade(Grade grade);
+
+  Grade createGrade(Grade grade);
+
+  void deleteGrade(String tisId);
 }

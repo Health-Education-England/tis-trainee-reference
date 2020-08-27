@@ -21,10 +21,17 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
+import java.net.URI;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
@@ -38,13 +45,12 @@ public class GradeResource {
 
   private static final Logger log = LoggerFactory.getLogger(GradeResource.class);
 
-  private GradeService gradeService;
-  private GradeMapper gradeMapper;
+  private final GradeService service;
+  private final GradeMapper mapper;
 
-  public GradeResource(GradeService gradeService,
-      GradeMapper gradeMapper) {
-    this.gradeService = gradeService;
-    this.gradeMapper = gradeMapper;
+  public GradeResource(GradeService service, GradeMapper mapper) {
+    this.service = service;
+    this.mapper = mapper;
   }
 
   /**
@@ -53,9 +59,46 @@ public class GradeResource {
    * @return list of Grades.
    */
   @GetMapping("/grade")
-  public List<GradeDto> getGender() {
+  public ResponseEntity<List<GradeDto>> getGrades() {
     log.trace("Get all Grades");
-    List<Grade> grades = gradeService.getAllGrades();
-    return gradeMapper.toDtos(grades);
+    List<Grade> grades = service.getAllGrades();
+    return ResponseEntity.ok(mapper.toDtos(grades));
+  }
+
+  /**
+   * Create a Grade, or update an existing Grade if the tisID matches.
+   *
+   * @param gradeDto The Grade to create.
+   * @return The created (or updated) Grade.
+   */
+  @PostMapping("/grade")
+  public ResponseEntity<GradeDto> createGrade(@RequestBody GradeDto gradeDto) {
+    Grade grade = mapper.toEntity(gradeDto);
+    grade = service.createGrade(grade);
+    return ResponseEntity.created(URI.create("/api/grade")).body(mapper.toDto(grade));
+  }
+
+  /**
+   * Update a Grade with a matching tisId value, or creates a new Grade if the ID was not found.
+   *
+   * @param gradeDto The Grade details to update.
+   * @return The updated (or created) Grade.
+   */
+  @PutMapping("/grade")
+  public ResponseEntity<GradeDto> updateGrade(@RequestBody GradeDto gradeDto) {
+    Grade grade = mapper.toEntity(gradeDto);
+    grade = service.updateGrade(grade);
+    return ResponseEntity.ok(mapper.toDto(grade));
+  }
+
+  /**
+   * Delete the Grade with the given tisId.
+   *
+   * @param tisId The tisId of the Grade to delete.
+   */
+  @DeleteMapping("/grade/{tisId}")
+  public ResponseEntity<Void> deleteGrade(@PathVariable String tisId) {
+    service.deleteGrade(tisId);
+    return ResponseEntity.noContent().build();
   }
 }

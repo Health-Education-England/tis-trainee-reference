@@ -23,33 +23,41 @@ package uk.nhs.hee.tis.trainee.reference.api;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
+@ContextConfiguration(classes = {CollegeMapper.class})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = CollegeResource.class)
-public class CollegeResourceTest {
+@WebMvcTest(CollegeResource.class)
+class CollegeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -64,25 +72,24 @@ public class CollegeResourceTest {
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
+  @Autowired
+  private ObjectMapper mapper;
+
   private MockMvc mockMvc;
 
   @MockBean
   private CollegeService collegeServiceMock;
 
-  @MockBean
-  private CollegeMapper collageMapperMock;
-
   private College college1;
   private College college2;
-  private CollegeDto collegeDto1;
-  private CollegeDto collegeDto2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
-  public void setup() {
-    CollegeResource collegeResource = new CollegeResource(collegeServiceMock, collageMapperMock);
+  void setup() {
+    CollegeMapper mapper = Mappers.getMapper(CollegeMapper.class);
+    CollegeResource collegeResource = new CollegeResource(collegeServiceMock, mapper);
     mockMvc = MockMvcBuilders.standaloneSetup(collegeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -92,7 +99,7 @@ public class CollegeResourceTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     college1 = new College();
     college1.setId(DEFAULT_ID_1);
     college1.setTisId(DEFAULT_TIS_ID_1);
@@ -102,16 +109,6 @@ public class CollegeResourceTest {
     college2.setId(DEFAULT_ID_2);
     college2.setTisId(DEFAULT_TIS_ID_2);
     college2.setLabel(DEFAULT_LABEL_2);
-
-    collegeDto1 = new CollegeDto();
-    collegeDto1.setId(DEFAULT_ID_1);
-    collegeDto1.setTisId(DEFAULT_TIS_ID_1);
-    collegeDto1.setLabel(DEFAULT_LABEL_1);
-
-    collegeDto2 = new CollegeDto();
-    collegeDto2.setId(DEFAULT_ID_2);
-    collegeDto2.setTisId(DEFAULT_TIS_ID_2);
-    collegeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -119,17 +116,51 @@ public class CollegeResourceTest {
     List<College> colleges = new ArrayList<>();
     colleges.add(college1);
     colleges.add(college2);
-    List<CollegeDto> collegeDtos = new ArrayList<>();
-    collegeDtos.add(collegeDto1);
-    collegeDtos.add(collegeDto2);
     when(collegeServiceMock.getCollege()).thenReturn(colleges);
-    when(collageMapperMock.toDtos(colleges)).thenReturn(collegeDtos);
     this.mockMvc.perform(get("/api/college")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(collegeDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(2)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  }
+
+  @Test
+  void testCreateCollege() throws Exception {
+    when(collegeServiceMock.createCollege(college1)).thenReturn(college1);
+
+    mockMvc.perform(post("/api/college")
+        .content(mapper.writeValueAsBytes(college1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testUpdateCollege() throws Exception {
+    when(collegeServiceMock.updateCollege(college1)).thenReturn(college1);
+
+    mockMvc.perform(put("/api/college")
+        .content(mapper.writeValueAsBytes(college1))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void testDeleteCollege() throws Exception {
+    mockMvc.perform(delete("/api/college/{tisId}", DEFAULT_TIS_ID_1)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(collegeServiceMock).deleteCollege(DEFAULT_TIS_ID_1);
   }
 }
