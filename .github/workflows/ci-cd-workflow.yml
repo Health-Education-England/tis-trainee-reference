@@ -179,7 +179,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: .aws/task-definition.json
+          task-definition: .aws/task-definition-preprod.json
           container-name: ${{ github.event.repository.name }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }}
 
