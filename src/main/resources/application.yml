@@ -1,3 +1,19 @@
+cloud:
+  aws:
+    stack:
+      auto: ${ENABLE_CLOUDWATCH_METRICS:false}
+    region:
+      auto: false
+      static: eu-west-2
+
+management:
+  metrics:
+    export:
+      cloudwatch:
+        enabled: ${ENABLE_CLOUDWATCH_METRICS:false}
+        namespace: tis-trainee-reference
+        batch-size: 20
+
 server:
   port: 8205
   servlet:
