@@ -1,11 +1,10 @@
 cloud:
   aws:
-    credentials:
-      use-default-aws-credentials-chain: true
     region:
-      use-default-aws-region-chain: true
+      auto: false
+      static: ${AWS_REGION:eu-west-2}
     stack:
-      auto: ${ENABLE_CLOUDWATCH_METRICS:false}
+      auto: false
 
 management:
   metrics:
