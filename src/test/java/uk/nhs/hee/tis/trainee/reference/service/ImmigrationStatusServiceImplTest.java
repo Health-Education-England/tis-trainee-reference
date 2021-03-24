@@ -41,7 +41,6 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.ImmigrationStatusServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ImmigrationStatusServiceImplTest {
@@ -55,7 +54,7 @@ class ImmigrationStatusServiceImplTest {
   private static final String DEFAULT_LABEL_1 = "EEA Resident";
   private static final String DEFAULT_LABEL_2 = "Settled";
 
-  private ImmigrationStatusServiceImpl service;
+  private ImmigrationStatusService service;
 
   @Mock
   private ImmigrationStatusRepository repository;
@@ -68,7 +67,7 @@ class ImmigrationStatusServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new ImmigrationStatusServiceImpl(repository,
+    service = new ImmigrationStatusService(repository,
         Mappers.getMapper(ImmigrationStatusMapper.class));
 
     immigrationStatus1 = new ImmigrationStatus();
@@ -88,8 +87,7 @@ class ImmigrationStatusServiceImplTest {
     immigrationStatus.add(immigrationStatus1);
     immigrationStatus.add(immigrationStatus2);
     when(repository.findAll(Sort.by("label"))).thenReturn(immigrationStatus);
-    List<ImmigrationStatus> allImmigrationStatus =
-        service.getImmigrationStatus();
+    List<ImmigrationStatus> allImmigrationStatus = service.get();
     MatcherAssert.assertThat(
         "The size of returned immigration status list do not match the expected value",
         allImmigrationStatus.size(), CoreMatchers.equalTo(immigrationStatus.size()));
@@ -103,7 +101,7 @@ class ImmigrationStatusServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(ImmigrationStatus.class))).thenAnswer(returnsFirstArg());
 
-    ImmigrationStatus immigrationStatus = service.createImmigrationStatus(immigrationStatus2);
+    ImmigrationStatus immigrationStatus = service.create(immigrationStatus2);
 
     assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -115,7 +113,7 @@ class ImmigrationStatusServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(immigrationStatus1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    ImmigrationStatus immigrationStatus = service.createImmigrationStatus(immigrationStatus2);
+    ImmigrationStatus immigrationStatus = service.create(immigrationStatus2);
 
     assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -127,7 +125,7 @@ class ImmigrationStatusServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(ImmigrationStatus.class))).thenAnswer(returnsFirstArg());
 
-    ImmigrationStatus immigrationStatus = service.updateImmigrationStatus(immigrationStatus2);
+    ImmigrationStatus immigrationStatus = service.update(immigrationStatus2);
 
     assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -139,7 +137,7 @@ class ImmigrationStatusServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(immigrationStatus1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    ImmigrationStatus immigrationStatus = service.updateImmigrationStatus(immigrationStatus2);
+    ImmigrationStatus immigrationStatus = service.update(immigrationStatus2);
 
     assertThat("Unexpected id.", immigrationStatus.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", immigrationStatus.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -148,7 +146,7 @@ class ImmigrationStatusServiceImplTest {
 
   @Test
   void shouldDeleteImmigrationStatussByTisId() {
-    service.deleteImmigrationStatus(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }

@@ -20,16 +20,35 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
+import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
 
-public interface ImmigrationStatusService {
+@Service
+public class ImmigrationStatusService extends AbstractReferenceService<ImmigrationStatus> {
 
-  List<ImmigrationStatus> getImmigrationStatus();
+  private ImmigrationStatusMapper mapper;
 
-  ImmigrationStatus updateImmigrationStatus(ImmigrationStatus immigrationStatus);
+  protected ImmigrationStatusService(ImmigrationStatusRepository repository,
+      ImmigrationStatusMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  ImmigrationStatus createImmigrationStatus(ImmigrationStatus immigrationStatus);
+  @Override
+  protected String getTisId(ImmigrationStatus entity) {
+    return entity.getTisId();
+  }
 
-  void deleteImmigrationStatus(String tisId);
+  @Override
+  protected Sort getSort() {
+    return Sort.by("label");
+  }
+
+  @Override
+  protected void copyAttributes(ImmigrationStatus target, ImmigrationStatus source) {
+    mapper.update(target, source);
+  }
 }
