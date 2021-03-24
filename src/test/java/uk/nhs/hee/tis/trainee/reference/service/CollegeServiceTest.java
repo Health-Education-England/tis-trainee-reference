@@ -42,10 +42,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.CollegeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class CollegeServiceImplTest {
+class CollegeServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -56,7 +55,7 @@ class CollegeServiceImplTest {
   private static final String DEFAULT_LABEL_1 = "Faculty Of Dental Surgery";
   private static final String DEFAULT_LABEL_2 = "Faculty of Intensive Care Medicine";
 
-  private CollegeServiceImpl service;
+  private CollegeService service;
 
   @Mock
   private CollegeRepository repository;
@@ -69,7 +68,7 @@ class CollegeServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new CollegeServiceImpl(repository, Mappers.getMapper(CollegeMapper.class));
+    service = new CollegeService(repository, Mappers.getMapper(CollegeMapper.class));
 
     college1 = new College();
     college1.setId(DEFAULT_ID_1);
@@ -88,7 +87,7 @@ class CollegeServiceImplTest {
     colleges.add(college1);
     colleges.add(college2);
     when(repository.findAll(Sort.by("label"))).thenReturn(colleges);
-    List<College> allColleges = service.getCollege();
+    List<College> allColleges = service.get();
     MatcherAssert.assertThat("The size of returned college list do not match the expected value",
         allColleges.size(), CoreMatchers.equalTo(colleges.size()));
     MatcherAssert.assertThat("The returned college list doesn't not contain the expected college",
@@ -100,7 +99,7 @@ class CollegeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(College.class))).thenAnswer(returnsFirstArg());
 
-    College college = service.createCollege(college2);
+    College college = service.create(college2);
 
     assertThat("Unexpected id.", college.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", college.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -112,7 +111,7 @@ class CollegeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(college1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    College college = service.createCollege(college2);
+    College college = service.create(college2);
 
     assertThat("Unexpected id.", college.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", college.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -124,7 +123,7 @@ class CollegeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(College.class))).thenAnswer(returnsFirstArg());
 
-    College college = service.updateCollege(college2);
+    College college = service.update(college2);
 
     assertThat("Unexpected id.", college.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", college.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -136,7 +135,7 @@ class CollegeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(college1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    College college = service.updateCollege(college2);
+    College college = service.update(college2);
 
     assertThat("Unexpected id.", college.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", college.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -145,7 +144,7 @@ class CollegeServiceImplTest {
 
   @Test
   void shouldDeleteCollegesByTisId() {
-    service.deleteCollege(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }
