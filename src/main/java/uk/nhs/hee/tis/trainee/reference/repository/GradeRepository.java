@@ -21,14 +21,10 @@
 
 package uk.nhs.hee.tis.trainee.reference.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 
 @Repository
-public interface GradeRepository extends MongoRepository<Grade, String> {
+public interface GradeRepository extends ReferenceRepository<Grade> {
 
-  void deleteByTisId(String tisId);
-
-  Grade findByTisId(String tisId);
 }

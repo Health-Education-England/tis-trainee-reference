@@ -21,14 +21,10 @@
 
 package uk.nhs.hee.tis.trainee.reference.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
 
 @Repository
-public interface DbcRepository extends MongoRepository<Dbc, String> {
+public interface DbcRepository extends ReferenceRepository<Dbc> {
 
-  void deleteByTisId(String tisId);
-
-  Dbc findByTisId(String tisId);
 }
