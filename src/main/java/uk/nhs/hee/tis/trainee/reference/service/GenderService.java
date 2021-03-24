@@ -21,16 +21,34 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
+import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
 
-public interface GenderService {
+@Service
+public class GenderService extends AbstractReferenceService<Gender> {
 
-  List<Gender> getGender();
+  private GenderMapper mapper;
 
-  Gender updateGender(Gender gender);
+  protected GenderService(GenderRepository repository, GenderMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  Gender createGender(Gender gender);
+  @Override
+  protected String getTisId(Gender entity) {
+    return entity.getTisId();
+  }
 
-  void deleteGender(String tisId);
+  @Override
+  protected Sort getSort() {
+    return Sort.by("label");
+  }
+
+  @Override
+  protected void copyAttributes(Gender target, Gender source) {
+    mapper.update(target, source);
+  }
 }

@@ -61,7 +61,7 @@ public class GenderResource {
   @GetMapping("/gender")
   public List<GenderDto> getGender() {
     log.trace("Get all Genders");
-    List<Gender> genders = service.getGender();
+    List<Gender> genders = service.get();
     return mapper.toDtos(genders);
   }
 
@@ -74,7 +74,7 @@ public class GenderResource {
   @PostMapping("/gender")
   public ResponseEntity<GenderDto> createGender(@RequestBody GenderDto genderDto) {
     Gender gender = mapper.toEntity(genderDto);
-    gender = service.createGender(gender);
+    gender = service.create(gender);
     return ResponseEntity.created(URI.create("/api/gender")).body(mapper.toDto(gender));
   }
 
@@ -87,7 +87,7 @@ public class GenderResource {
   @PutMapping("/gender")
   public ResponseEntity<GenderDto> updateGender(@RequestBody GenderDto genderDto) {
     Gender gender = mapper.toEntity(genderDto);
-    gender = service.updateGender(gender);
+    gender = service.update(gender);
     return ResponseEntity.ok(mapper.toDto(gender));
   }
 
@@ -98,7 +98,7 @@ public class GenderResource {
    */
   @DeleteMapping("/gender/{tisId}")
   public ResponseEntity<Void> deleteGender(@PathVariable String tisId) {
-    service.deleteGender(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }
