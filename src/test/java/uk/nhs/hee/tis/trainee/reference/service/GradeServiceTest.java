@@ -41,10 +41,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.GradeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class GradeServiceImplTest {
+class GradeServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -55,7 +54,7 @@ class GradeServiceImplTest {
   private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
   private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
 
-  private GradeServiceImpl service;
+  private GradeService service;
 
   @Mock
   private GradeRepository repository;
@@ -68,7 +67,7 @@ class GradeServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new GradeServiceImpl(repository, Mappers.getMapper(GradeMapper.class));
+    service = new GradeService(repository, Mappers.getMapper(GradeMapper.class));
 
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);
@@ -87,7 +86,7 @@ class GradeServiceImplTest {
     grades.add(grade1);
     grades.add(grade2);
     when(repository.findAll(Sort.by("label"))).thenReturn(grades);
-    List<Grade> allGrades = service.getAllGrades();
+    List<Grade> allGrades = service.get();
     assertThat("The size of returned grade list do not match the expected value",
         allGrades.size(), CoreMatchers.equalTo(grades.size()));
     assertThat("The returned grade list doesn't not contain the expected grade",
@@ -99,7 +98,7 @@ class GradeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Grade.class))).thenAnswer(returnsFirstArg());
 
-    Grade grade = service.createGrade(grade2);
+    Grade grade = service.create(grade2);
 
     assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -111,7 +110,7 @@ class GradeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(grade1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Grade grade = service.createGrade(grade2);
+    Grade grade = service.create(grade2);
 
     assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -123,7 +122,7 @@ class GradeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Grade.class))).thenAnswer(returnsFirstArg());
 
-    Grade grade = service.updateGrade(grade2);
+    Grade grade = service.update(grade2);
 
     assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -135,7 +134,7 @@ class GradeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(grade1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Grade grade = service.updateGrade(grade2);
+    Grade grade = service.update(grade2);
 
     assertThat("Unexpected id.", grade.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", grade.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -144,7 +143,7 @@ class GradeServiceImplTest {
 
   @Test
   void shouldDeleteGradesByTisId() {
-    service.deleteGrade(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }

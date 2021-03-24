@@ -61,7 +61,7 @@ public class GradeResource {
   @GetMapping("/grade")
   public ResponseEntity<List<GradeDto>> getGrades() {
     log.trace("Get all Grades");
-    List<Grade> grades = service.getAllGrades();
+    List<Grade> grades = service.get();
     return ResponseEntity.ok(mapper.toDtos(grades));
   }
 
@@ -74,7 +74,7 @@ public class GradeResource {
   @PostMapping("/grade")
   public ResponseEntity<GradeDto> createGrade(@RequestBody GradeDto gradeDto) {
     Grade grade = mapper.toEntity(gradeDto);
-    grade = service.createGrade(grade);
+    grade = service.create(grade);
     return ResponseEntity.created(URI.create("/api/grade")).body(mapper.toDto(grade));
   }
 
@@ -87,7 +87,7 @@ public class GradeResource {
   @PutMapping("/grade")
   public ResponseEntity<GradeDto> updateGrade(@RequestBody GradeDto gradeDto) {
     Grade grade = mapper.toEntity(gradeDto);
-    grade = service.updateGrade(grade);
+    grade = service.update(grade);
     return ResponseEntity.ok(mapper.toDto(grade));
   }
 
@@ -98,7 +98,7 @@ public class GradeResource {
    */
   @DeleteMapping("/grade/{tisId}")
   public ResponseEntity<Void> deleteGrade(@PathVariable String tisId) {
-    service.deleteGrade(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }
