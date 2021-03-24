@@ -117,7 +117,7 @@ class DbcResourceTest {
     List<Dbc> dbcs = new ArrayList<>();
     dbcs.add(dbc1);
     dbcs.add(dbc2);
-    when(dbcServiceMock.getDbcs()).thenReturn(dbcs);
+    when(dbcServiceMock.get()).thenReturn(dbcs);
     this.mockMvc.perform(get("/api/dbc")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -129,7 +129,7 @@ class DbcResourceTest {
 
   @Test
   void testCreateDbc() throws Exception {
-    when(dbcServiceMock.createDbc(dbc1)).thenReturn(dbc1);
+    when(dbcServiceMock.create(dbc1)).thenReturn(dbc1);
 
     mockMvc.perform(post("/api/dbc")
         .content(mapper.writeValueAsBytes(dbc1))
@@ -143,7 +143,7 @@ class DbcResourceTest {
 
   @Test
   void testUpdateDbc() throws Exception {
-    when(dbcServiceMock.updateDbc(dbc1)).thenReturn(dbc1);
+    when(dbcServiceMock.update(dbc1)).thenReturn(dbc1);
 
     mockMvc.perform(put("/api/dbc")
         .content(mapper.writeValueAsBytes(dbc1))
@@ -162,6 +162,6 @@ class DbcResourceTest {
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(dbcServiceMock).deleteDbc(DEFAULT_TIS_ID_1);
+    verify(dbcServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

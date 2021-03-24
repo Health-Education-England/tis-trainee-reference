@@ -21,16 +21,34 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
+import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
 
-public interface DbcService {
+@Service
+public class DbcService extends AbstractReferenceService<Dbc> {
 
-  List<Dbc> getDbcs();
+  private DbcMapper mapper;
 
-  Dbc updateDbc(Dbc dbc);
+  protected DbcService(DbcRepository repository, DbcMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  Dbc createDbc(Dbc dbc);
+  @Override
+  protected String getTisId(Dbc entity) {
+    return entity.getTisId();
+  }
 
-  void deleteDbc(String tisId);
+  @Override
+  protected Sort getSort() {
+    return Sort.by("name");
+  }
+
+  @Override
+  protected void copyAttributes(Dbc target, Dbc source) {
+    mapper.update(target, source);
+  }
 }

@@ -59,7 +59,7 @@ public class DbcResource {
   @GetMapping
   public List<DbcDto> getDbc() {
     log.trace("Get all Dbcs");
-    List<Dbc> dbcs = service.getDbcs();
+    List<Dbc> dbcs = service.get();
     return mapper.toDtos(dbcs);
   }
 
@@ -73,7 +73,7 @@ public class DbcResource {
   public ResponseEntity<DbcDto> createDbc(
       @RequestBody DbcDto dbcDto) {
     Dbc dbc = mapper.toEntity(dbcDto);
-    dbc = service.createDbc(dbc);
+    dbc = service.create(dbc);
     return ResponseEntity.created(URI.create("/api/dbc")).body(mapper.toDto(dbc));
   }
 
@@ -87,7 +87,7 @@ public class DbcResource {
   public ResponseEntity<DbcDto> updateDbc(
       @RequestBody DbcDto dbcDto) {
     Dbc dbc = mapper.toEntity(dbcDto);
-    dbc = service.updateDbc(dbc);
+    dbc = service.update(dbc);
     return ResponseEntity.ok(mapper.toDto(dbc));
   }
 
@@ -98,7 +98,7 @@ public class DbcResource {
    */
   @DeleteMapping("/{tisId}")
   public ResponseEntity<Void> deleteDbc(@PathVariable String tisId) {
-    service.deleteDbc(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }

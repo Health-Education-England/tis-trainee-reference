@@ -42,10 +42,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
 import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.DbcServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class DbcServiceImplTest {
+class DbcServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -57,7 +56,7 @@ class DbcServiceImplTest {
   private static final String DEFAULT_NAME_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
-  private DbcServiceImpl service;
+  private DbcService service;
 
   @Mock
   private DbcRepository repository;
@@ -70,7 +69,7 @@ class DbcServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new DbcServiceImpl(repository, Mappers.getMapper(DbcMapper.class));
+    service = new DbcService(repository, Mappers.getMapper(DbcMapper.class));
 
     dbc1 = new Dbc();
     dbc1.setId(DEFAULT_ID_1);
@@ -89,7 +88,7 @@ class DbcServiceImplTest {
     dbcs.add(dbc1);
     dbcs.add(dbc2);
     when(repository.findAll(Sort.by("name"))).thenReturn(dbcs);
-    List<Dbc> allDbcs = service.getDbcs();
+    List<Dbc> allDbcs = service.get();
     MatcherAssert
         .assertThat("The size of returned dbc list do not match the expected value",
             allDbcs.size(), CoreMatchers.equalTo(dbcs.size()));
@@ -103,7 +102,7 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Dbc.class))).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.createDbc(dbc2);
+    Dbc dbc = service.create(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -115,7 +114,7 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(dbc1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.createDbc(dbc2);
+    Dbc dbc = service.create(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -127,7 +126,7 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Dbc.class))).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.updateDbc(dbc2);
+    Dbc dbc = service.update(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -139,7 +138,7 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(dbc1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.updateDbc(dbc2);
+    Dbc dbc = service.update(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -148,7 +147,7 @@ class DbcServiceImplTest {
 
   @Test
   void shouldDeleteDbcsByTisId() {
-    service.deleteDbc(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }
