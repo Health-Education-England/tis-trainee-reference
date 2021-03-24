@@ -43,7 +43,7 @@ import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
 import uk.nhs.hee.tis.trainee.reference.repository.ImmigrationStatusRepository;
 
 @ExtendWith(MockitoExtension.class)
-class ImmigrationStatusServiceImplTest {
+class ImmigrationStatusServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";

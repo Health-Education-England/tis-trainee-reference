@@ -44,7 +44,7 @@ import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
 @ExtendWith(MockitoExtension.class)
-class LocalOfficeServiceImplTest {
+class LocalOfficeServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
