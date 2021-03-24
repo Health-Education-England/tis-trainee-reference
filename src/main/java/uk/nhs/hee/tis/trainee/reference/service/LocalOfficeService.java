@@ -21,16 +21,34 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
+import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
-public interface LocalOfficeService {
+@Service
+public class LocalOfficeService extends AbstractReferenceService<LocalOffice> {
 
-  List<LocalOffice> getLocalOffice();
+  private LocalOfficeMapper mapper;
 
-  LocalOffice updateLocalOffice(LocalOffice localOffice);
+  protected LocalOfficeService(LocalOfficeRepository repository, LocalOfficeMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  LocalOffice createLocalOffice(LocalOffice localOffice);
+  @Override
+  protected String getTisId(LocalOffice entity) {
+    return entity.getTisId();
+  }
 
-  void deleteLocalOffice(String tisId);
+  @Override
+  protected Sort getSort() {
+    return Sort.by("label");
+  }
+
+  @Override
+  protected void copyAttributes(LocalOffice target, LocalOffice source) {
+    mapper.update(target, source);
+  }
 }

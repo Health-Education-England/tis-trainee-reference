@@ -59,7 +59,7 @@ public class LocalOfficeResource {
   @GetMapping("/local-office")
   public List<LocalOfficeDto> getLocalOffice() {
     log.trace("Get all LocalOffices");
-    List<LocalOffice> localOffices = service.getLocalOffice();
+    List<LocalOffice> localOffices = service.get();
     return mapper.toDtos(localOffices);
   }
 
@@ -73,7 +73,7 @@ public class LocalOfficeResource {
   public ResponseEntity<LocalOfficeDto> createLocalOffice(
       @RequestBody LocalOfficeDto localOfficeDto) {
     LocalOffice localOffice = mapper.toEntity(localOfficeDto);
-    localOffice = service.createLocalOffice(localOffice);
+    localOffice = service.create(localOffice);
     return ResponseEntity.created(URI.create("/api/localOffice")).body(mapper.toDto(localOffice));
   }
 
@@ -88,7 +88,7 @@ public class LocalOfficeResource {
   public ResponseEntity<LocalOfficeDto> updateLocalOffice(
       @RequestBody LocalOfficeDto localOfficeDto) {
     LocalOffice localOffice = mapper.toEntity(localOfficeDto);
-    localOffice = service.updateLocalOffice(localOffice);
+    localOffice = service.update(localOffice);
     return ResponseEntity.ok(mapper.toDto(localOffice));
   }
 
@@ -99,7 +99,7 @@ public class LocalOfficeResource {
    */
   @DeleteMapping("/local-office/{tisId}")
   public ResponseEntity<Void> deleteLocalOffice(@PathVariable String tisId) {
-    service.deleteLocalOffice(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }

@@ -42,7 +42,6 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.LocalOfficeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class LocalOfficeServiceImplTest {
@@ -57,7 +56,7 @@ class LocalOfficeServiceImplTest {
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
-  private LocalOfficeServiceImpl service;
+  private LocalOfficeService service;
 
   @Mock
   private LocalOfficeRepository repository;
@@ -70,7 +69,7 @@ class LocalOfficeServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new LocalOfficeServiceImpl(repository, Mappers.getMapper(LocalOfficeMapper.class));
+    service = new LocalOfficeService(repository, Mappers.getMapper(LocalOfficeMapper.class));
 
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);
@@ -89,7 +88,7 @@ class LocalOfficeServiceImplTest {
     localOffices.add(localOffice1);
     localOffices.add(localOffice2);
     when(repository.findAll(Sort.by("label"))).thenReturn(localOffices);
-    List<LocalOffice> allLocalOffices = service.getLocalOffice();
+    List<LocalOffice> allLocalOffices = service.get();
     MatcherAssert
         .assertThat("The size of returned local office list do not match the expected value",
             allLocalOffices.size(), CoreMatchers.equalTo(localOffices.size()));
@@ -103,7 +102,7 @@ class LocalOfficeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(LocalOffice.class))).thenAnswer(returnsFirstArg());
 
-    LocalOffice localOffice = service.createLocalOffice(localOffice2);
+    LocalOffice localOffice = service.create(localOffice2);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -115,7 +114,7 @@ class LocalOfficeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(localOffice1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    LocalOffice localOffice = service.createLocalOffice(localOffice2);
+    LocalOffice localOffice = service.create(localOffice2);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -127,7 +126,7 @@ class LocalOfficeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(LocalOffice.class))).thenAnswer(returnsFirstArg());
 
-    LocalOffice localOffice = service.updateLocalOffice(localOffice2);
+    LocalOffice localOffice = service.update(localOffice2);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -139,7 +138,7 @@ class LocalOfficeServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(localOffice1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    LocalOffice localOffice = service.updateLocalOffice(localOffice2);
+    LocalOffice localOffice = service.update(localOffice2);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -148,7 +147,7 @@ class LocalOfficeServiceImplTest {
 
   @Test
   void shouldDeleteLocalOfficesByTisId() {
-    service.deleteLocalOffice(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }

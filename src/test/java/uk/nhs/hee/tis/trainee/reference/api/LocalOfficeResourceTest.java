@@ -117,7 +117,7 @@ class LocalOfficeResourceTest {
     List<LocalOffice> localOffices = new ArrayList<>();
     localOffices.add(localOffice1);
     localOffices.add(localOffice2);
-    when(localOfficeServiceMock.getLocalOffice()).thenReturn(localOffices);
+    when(localOfficeServiceMock.get()).thenReturn(localOffices);
     this.mockMvc.perform(get("/api/local-office")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -129,7 +129,7 @@ class LocalOfficeResourceTest {
 
   @Test
   void testCreateLocalOffice() throws Exception {
-    when(localOfficeServiceMock.createLocalOffice(localOffice1)).thenReturn(localOffice1);
+    when(localOfficeServiceMock.create(localOffice1)).thenReturn(localOffice1);
 
     mockMvc.perform(post("/api/local-office")
         .content(mapper.writeValueAsBytes(localOffice1))
@@ -143,7 +143,7 @@ class LocalOfficeResourceTest {
 
   @Test
   void testUpdateLocalOffice() throws Exception {
-    when(localOfficeServiceMock.updateLocalOffice(localOffice1)).thenReturn(localOffice1);
+    when(localOfficeServiceMock.update(localOffice1)).thenReturn(localOffice1);
 
     mockMvc.perform(put("/api/local-office")
         .content(mapper.writeValueAsBytes(localOffice1))
@@ -162,6 +162,6 @@ class LocalOfficeResourceTest {
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(localOfficeServiceMock).deleteLocalOffice(DEFAULT_TIS_ID_1);
+    verify(localOfficeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }
