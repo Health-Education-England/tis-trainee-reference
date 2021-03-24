@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,9 +22,22 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
+import uk.nhs.hee.tis.trainee.reference.repository.CovidChangeCircumstanceRepository;
 
-public interface CovidChangeCircumstanceService {
+@Service
+public class CovidChangeCircumstanceService {
 
-  List<CovidChangeCircumstance> getCovidChangeCircumstances();
+  CovidChangeCircumstanceRepository changeCircumstanceRepository;
+
+  public CovidChangeCircumstanceService(
+      CovidChangeCircumstanceRepository changeCircumstanceRepository) {
+    this.changeCircumstanceRepository = changeCircumstanceRepository;
+  }
+
+  public List<CovidChangeCircumstance> getCovidChangeCircumstances() {
+    return changeCircumstanceRepository.findAll(Sort.by("label"));
+  }
 }

@@ -35,10 +35,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.CurriculumServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class CurriculumServiceImplTest {
+class CurriculumServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -50,7 +49,7 @@ public class CurriculumServiceImplTest {
   private static final String DEFAULT_LABEL_2 = "Paediatrics";
 
   @InjectMocks
-  private CurriculumServiceImpl curriculumServiceImpl;
+  private CurriculumService curriculumService;
 
   @Mock
   private CurriculumRepository curriculumRepositoryMock;
@@ -62,7 +61,7 @@ public class CurriculumServiceImplTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     curriculum1 = new Curriculum();
     curriculum1.setId(DEFAULT_ID_1);
     curriculum1.setTisId(DEFAULT_TIS_ID_1);
@@ -75,12 +74,12 @@ public class CurriculumServiceImplTest {
   }
 
   @Test
-  public void getAllCurriculaShouldReturnAllCurricula() {
+  void getAllCurriculaShouldReturnAllCurricula() {
     List<Curriculum> curricula = new ArrayList<>();
     curricula.add(curriculum1);
     curricula.add(curriculum2);
     when(curriculumRepositoryMock.findAll(Sort.by("label"))).thenReturn(curricula);
-    List<Curriculum> allCurricula = curriculumServiceImpl.getCurricula();
+    List<Curriculum> allCurricula = curriculumService.getCurricula();
     MatcherAssert.assertThat("The size of returned curriculum list do not match the expected value",
         allCurricula.size(), CoreMatchers.equalTo(curricula.size()));
     MatcherAssert
