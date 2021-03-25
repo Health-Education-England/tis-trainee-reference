@@ -35,5 +35,5 @@ public class Dbc {
 
   @Indexed(unique = true)
   private String tisId;
-  private String name;
+  private String label;
 }
