@@ -42,7 +42,7 @@ dependencies {
   annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
 
   // Sentry reporting
-  implementation "io.sentry:sentry-spring:1.7.30"
+  implementation "io.sentry:sentry-spring:4.3.0"
 
   // Swagger
   ext.swaggerVersion = "2.9.2"
