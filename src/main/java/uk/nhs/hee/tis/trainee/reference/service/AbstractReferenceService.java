@@ -38,6 +38,15 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
     return repository.findAll(getSort());
   }
 
+  /**
+   * Get the sort to apply to returned results.
+   *
+   * @return The Sort to apply.
+   */
+  protected Sort getSort() {
+    return Sort.by("label");
+  }
+
   @Override
   public T create(T entity) {
     T persistedEntity = repository.findByTisId(getTisId(entity));
@@ -73,13 +82,6 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
    * @return The TIS id.
    */
   protected abstract String getTisId(T entity);
-
-  /**
-   * Get the sort to apply to returned results.
-   *
-   * @return The Sort to apply.
-   */
-  protected abstract Sort getSort();
 
   /**
    * Copy the attributes from one entity to the other.

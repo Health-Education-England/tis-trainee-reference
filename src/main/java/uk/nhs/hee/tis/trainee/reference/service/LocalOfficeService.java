@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
@@ -40,11 +39,6 @@ public class LocalOfficeService extends AbstractReferenceService<LocalOffice> {
   @Override
   protected String getTisId(LocalOffice entity) {
     return entity.getTisId();
-  }
-
-  @Override
-  protected Sort getSort() {
-    return Sort.by("label");
   }
 
   @Override

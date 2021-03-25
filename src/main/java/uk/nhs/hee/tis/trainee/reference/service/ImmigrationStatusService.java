@@ -20,7 +20,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.ImmigrationStatusMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ImmigrationStatus;
@@ -40,11 +39,6 @@ public class ImmigrationStatusService extends AbstractReferenceService<Immigrati
   @Override
   protected String getTisId(ImmigrationStatus entity) {
     return entity.getTisId();
-  }
-
-  @Override
-  protected Sort getSort() {
-    return Sort.by("label");
   }
 
   @Override

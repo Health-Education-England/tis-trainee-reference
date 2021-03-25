@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
@@ -40,11 +39,6 @@ public class CollegeService extends AbstractReferenceService<College> {
   @Override
   protected String getTisId(College entity) {
     return entity.getTisId();
-  }
-
-  @Override
-  protected Sort getSort() {
-    return Sort.by("label");
   }
 
   @Override
