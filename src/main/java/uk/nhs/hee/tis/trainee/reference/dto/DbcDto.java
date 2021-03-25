@@ -31,5 +31,5 @@ public class DbcDto {
 
   private String id;
   private String tisId;
-  private String name;
+  private String label;
 }

@@ -65,8 +65,8 @@ class DbcResourceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_NAME_1 = "Health Education England East of England";
-  private static final String DEFAULT_NAME_2 =
+  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
+  private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
   @Autowired
@@ -104,12 +104,12 @@ class DbcResourceTest {
     dbc1 = new Dbc();
     dbc1.setId(DEFAULT_ID_1);
     dbc1.setTisId(DEFAULT_TIS_ID_1);
-    dbc1.setName(DEFAULT_NAME_1);
+    dbc1.setLabel(DEFAULT_LABEL_1);
 
     dbc2 = new Dbc();
     dbc2.setId(DEFAULT_ID_2);
     dbc2.setTisId(DEFAULT_TIS_ID_2);
-    dbc2.setName(DEFAULT_NAME_2);
+    dbc2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -138,7 +138,7 @@ class DbcResourceTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.name").value(is(DEFAULT_NAME_1)));
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
   }
 
   @Test
@@ -152,7 +152,7 @@ class DbcResourceTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.name").value(is(DEFAULT_NAME_1)));
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
   }
 
   @Test
