@@ -52,8 +52,8 @@ class DbcServiceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_NAME_1 = "Health Education England East of England";
-  private static final String DEFAULT_NAME_2 =
+  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
+  private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
   private DbcService service;
@@ -74,12 +74,12 @@ class DbcServiceTest {
     dbc1 = new Dbc();
     dbc1.setId(DEFAULT_ID_1);
     dbc1.setTisId(DEFAULT_TIS_ID_1);
-    dbc1.setLabel(DEFAULT_NAME_1);
+    dbc1.setLabel(DEFAULT_LABEL_1);
 
     dbc2 = new Dbc();
     dbc2.setId(DEFAULT_ID_2);
     dbc2.setTisId(DEFAULT_TIS_ID_2);
-    dbc2.setLabel(DEFAULT_NAME_2);
+    dbc2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -87,7 +87,7 @@ class DbcServiceTest {
     List<Dbc> dbcs = new ArrayList<>();
     dbcs.add(dbc1);
     dbcs.add(dbc2);
-    when(repository.findAll(Sort.by("name"))).thenReturn(dbcs);
+    when(repository.findAll(Sort.by("label"))).thenReturn(dbcs);
     List<Dbc> allDbcs = service.get();
     MatcherAssert
         .assertThat("The size of returned dbc list do not match the expected value",
@@ -106,7 +106,7 @@ class DbcServiceTest {
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -118,7 +118,7 @@ class DbcServiceTest {
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -130,7 +130,7 @@ class DbcServiceTest {
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -142,7 +142,7 @@ class DbcServiceTest {
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test

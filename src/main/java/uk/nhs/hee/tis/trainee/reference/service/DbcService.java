@@ -44,7 +44,7 @@ public class DbcService extends AbstractReferenceService<Dbc> {
 
   @Override
   protected Sort getSort() {
-    return Sort.by("name");
+    return Sort.by("label");
   }
 
   @Override
