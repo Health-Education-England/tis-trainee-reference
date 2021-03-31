@@ -115,7 +115,7 @@ class GenderResourceTest {
     List<Gender> genders = new ArrayList<>();
     genders.add(gender1);
     genders.add(gender2);
-    when(genderServiceMock.getGender()).thenReturn(genders);
+    when(genderServiceMock.get()).thenReturn(genders);
     this.mockMvc.perform(get("/api/gender")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -127,7 +127,7 @@ class GenderResourceTest {
 
   @Test
   void testCreateGender() throws Exception {
-    when(genderServiceMock.createGender(gender1)).thenReturn(gender1);
+    when(genderServiceMock.create(gender1)).thenReturn(gender1);
 
     mockMvc.perform(post("/api/gender")
         .content(mapper.writeValueAsBytes(gender1))
@@ -141,7 +141,7 @@ class GenderResourceTest {
 
   @Test
   void testUpdateGender() throws Exception {
-    when(genderServiceMock.updateGender(gender1)).thenReturn(gender1);
+    when(genderServiceMock.update(gender1)).thenReturn(gender1);
 
     mockMvc.perform(put("/api/gender")
         .content(mapper.writeValueAsBytes(gender1))
@@ -160,6 +160,6 @@ class GenderResourceTest {
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(genderServiceMock).deleteGender(DEFAULT_TIS_ID_1);
+    verify(genderServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

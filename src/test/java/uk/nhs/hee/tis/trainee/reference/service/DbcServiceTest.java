@@ -42,10 +42,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
 import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.DbcServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class DbcServiceImplTest {
+class DbcServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -53,11 +52,11 @@ class DbcServiceImplTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_NAME_1 = "Health Education England East of England";
-  private static final String DEFAULT_NAME_2 =
+  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
+  private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
-  private DbcServiceImpl service;
+  private DbcService service;
 
   @Mock
   private DbcRepository repository;
@@ -70,17 +69,17 @@ class DbcServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new DbcServiceImpl(repository, Mappers.getMapper(DbcMapper.class));
+    service = new DbcService(repository, Mappers.getMapper(DbcMapper.class));
 
     dbc1 = new Dbc();
     dbc1.setId(DEFAULT_ID_1);
     dbc1.setTisId(DEFAULT_TIS_ID_1);
-    dbc1.setLabel(DEFAULT_NAME_1);
+    dbc1.setLabel(DEFAULT_LABEL_1);
 
     dbc2 = new Dbc();
     dbc2.setId(DEFAULT_ID_2);
     dbc2.setTisId(DEFAULT_TIS_ID_2);
-    dbc2.setLabel(DEFAULT_NAME_2);
+    dbc2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
@@ -88,8 +87,8 @@ class DbcServiceImplTest {
     List<Dbc> dbcs = new ArrayList<>();
     dbcs.add(dbc1);
     dbcs.add(dbc2);
-    when(repository.findAll(Sort.by("name"))).thenReturn(dbcs);
-    List<Dbc> allDbcs = service.getDbcs();
+    when(repository.findAll(Sort.by("label"))).thenReturn(dbcs);
+    List<Dbc> allDbcs = service.get();
     MatcherAssert
         .assertThat("The size of returned dbc list do not match the expected value",
             allDbcs.size(), CoreMatchers.equalTo(dbcs.size()));
@@ -103,11 +102,11 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Dbc.class))).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.createDbc(dbc2);
+    Dbc dbc = service.create(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -115,11 +114,11 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(dbc1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.createDbc(dbc2);
+    Dbc dbc = service.create(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -127,11 +126,11 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Dbc.class))).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.updateDbc(dbc2);
+    Dbc dbc = service.update(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
@@ -139,16 +138,16 @@ class DbcServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(dbc1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Dbc dbc = service.updateDbc(dbc2);
+    Dbc dbc = service.update(dbc2);
 
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
-    assertThat("Unexpected name.", dbc.getLabel(), is(DEFAULT_NAME_2));
+    assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
   void shouldDeleteDbcsByTisId() {
-    service.deleteDbc(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }

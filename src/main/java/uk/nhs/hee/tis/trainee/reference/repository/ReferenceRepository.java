@@ -1,6 +1,7 @@
 /*
  * The MIT License (MIT)
- * Copyright 2020 Crown Copyright (Health Education England)
+ *
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,25 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.service.impl;
+package uk.nhs.hee.tis.trainee.reference.repository;
 
-import java.util.List;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
-import uk.nhs.hee.tis.trainee.reference.repository.DeclarationTypeRepository;
-import uk.nhs.hee.tis.trainee.reference.service.DeclarationTypeService;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-@Service
-public class DeclarationTypeServiceImpl implements DeclarationTypeService {
+@NoRepositoryBean
+public interface ReferenceRepository<T> extends MongoRepository<T, String> {
 
-  DeclarationTypeRepository declarationTypeRepository;
+  void deleteByTisId(String tisId);
 
-  public DeclarationTypeServiceImpl(DeclarationTypeRepository declarationTypeRepository) {
-    this.declarationTypeRepository = declarationTypeRepository;
-  }
-
-  public List<DeclarationType> getDeclarationType() {
-    return declarationTypeRepository.findAll(Sort.by("label"));
-  }
+  T findByTisId(String tisId);
 }

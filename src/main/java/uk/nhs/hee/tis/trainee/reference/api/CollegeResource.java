@@ -59,7 +59,7 @@ public class CollegeResource {
   @GetMapping("/college")
   public List<CollegeDto> getCollege() {
     log.trace("Get all College");
-    List<College> colleges = service.getCollege();
+    List<College> colleges = service.get();
     return mapper.toDtos(colleges);
   }
 
@@ -72,7 +72,7 @@ public class CollegeResource {
   @PostMapping("/college")
   public ResponseEntity<CollegeDto> createCollege(@RequestBody CollegeDto collegeDto) {
     College college = mapper.toEntity(collegeDto);
-    college = service.createCollege(college);
+    college = service.create(college);
     return ResponseEntity.created(URI.create("/api/college")).body(mapper.toDto(college));
   }
 
@@ -86,7 +86,7 @@ public class CollegeResource {
   @PutMapping("/college")
   public ResponseEntity<CollegeDto> updateCollege(@RequestBody CollegeDto collegeDto) {
     College college = mapper.toEntity(collegeDto);
-    college = service.updateCollege(college);
+    college = service.update(college);
     return ResponseEntity.ok(mapper.toDto(college));
   }
 
@@ -97,7 +97,7 @@ public class CollegeResource {
    */
   @DeleteMapping("/college/{tisId}")
   public ResponseEntity<Void> deleteCollege(@PathVariable String tisId) {
-    service.deleteCollege(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }

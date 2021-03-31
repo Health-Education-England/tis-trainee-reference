@@ -59,7 +59,7 @@ public class ImmigrationStatusResource {
   @GetMapping("/immigration-status")
   public List<ImmigrationStatusDto> getImmigrationStatus() {
     log.trace("Get all ImmigrationStatus");
-    List<ImmigrationStatus> immigrationStatus = service.getImmigrationStatus();
+    List<ImmigrationStatus> immigrationStatus = service.get();
     return mapper.toDtos(immigrationStatus);
   }
 
@@ -73,7 +73,7 @@ public class ImmigrationStatusResource {
   public ResponseEntity<ImmigrationStatusDto> createImmigrationStatus(
       @RequestBody ImmigrationStatusDto immigrationStatusDto) {
     ImmigrationStatus immigrationStatus = mapper.toEntity(immigrationStatusDto);
-    immigrationStatus = service.createImmigrationStatus(immigrationStatus);
+    immigrationStatus = service.create(immigrationStatus);
     return ResponseEntity.created(URI.create("/api/immigrationStatus"))
         .body(mapper.toDto(immigrationStatus));
   }
@@ -89,7 +89,7 @@ public class ImmigrationStatusResource {
   public ResponseEntity<ImmigrationStatusDto> updateImmigrationStatus(
       @RequestBody ImmigrationStatusDto immigrationStatusDto) {
     ImmigrationStatus immigrationStatus = mapper.toEntity(immigrationStatusDto);
-    immigrationStatus = service.updateImmigrationStatus(immigrationStatus);
+    immigrationStatus = service.update(immigrationStatus);
     return ResponseEntity.ok(mapper.toDto(immigrationStatus));
   }
 
@@ -100,7 +100,7 @@ public class ImmigrationStatusResource {
    */
   @DeleteMapping("/immigration-status/{tisId}")
   public ResponseEntity<Void> deleteImmigrationStatus(@PathVariable String tisId) {
-    service.deleteImmigrationStatus(tisId);
+    service.deleteByTisId(tisId);
     return ResponseEntity.noContent().build();
   }
 }

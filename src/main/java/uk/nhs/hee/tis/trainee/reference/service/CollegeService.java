@@ -21,16 +21,28 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
+import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
 
-public interface CollegeService {
+@Service
+public class CollegeService extends AbstractReferenceService<College> {
 
-  List<College> getCollege();
+  private CollegeMapper mapper;
 
-  College updateCollege(College college);
+  protected CollegeService(CollegeRepository repository, CollegeMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  College createCollege(College college);
+  @Override
+  protected String getTisId(College entity) {
+    return entity.getTisId();
+  }
 
-  void deleteCollege(String tisId);
+  @Override
+  protected void copyAttributes(College target, College source) {
+    mapper.update(target, source);
+  }
 }

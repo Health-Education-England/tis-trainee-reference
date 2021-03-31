@@ -21,16 +21,28 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
+import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
 
-public interface GradeService {
+@Service
+public class GradeService extends AbstractReferenceService<Grade> {
 
-  List<Grade> getAllGrades();
+  private GradeMapper mapper;
 
-  Grade updateGrade(Grade grade);
+  protected GradeService(GradeRepository repository, GradeMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
 
-  Grade createGrade(Grade grade);
+  @Override
+  protected String getTisId(Grade entity) {
+    return entity.getTisId();
+  }
 
-  void deleteGrade(String tisId);
+  @Override
+  protected void copyAttributes(Grade target, Grade source) {
+    mapper.update(target, source);
+  }
 }

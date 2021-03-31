@@ -116,7 +116,7 @@ class CollegeResourceTest {
     List<College> colleges = new ArrayList<>();
     colleges.add(college1);
     colleges.add(college2);
-    when(collegeServiceMock.getCollege()).thenReturn(colleges);
+    when(collegeServiceMock.get()).thenReturn(colleges);
     this.mockMvc.perform(get("/api/college")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -128,7 +128,7 @@ class CollegeResourceTest {
 
   @Test
   void testCreateCollege() throws Exception {
-    when(collegeServiceMock.createCollege(college1)).thenReturn(college1);
+    when(collegeServiceMock.create(college1)).thenReturn(college1);
 
     mockMvc.perform(post("/api/college")
         .content(mapper.writeValueAsBytes(college1))
@@ -142,7 +142,7 @@ class CollegeResourceTest {
 
   @Test
   void testUpdateCollege() throws Exception {
-    when(collegeServiceMock.updateCollege(college1)).thenReturn(college1);
+    when(collegeServiceMock.update(college1)).thenReturn(college1);
 
     mockMvc.perform(put("/api/college")
         .content(mapper.writeValueAsBytes(college1))
@@ -161,6 +161,6 @@ class CollegeResourceTest {
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(collegeServiceMock).deleteCollege(DEFAULT_TIS_ID_1);
+    verify(collegeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

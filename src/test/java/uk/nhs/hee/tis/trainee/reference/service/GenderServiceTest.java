@@ -42,10 +42,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.GenderServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class GenderServiceImplTest {
+class GenderServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -56,7 +55,7 @@ class GenderServiceImplTest {
   private static final String DEFAULT_LABEL_1 = "Male";
   private static final String DEFAULT_LABEL_2 = "Female";
 
-  private GenderServiceImpl service;
+  private GenderService service;
 
   @Mock
   private GenderRepository repository;
@@ -69,7 +68,7 @@ class GenderServiceImplTest {
    */
   @BeforeEach
   void initData() {
-    service = new GenderServiceImpl(repository, Mappers.getMapper(GenderMapper.class));
+    service = new GenderService(repository, Mappers.getMapper(GenderMapper.class));
 
     gender1 = new Gender();
     gender1.setId(DEFAULT_ID_1);
@@ -88,7 +87,7 @@ class GenderServiceImplTest {
     genders.add(gender1);
     genders.add(gender2);
     when(repository.findAll(Sort.by("label"))).thenReturn(genders);
-    List<Gender> allGenders = service.getGender();
+    List<Gender> allGenders = service.get();
     MatcherAssert.assertThat("The size of returned gender list do not match the expected value",
         allGenders.size(), CoreMatchers.equalTo(genders.size()));
     MatcherAssert.assertThat("The returned gender list doesn't not contain the expected gender",
@@ -100,7 +99,7 @@ class GenderServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Gender.class))).thenAnswer(returnsFirstArg());
 
-    Gender gender = service.createGender(gender2);
+    Gender gender = service.create(gender2);
 
     assertThat("Unexpected id.", gender.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", gender.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -112,7 +111,7 @@ class GenderServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(gender1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Gender gender = service.createGender(gender2);
+    Gender gender = service.create(gender2);
 
     assertThat("Unexpected id.", gender.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", gender.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -124,7 +123,7 @@ class GenderServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(null);
     when(repository.insert(any(Gender.class))).thenAnswer(returnsFirstArg());
 
-    Gender gender = service.updateGender(gender2);
+    Gender gender = service.update(gender2);
 
     assertThat("Unexpected id.", gender.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", gender.getTisId(), is(DEFAULT_TIS_ID_2));
@@ -136,7 +135,7 @@ class GenderServiceImplTest {
     when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(gender1);
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
-    Gender gender = service.updateGender(gender2);
+    Gender gender = service.update(gender2);
 
     assertThat("Unexpected id.", gender.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", gender.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -145,7 +144,7 @@ class GenderServiceImplTest {
 
   @Test
   void shouldDeleteGendersByTisId() {
-    service.deleteGender(DEFAULT_TIS_ID_1);
+    service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
   }

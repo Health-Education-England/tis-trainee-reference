@@ -115,7 +115,7 @@ class GradeResourceTest {
     List<Grade> grades = new ArrayList<>();
     grades.add(grade1);
     grades.add(grade2);
-    when(gradeServiceMock.getAllGrades()).thenReturn(grades);
+    when(gradeServiceMock.get()).thenReturn(grades);
     mockMvc.perform(get("/api/grade")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -127,7 +127,7 @@ class GradeResourceTest {
 
   @Test
   void testCreateGrade() throws Exception {
-    when(gradeServiceMock.createGrade(grade1)).thenReturn(grade1);
+    when(gradeServiceMock.create(grade1)).thenReturn(grade1);
 
     mockMvc.perform(post("/api/grade")
         .content(mapper.writeValueAsBytes(grade1))
@@ -141,7 +141,7 @@ class GradeResourceTest {
 
   @Test
   void testUpdateGrade() throws Exception {
-    when(gradeServiceMock.updateGrade(grade1)).thenReturn(grade1);
+    when(gradeServiceMock.update(grade1)).thenReturn(grade1);
 
     mockMvc.perform(put("/api/grade")
         .content(mapper.writeValueAsBytes(grade1))
@@ -160,6 +160,6 @@ class GradeResourceTest {
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(gradeServiceMock).deleteGrade(DEFAULT_TIS_ID_1);
+    verify(gradeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

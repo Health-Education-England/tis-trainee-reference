@@ -34,13 +34,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import uk.nhs.hee.tis.trainee.reference.dto.CovidChangeCircumstanceDto;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 import uk.nhs.hee.tis.trainee.reference.repository.CovidChangeCircumstanceRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.CovidChangeCircumstanceServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class CovidChangeCircumstanceServiceImplTest {
+class CovidChangeCircumstanceServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -49,21 +47,19 @@ public class CovidChangeCircumstanceServiceImplTest {
   private static final String DEFAULT_LABEL_2 = "DEFAULT_LABEL_2";
 
   @InjectMocks
-  private CovidChangeCircumstanceServiceImpl covidChangeCircServiceImpl;
+  private CovidChangeCircumstanceService covidChangeCircServiceImpl;
 
   @Mock
   private CovidChangeCircumstanceRepository covidChangeCircRepositoryMock;
 
   private CovidChangeCircumstance covidChangeCirc1;
   private CovidChangeCircumstance covidChangeCirc2;
-  private CovidChangeCircumstanceDto covidChangeCircDto1;
-  private CovidChangeCircumstanceDto covidChangeCircDto2;
 
   /**
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     covidChangeCirc1 = new CovidChangeCircumstance();
     covidChangeCirc1.setId(DEFAULT_ID_1);
     covidChangeCirc1.setLabel(DEFAULT_LABEL_1);
@@ -74,7 +70,7 @@ public class CovidChangeCircumstanceServiceImplTest {
   }
 
   @Test
-  public void getAllCovidChangeCircShouldReturnAll() {
+  void getAllCovidChangeCircShouldReturnAll() {
     List<CovidChangeCircumstance> covidChangeCircs = new ArrayList<>();
     covidChangeCircs.add(covidChangeCirc1);
     covidChangeCircs.add(covidChangeCirc2);
@@ -89,6 +85,5 @@ public class CovidChangeCircumstanceServiceImplTest {
     MatcherAssert.assertThat(
         "The returned CovidChangeCircumstance list doesn't not contain the expected item",
         allCovidChangeCircs, CoreMatchers.hasItem(covidChangeCirc1));
-
   }
 }

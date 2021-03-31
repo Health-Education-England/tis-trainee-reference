@@ -36,10 +36,9 @@ import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.dto.DeclarationTypeDto;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 import uk.nhs.hee.tis.trainee.reference.repository.DeclarationTypeRepository;
-import uk.nhs.hee.tis.trainee.reference.service.impl.DeclarationTypeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class DeclarationTypeServiceImplTest {
+class DeclarationTypeServiceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -48,21 +47,19 @@ public class DeclarationTypeServiceImplTest {
   private static final String DEFAULT_LABEL_2 = "Other investigation";
 
   @InjectMocks
-  private DeclarationTypeServiceImpl declarationTypeServiceImpl;
+  private DeclarationTypeService declarationTypeService;
 
   @Mock
   private DeclarationTypeRepository declarationTypeRepositoryMock;
 
   private DeclarationType declarationType1;
   private DeclarationType declarationType2;
-  private DeclarationTypeDto declarationTypeDto1;
-  private DeclarationTypeDto declarationTypeDto2;
 
   /**
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
+  void initData() {
     declarationType1 = new DeclarationType();
     declarationType1.setId(DEFAULT_ID_1);
     declarationType1.setLabel(DEFAULT_LABEL_1);
@@ -71,23 +68,23 @@ public class DeclarationTypeServiceImplTest {
     declarationType2.setId(DEFAULT_ID_2);
     declarationType2.setLabel(DEFAULT_LABEL_2);
 
-    declarationTypeDto1 = new DeclarationTypeDto();
+    DeclarationTypeDto declarationTypeDto1 = new DeclarationTypeDto();
     declarationTypeDto1.setId(DEFAULT_ID_1);
     declarationTypeDto1.setLabel(DEFAULT_LABEL_1);
 
-    declarationTypeDto2 = new DeclarationTypeDto();
+    DeclarationTypeDto declarationTypeDto2 = new DeclarationTypeDto();
     declarationTypeDto2.setId(DEFAULT_ID_2);
     declarationTypeDto2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  public void getAllDeclarationTypeShouldReturnAllDeclarationType() {
+  void getAllDeclarationTypeShouldReturnAllDeclarationType() {
     List<DeclarationType> declarationType = new ArrayList<>();
     declarationType.add(declarationType1);
     declarationType.add(declarationType2);
     when(declarationTypeRepositoryMock.findAll(Sort.by("label"))).thenReturn(declarationType);
     List<DeclarationType> allDeclarationType =
-        declarationTypeServiceImpl.getDeclarationType();
+        declarationTypeService.getDeclarationType();
     MatcherAssert.assertThat(
         "The size of returned declaration type list do not match the expected value",
         allDeclarationType.size(), CoreMatchers.equalTo(declarationType.size()));
