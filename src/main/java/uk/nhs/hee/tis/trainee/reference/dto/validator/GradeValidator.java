@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,20 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
-import lombok.Data;
+import org.springframework.stereotype.Component;
+import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import uk.nhs.hee.tis.trainee.reference.dto.Status;
 
 /**
- * A DTO for Grade entity. Holds all options for Grade.
+ * A validator for {@link GradeDto}
  */
-@Data
-public class GradeDto {
+@Component
+public class GradeValidator {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private boolean placementGrade;
-  private boolean trainingGrade;
-  private Status status;
+  /**
+   * Whether the given grade is valid for storage within the reference service.
+   *
+   * @param dto The grade to validate.
+   * @return true if valid, else false.
+   */
+  public boolean isValid(GradeDto dto) {
+    return dto.getStatus() == Status.CURRENT && dto.isPlacementGrade() && dto.isTrainingGrade();
+  }
 }
