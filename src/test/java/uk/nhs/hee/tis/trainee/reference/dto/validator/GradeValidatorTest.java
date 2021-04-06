@@ -39,7 +39,9 @@ class GradeValidatorTest {
     validator = new GradeValidator();
   }
 
-  @ParameterizedTest(name = "Valid should be {3} when status {0}, placementGrade {1} and trainingGrade {2}.")
+  @ParameterizedTest(
+      name = "Valid should be {3} when status {0}, placementGrade {1} and trainingGrade {2}."
+  )
   @CsvSource({
       "INACTIVE,false,false,false",
       "INACTIVE,false,true,false",

@@ -26,7 +26,7 @@ import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
 import uk.nhs.hee.tis.trainee.reference.dto.Status;
 
 /**
- * A validator for {@link GradeDto}
+ * A validator for {@link GradeDto}.
  */
 @Component
 public class GradeValidator {

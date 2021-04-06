@@ -50,7 +50,7 @@ public class GradeResource {
   private final GradeMapper mapper;
   private final GradeValidator validator;
 
-  public GradeResource(GradeService service, GradeMapper mapper, GradeValidator validator) {
+  GradeResource(GradeService service, GradeMapper mapper, GradeValidator validator) {
     this.service = service;
     this.mapper = mapper;
     this.validator = validator;
