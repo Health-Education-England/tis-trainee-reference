@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,6 +51,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import uk.nhs.hee.tis.trainee.reference.dto.validator.GradeValidator;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.service.GradeService;
@@ -77,10 +80,15 @@ class GradeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GradeService gradeServiceMock;
+  private GradeService service;
 
-  private Grade grade1;
-  private Grade grade2;
+  @MockBean
+  private GradeValidator validator;
+
+  private GradeDto dto;
+
+  private Grade entity1;
+  private Grade entity2;
 
   /**
    * Set up mocks before each test.
@@ -88,7 +96,7 @@ class GradeResourceTest {
   @BeforeEach
   void setup() {
     GradeMapper mapper = Mappers.getMapper(GradeMapper.class);
-    GradeResource gradeResource = new GradeResource(gradeServiceMock, mapper);
+    GradeResource gradeResource = new GradeResource(service, mapper, validator);
     mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -99,23 +107,28 @@ class GradeResourceTest {
    */
   @BeforeEach
   void initData() {
-    grade1 = new Grade();
-    grade1.setId(DEFAULT_ID_1);
-    grade1.setTisId(DEFAULT_TIS_ID_1);
-    grade1.setLabel(DEFAULT_LABEL_1);
+    dto = new GradeDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    grade2 = new Grade();
-    grade2.setId(DEFAULT_ID_2);
-    grade2.setTisId(DEFAULT_TIS_ID_2);
-    grade2.setLabel(DEFAULT_LABEL_2);
+    entity1 = new Grade();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    entity2 = new Grade();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllGrades() throws Exception {
+  void shouldGetAllGrades() throws Exception {
     List<Grade> grades = new ArrayList<>();
-    grades.add(grade1);
-    grades.add(grade2);
-    when(gradeServiceMock.get()).thenReturn(grades);
+    grades.add(entity1);
+    grades.add(entity2);
+    when(service.get()).thenReturn(grades);
     mockMvc.perform(get("/api/grade")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -126,11 +139,12 @@ class GradeResourceTest {
   }
 
   @Test
-  void testCreateGrade() throws Exception {
-    when(gradeServiceMock.create(grade1)).thenReturn(grade1);
+  void shouldCreateGradeWhenCreateValid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(true);
+    when(service.create(entity1)).thenReturn(entity1);
 
     mockMvc.perform(post("/api/grade")
-        .content(mapper.writeValueAsBytes(grade1))
+        .content(mapper.writeValueAsBytes(dto))
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -140,11 +154,26 @@ class GradeResourceTest {
   }
 
   @Test
-  void testUpdateGrade() throws Exception {
-    when(gradeServiceMock.update(grade1)).thenReturn(grade1);
+  void shouldDeleteGradeWhenCreateInvalid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(false);
+
+    mockMvc.perform(post("/api/grade")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
+    verifyNoMoreInteractions(service);
+  }
+
+  @Test
+  void shouldUpdateGradeWhenUpdateValid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(true);
+    when(service.update(entity1)).thenReturn(entity1);
 
     mockMvc.perform(put("/api/grade")
-        .content(mapper.writeValueAsBytes(grade1))
+        .content(mapper.writeValueAsBytes(dto))
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -154,12 +183,26 @@ class GradeResourceTest {
   }
 
   @Test
-  void testDeleteGrade() throws Exception {
+  void shouldDeleteGradeWhenUpdateInvalid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(false);
+
+    mockMvc.perform(put("/api/grade")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
+    verifyNoMoreInteractions(service);
+  }
+
+  @Test
+  void shouldDeleteGrade() throws Exception {
     mockMvc.perform(delete("/api/grade/{tisId}", DEFAULT_TIS_ID_1)
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(gradeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }
