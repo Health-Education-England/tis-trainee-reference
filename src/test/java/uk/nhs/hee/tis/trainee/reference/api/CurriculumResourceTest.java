@@ -22,33 +22,44 @@ package uk.nhs.hee.tis.trainee.reference.api;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
+import uk.nhs.hee.tis.trainee.reference.dto.validator.CurriculumValidator;
 import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.service.CurriculumService;
 
+@ContextConfiguration(classes = {CurriculumMapper.class})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = CurriculumResource.class)
-public class CurriculumResourceTest {
+class CurriculumResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
@@ -64,24 +75,27 @@ public class CurriculumResourceTest {
 
   private MockMvc mockMvc;
 
-  @MockBean
-  private CurriculumService curriculumServiceMock;
+  @Autowired
+  private ObjectMapper mapper;
 
   @MockBean
-  private CurriculumMapper curriculumMapperMock;
+  private CurriculumService service;
 
-  private Curriculum curriculum1;
-  private Curriculum curriculum2;
-  private CurriculumDto curriculumDto1;
-  private CurriculumDto curriculumDto2;
+  @MockBean
+  private CurriculumValidator validator;
+
+  private CurriculumDto dto;
+
+  private Curriculum entity1;
+  private Curriculum entity2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
-  public void setup() {
-    CurriculumResource curriculumResource = new CurriculumResource(curriculumServiceMock,
-        curriculumMapperMock);
+  void setup() {
+    CurriculumMapper mapper = Mappers.getMapper(CurriculumMapper.class);
+    CurriculumResource curriculumResource = new CurriculumResource(service, mapper, validator);
     mockMvc = MockMvcBuilders.standaloneSetup(curriculumResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -91,44 +105,103 @@ public class CurriculumResourceTest {
    * Set up data.
    */
   @BeforeEach
-  public void initData() {
-    curriculum1 = new Curriculum();
-    curriculum1.setId(DEFAULT_ID_1);
-    curriculum1.setTisId(DEFAULT_TIS_ID_1);
-    curriculum1.setLabel(DEFAULT_LABEL_1);
+  void initData() {
+    dto = new CurriculumDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    curriculum2 = new Curriculum();
-    curriculum2.setId(DEFAULT_ID_2);
-    curriculum2.setTisId(DEFAULT_TIS_ID_2);
-    curriculum2.setLabel(DEFAULT_LABEL_2);
+    entity1 = new Curriculum();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
 
-    curriculumDto1 = new CurriculumDto();
-    curriculumDto1.setId(DEFAULT_ID_1);
-    curriculumDto1.setTisId(DEFAULT_TIS_ID_1);
-    curriculumDto1.setLabel(DEFAULT_LABEL_1);
-
-    curriculumDto2 = new CurriculumDto();
-    curriculumDto2.setId(DEFAULT_ID_2);
-    curriculumDto2.setTisId(DEFAULT_TIS_ID_2);
-    curriculumDto2.setLabel(DEFAULT_LABEL_2);
+    entity2 = new Curriculum();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllCurricula() throws Exception {
+  void shouldGetAllCurricula() throws Exception {
     List<Curriculum> curricula = new ArrayList<>();
-    curricula.add(curriculum1);
-    curricula.add(curriculum2);
-    List<CurriculumDto> curriculumDtos = new ArrayList<>();
-    curriculumDtos.add(curriculumDto1);
-    curriculumDtos.add(curriculumDto2);
-    when(curriculumServiceMock.getCurricula()).thenReturn(curricula);
-    when(curriculumMapperMock.toDtos(curricula)).thenReturn(curriculumDtos);
-    this.mockMvc.perform(get("/api/curriculum")
+    curricula.add(entity1);
+    curricula.add(entity2);
+    when(service.get()).thenReturn(curricula);
+    mockMvc.perform(get("/api/curriculum")
         .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(curriculumDtos.size())))
+        .andExpect(jsonPath("$").value(hasSize(2)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  }
+
+  @Test
+  void shouldCreateCurriculumWhenCreateValid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(true);
+    when(service.create(entity1)).thenReturn(entity1);
+
+    mockMvc.perform(post("/api/curriculum")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void shouldDeleteCurriculumWhenCreateInvalid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(false);
+
+    mockMvc.perform(post("/api/curriculum")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
+    verifyNoMoreInteractions(service);
+  }
+
+  @Test
+  void shouldUpdateCurriculumWhenUpdateValid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(true);
+    when(service.update(entity1)).thenReturn(entity1);
+
+    mockMvc.perform(put("/api/curriculum")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+  }
+
+  @Test
+  void shouldDeleteCurriculumWhenUpdateInvalid() throws Exception {
+    when(validator.isValid(dto)).thenReturn(false);
+
+    mockMvc.perform(put("/api/curriculum")
+        .content(mapper.writeValueAsBytes(dto))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
+    verifyNoMoreInteractions(service);
+  }
+
+  @Test
+  void shouldDeleteCurriculum() throws Exception {
+    mockMvc.perform(delete("/api/curriculum/{tisId}", DEFAULT_TIS_ID_1)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$").doesNotExist());
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

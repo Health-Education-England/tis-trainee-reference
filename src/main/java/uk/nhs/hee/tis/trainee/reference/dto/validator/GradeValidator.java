@@ -29,7 +29,7 @@ import uk.nhs.hee.tis.trainee.reference.dto.Status;
  * A validator for {@link GradeDto}.
  */
 @Component
-public class GradeValidator {
+public class GradeValidator implements ReferenceValidator<GradeDto> {
 
   /**
    * Whether the given grade is valid for storage within the reference service.

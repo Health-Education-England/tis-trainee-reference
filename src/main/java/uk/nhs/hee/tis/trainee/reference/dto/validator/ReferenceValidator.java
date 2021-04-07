@@ -1,6 +1,7 @@
 /*
  * The MIT License (MIT)
- * Copyright 2020 Crown Copyright (Health Education England)
+ *
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,27 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.mapper;
+package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
-import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
-import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
+/**
+ * An interface for validators of reference types.
+ *
+ * @param <T> The reference type to validate.
+ */
+public interface ReferenceValidator<T> {
 
-@Mapper(componentModel = "spring")
-public interface CurriculumMapper {
-
-  CurriculumDto toDto(Curriculum curriculum);
-
-  List<CurriculumDto> toDtos(List<Curriculum> curricula);
-
-  Curriculum toEntity(CurriculumDto curriculumDto);
-
-  List<Curriculum> toEntities(List<CurriculumDto> curriculumDtos);
-
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "tisId", ignore = true)
-  Curriculum update(@MappingTarget Curriculum target, Curriculum source);
+  /**
+   * Whether the given reference object is valid.
+   *
+   * @param referenceType The object to validate.
+   * @return true if valid, else false.
+   */
+  boolean isValid(T referenceType);
 }

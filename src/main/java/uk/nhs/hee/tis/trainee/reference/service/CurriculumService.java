@@ -21,22 +21,28 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
 
 @Service
-public class CurriculumService {
+public class CurriculumService extends AbstractReferenceService<Curriculum> {
 
-  CurriculumRepository curriculumRepository;
+  private CurriculumMapper mapper;
 
-  public CurriculumService(CurriculumRepository curriculumRepository) {
-    this.curriculumRepository = curriculumRepository;
+  protected CurriculumService(CurriculumRepository repository, CurriculumMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
   }
 
-  public List<Curriculum> getCurricula() {
-    return curriculumRepository.findAll(Sort.by("label"));
+  @Override
+  protected String getTisId(Curriculum entity) {
+    return entity.getTisId();
+  }
+
+  @Override
+  protected void copyAttributes(Curriculum target, Curriculum source) {
+    mapper.update(target, source);
   }
 }

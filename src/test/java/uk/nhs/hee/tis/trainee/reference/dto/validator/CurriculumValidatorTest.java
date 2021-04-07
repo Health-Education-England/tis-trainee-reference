@@ -1,6 +1,7 @@
 /*
  * The MIT License (MIT)
- * Copyright 2020 Crown Copyright (Health Education England)
+ *
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,27 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.mapper;
+package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
-import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
-import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 
-@Mapper(componentModel = "spring")
-public interface CurriculumMapper {
+class CurriculumValidatorTest {
 
-  CurriculumDto toDto(Curriculum curriculum);
+  private CurriculumValidator validator;
 
-  List<CurriculumDto> toDtos(List<Curriculum> curricula);
+  @BeforeEach
+  void setUp() {
+    validator = new CurriculumValidator();
+  }
 
-  Curriculum toEntity(CurriculumDto curriculumDto);
+  @Test
+  void shouldValidateCurriculum() {
+    CurriculumDto dto = new CurriculumDto();
 
-  List<Curriculum> toEntities(List<CurriculumDto> curriculumDtos);
-
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "tisId", ignore = true)
-  Curriculum update(@MappingTarget Curriculum target, Curriculum source);
+    boolean valid = validator.isValid(dto);
+    assertThat("Unexpected validity.", valid, is(true));
+  }
 }

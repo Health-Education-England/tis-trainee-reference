@@ -20,30 +20,38 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
+import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
+import uk.nhs.hee.tis.trainee.reference.dto.validator.CurriculumValidator;
 import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.service.CurriculumService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class CurriculumResource {
 
-  private static final Logger log = LoggerFactory.getLogger(CurriculumResource.class);
+  private CurriculumService service;
+  private CurriculumMapper mapper;
+  private CurriculumValidator validator;
 
-  private CurriculumService curriculumService;
-  private CurriculumMapper curriculumMapper;
-
-  public CurriculumResource(CurriculumService curriculumService,
-      CurriculumMapper curriculumMapper) {
-    this.curriculumService = curriculumService;
-    this.curriculumMapper = curriculumMapper;
+  public CurriculumResource(CurriculumService service, CurriculumMapper mapper,
+      CurriculumValidator validator) {
+    this.service = service;
+    this.mapper = mapper;
+    this.validator = validator;
   }
 
   /**
@@ -54,7 +62,57 @@ public class CurriculumResource {
   @GetMapping("/curriculum")
   public List<CurriculumDto> getCurricula() {
     log.trace("Get all Curricula");
-    List<Curriculum> curricula = curriculumService.getCurricula();
-    return curriculumMapper.toDtos(curricula);
+    List<Curriculum> curricula = service.get();
+    return mapper.toDtos(curricula);
+  }
+
+  /**
+   * Create a Curriculum, or update an existing Curriculum if the tisID matches.
+   *
+   * @param curriculumDto The Curriculum to create.
+   * @return The created (or updated) Curriculum.
+   */
+  @PostMapping("/curriculum")
+  public ResponseEntity<CurriculumDto> createCurriculum(@RequestBody CurriculumDto curriculumDto) {
+    if (!validator.isValid(curriculumDto)) {
+      // TODO: refactor service to take DTO instead of entity and move business logic there?
+      service.deleteByTisId(curriculumDto.getTisId());
+      return ResponseEntity.unprocessableEntity().build();
+    }
+
+    Curriculum curriculum = mapper.toEntity(curriculumDto);
+    curriculum = service.create(curriculum);
+    return ResponseEntity.created(URI.create("/api/curriculum")).body(mapper.toDto(curriculum));
+  }
+
+  /**
+   * Update a Curriculum with a matching tisId value, or creates a new Curriculum if the ID was not
+   * found.
+   *
+   * @param curriculumDto The Curriculum details to update.
+   * @return The updated (or created) Curriculum.
+   */
+  @PutMapping("/curriculum")
+  public ResponseEntity<CurriculumDto> updateCurriculum(@RequestBody CurriculumDto curriculumDto) {
+    if (!validator.isValid(curriculumDto)) {
+      // TODO: refactor service to take DTO instead of entity and move business logic there?
+      service.deleteByTisId(curriculumDto.getTisId());
+      return ResponseEntity.unprocessableEntity().build();
+    }
+
+    Curriculum curriculum = mapper.toEntity(curriculumDto);
+    curriculum = service.update(curriculum);
+    return ResponseEntity.ok(mapper.toDto(curriculum));
+  }
+
+  /**
+   * Delete the Curriculum with the given tisId.
+   *
+   * @param tisId The tisId of the Curriculum to delete.
+   */
+  @DeleteMapping("/curriculum/{tisId}")
+  public ResponseEntity<Void> deleteCurriculum(@PathVariable String tisId) {
+    service.deleteByTisId(tisId);
+    return ResponseEntity.noContent().build();
   }
 }
