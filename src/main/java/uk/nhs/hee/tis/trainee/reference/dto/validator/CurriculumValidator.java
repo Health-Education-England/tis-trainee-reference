@@ -39,6 +39,7 @@ public class CurriculumValidator implements ReferenceValidator<CurriculumDto> {
    */
   @Override
   public boolean isValid(CurriculumDto dto) {
-    return dto.getStatus() == Status.CURRENT && dto.getCurriculumSubType().equals("MEDICAL_CURRICULUM");
+    return dto.getStatus() == Status.CURRENT
+        && dto.getCurriculumSubType().equals("MEDICAL_CURRICULUM");
   }
 }
