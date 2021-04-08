@@ -31,4 +31,6 @@ public class CurriculumDto {
   private String id;
   private String tisId;
   private String label;
+  private String code;
+  private Status status;
 }
