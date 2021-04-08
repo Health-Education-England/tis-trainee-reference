@@ -26,7 +26,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
+import uk.nhs.hee.tis.trainee.reference.dto.Status;
 
 class CurriculumValidatorTest {
 
@@ -37,11 +40,21 @@ class CurriculumValidatorTest {
     validator = new CurriculumValidator();
   }
 
-  @Test
-  void shouldValidateCurriculum() {
+  @ParameterizedTest(
+      name = "Valid should be {2} when status is {0} and curriculumSubType is equal to {1}."
+  )
+  @CsvSource({
+      "INACTIVE,Other,false",
+      "INACTIVE,MEDICAL_CURRICULUM,false",
+      "CURRENT,Other,false",
+      "CURRENT,MEDICAL_CURRICULUM,true"
+  })
+  void shouldValidateCurriculum(Status status, String curriculumSubType, boolean result) {
     CurriculumDto dto = new CurriculumDto();
+    dto.setStatus(status);
+    dto.setCurriculumSubType(curriculumSubType);
 
     boolean valid = validator.isValid(dto);
-    assertThat("Unexpected validity.", valid, is(true));
+    assertThat("Unexpected validity.", valid, is(result));
   }
 }
