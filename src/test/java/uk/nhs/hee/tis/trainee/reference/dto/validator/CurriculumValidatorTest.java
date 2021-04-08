@@ -41,7 +41,7 @@ class CurriculumValidatorTest {
   }
 
   @ParameterizedTest(
-      name = "Valid should be {2} when status is {0} and code is equal to {1}."
+      name = "Valid should be {2} when status is {0} and curriculumSubType is equal to {1}."
   )
   @CsvSource({
       "INACTIVE,Other,false",
@@ -49,10 +49,10 @@ class CurriculumValidatorTest {
       "CURRENT,Other,false",
       "CURRENT,MEDICAL_CURRICULUM,true"
   })
-  void shouldValidateCurriculum(Status status, String code, boolean result) {
+  void shouldValidateCurriculum(Status status, String curriculumSubType, boolean result) {
     CurriculumDto dto = new CurriculumDto();
     dto.setStatus(status);
-    dto.setCode(code);
+    dto.setCurriculumSubType(curriculumSubType);
 
     boolean valid = validator.isValid(dto);
     assertThat("Unexpected validity.", valid, is(result));
