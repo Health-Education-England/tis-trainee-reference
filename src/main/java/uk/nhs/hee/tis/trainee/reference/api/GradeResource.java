@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import uk.nhs.hee.tis.trainee.reference.dto.validator.GradeValidator;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.service.GradeService;
@@ -47,10 +48,12 @@ public class GradeResource {
 
   private final GradeService service;
   private final GradeMapper mapper;
+  private final GradeValidator validator;
 
-  public GradeResource(GradeService service, GradeMapper mapper) {
+  GradeResource(GradeService service, GradeMapper mapper, GradeValidator validator) {
     this.service = service;
     this.mapper = mapper;
+    this.validator = validator;
   }
 
   /**
@@ -73,6 +76,12 @@ public class GradeResource {
    */
   @PostMapping("/grade")
   public ResponseEntity<GradeDto> createGrade(@RequestBody GradeDto gradeDto) {
+    if (!validator.isValid(gradeDto)) {
+      // TODO: refactor service to take DTO instead of entity and move business logic there?
+      service.deleteByTisId(gradeDto.getTisId());
+      return ResponseEntity.unprocessableEntity().build();
+    }
+
     Grade grade = mapper.toEntity(gradeDto);
     grade = service.create(grade);
     return ResponseEntity.created(URI.create("/api/grade")).body(mapper.toDto(grade));
@@ -86,6 +95,12 @@ public class GradeResource {
    */
   @PutMapping("/grade")
   public ResponseEntity<GradeDto> updateGrade(@RequestBody GradeDto gradeDto) {
+    if (!validator.isValid(gradeDto)) {
+      // TODO: refactor service to take DTO instead of entity and move business logic there?
+      service.deleteByTisId(gradeDto.getTisId());
+      return ResponseEntity.unprocessableEntity().build();
+    }
+
     Grade grade = mapper.toEntity(gradeDto);
     grade = service.update(grade);
     return ResponseEntity.ok(mapper.toDto(grade));
