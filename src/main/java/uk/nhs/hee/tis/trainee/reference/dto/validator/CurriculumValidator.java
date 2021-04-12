@@ -21,6 +21,7 @@
 
 package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
 import uk.nhs.hee.tis.trainee.reference.dto.Status;
@@ -40,6 +41,6 @@ public class CurriculumValidator implements ReferenceValidator<CurriculumDto> {
   @Override
   public boolean isValid(CurriculumDto dto) {
     return dto.getStatus() == Status.CURRENT
-        && dto.getCurriculumSubType().equals("MEDICAL_CURRICULUM");
+        && Objects.equals(dto.getCurriculumSubType(), ("MEDICAL_CURRICULUM"));
   }
 }

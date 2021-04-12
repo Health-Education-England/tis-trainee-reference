@@ -25,7 +25,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
@@ -47,7 +46,10 @@ class CurriculumValidatorTest {
       "INACTIVE,Other,false",
       "INACTIVE,MEDICAL_CURRICULUM,false",
       "CURRENT,Other,false",
-      "CURRENT,MEDICAL_CURRICULUM,true"
+      "CURRENT,MEDICAL_CURRICULUM,true",
+      "CURRENT,,false",
+      ",MEDICAL_CURRICULUM,false",
+      ",,false"
   })
   void shouldValidateCurriculum(Status status, String curriculumSubType, boolean result) {
     CurriculumDto dto = new CurriculumDto();
