@@ -22,6 +22,8 @@ package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 
@@ -35,4 +37,8 @@ public interface CurriculumMapper {
   Curriculum toEntity(CurriculumDto curriculumDto);
 
   List<Curriculum> toEntities(List<CurriculumDto> curriculumDtos);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tisId", ignore = true)
+  Curriculum update(@MappingTarget Curriculum target, Curriculum source);
 }

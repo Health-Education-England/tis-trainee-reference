@@ -1,6 +1,7 @@
 /*
  * The MIT License (MIT)
- * Copyright 2020 Crown Copyright (Health Education England)
+ *
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,19 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
-import lombok.Data;
+import org.springframework.stereotype.Component;
+import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
+import uk.nhs.hee.tis.trainee.reference.dto.Status;
 
 /**
- * A DTO for Curriculum entity. Holds all options for Curriculum.
+ * A validator for {@link CurriculumDto}.
  */
-@Data
-public class CurriculumDto {
+@Component
+public class CurriculumValidator implements ReferenceValidator<CurriculumDto> {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private String curriculumSubType;
-  private Status status;
+  /**
+   * Whether the given curriculum is valid for storage within the reference service.
+   *
+   * @param dto The curriculum to validate.
+   * @return true if valid, else false.
+   */
+  @Override
+  public boolean isValid(CurriculumDto dto) {
+    return dto.getStatus() == Status.CURRENT
+        && dto.getCurriculumSubType().equals("MEDICAL_CURRICULUM");
+  }
 }

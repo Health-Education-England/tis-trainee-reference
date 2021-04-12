@@ -21,23 +21,40 @@
 
 package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
-import org.springframework.stereotype.Component;
-import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
 import uk.nhs.hee.tis.trainee.reference.dto.Status;
 
-/**
- * A validator for {@link GradeDto}.
- */
-@Component
-public class GradeValidator implements ReferenceValidator<GradeDto> {
+class CurriculumValidatorTest {
 
-  /**
-   * Whether the given grade is valid for storage within the reference service.
-   *
-   * @param dto The grade to validate.
-   * @return true if valid, else false.
-   */
-  public boolean isValid(GradeDto dto) {
-    return dto.getStatus() == Status.CURRENT && dto.isPlacementGrade() && dto.isTrainingGrade();
+  private CurriculumValidator validator;
+
+  @BeforeEach
+  void setUp() {
+    validator = new CurriculumValidator();
+  }
+
+  @ParameterizedTest(
+      name = "Valid should be {2} when status is {0} and curriculumSubType is equal to {1}."
+  )
+  @CsvSource({
+      "INACTIVE,Other,false",
+      "INACTIVE,MEDICAL_CURRICULUM,false",
+      "CURRENT,Other,false",
+      "CURRENT,MEDICAL_CURRICULUM,true"
+  })
+  void shouldValidateCurriculum(Status status, String curriculumSubType, boolean result) {
+    CurriculumDto dto = new CurriculumDto();
+    dto.setStatus(status);
+    dto.setCurriculumSubType(curriculumSubType);
+
+    boolean valid = validator.isValid(dto);
+    assertThat("Unexpected validity.", valid, is(result));
   }
 }

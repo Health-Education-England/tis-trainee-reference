@@ -1,6 +1,7 @@
 /*
  * The MIT License (MIT)
- * Copyright 2020 Crown Copyright (Health Education England)
+ *
+ * Copyright 2021 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,19 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
-
-import lombok.Data;
+package uk.nhs.hee.tis.trainee.reference.dto.validator;
 
 /**
- * A DTO for Curriculum entity. Holds all options for Curriculum.
+ * An interface for validators of reference types.
+ *
+ * @param <T> The reference type to validate.
  */
-@Data
-public class CurriculumDto {
+public interface ReferenceValidator<T> {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private String curriculumSubType;
-  private Status status;
+  /**
+   * Whether the given reference object is valid.
+   *
+   * @param referenceType The object to validate.
+   * @return true if valid, else false.
+   */
+  boolean isValid(T referenceType);
 }
