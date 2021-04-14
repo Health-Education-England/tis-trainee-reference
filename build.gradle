@@ -45,7 +45,7 @@ dependencies {
   implementation "io.sentry:sentry-spring-boot-starter:4.3.0"
 
   // Swagger
-  ext.swaggerVersion = "2.9.2"
+  ext.swaggerVersion = "3.0.0"
   implementation "io.springfox:springfox-swagger2:$swaggerVersion"
   implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
 }
