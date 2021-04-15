@@ -45,6 +45,8 @@ class CurriculumValidatorTest {
   @CsvSource({
       "INACTIVE,Other,false",
       "INACTIVE,MEDICAL_CURRICULUM,false",
+      "DELETE,Other,false",
+      "DELETE,MEDICAL_CURRICULUM,false",
       "CURRENT,Other,false",
       "CURRENT,MEDICAL_CURRICULUM,true",
       "CURRENT,,false",
