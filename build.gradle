@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "uk.nhs.hee.tis.trainee"
-version = "0.3.2"
+version = "0.3.3"
 sourceCompatibility = "11"
 
 configurations {
@@ -40,6 +40,11 @@ dependencies {
   ext.mapStructVersion = "1.4.2.Final"
   implementation "org.mapstruct:mapstruct:$mapStructVersion"
   annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+
+  // Mongock
+  ext.mongockVersion = "4.3.8"
+  implementation "com.github.cloudyrock.mongock:mongock-spring-v5:${mongockVersion}"
+  implementation "com.github.cloudyrock.mongock:mongodb-springdata-v3-driver:${mongockVersion}"
 
   // Sentry reporting
   implementation "io.sentry:sentry-spring-boot-starter:4.3.0"
