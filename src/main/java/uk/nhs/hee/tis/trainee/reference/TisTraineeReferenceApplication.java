@@ -23,6 +23,7 @@ package uk.nhs.hee.tis.trainee.reference;
 
 import static springfox.documentation.builders.PathSelectors.regex;
 
+import com.github.cloudyrock.spring.v5.EnableMongock;
 import java.util.Collections;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,6 +34,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@EnableMongock
 @SpringBootApplication
 @EnableSwagger2
 public class TisTraineeReferenceApplication {
