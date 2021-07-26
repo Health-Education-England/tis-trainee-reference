@@ -40,5 +40,6 @@ public interface CurriculumMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "tisId", ignore = true)
+  @Mapping(target = "curriculumSubType", ignore = true)
   Curriculum update(@MappingTarget Curriculum target, Curriculum source);
 }

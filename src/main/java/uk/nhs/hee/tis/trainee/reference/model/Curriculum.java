@@ -35,4 +35,5 @@ public class Curriculum {
   @Indexed(unique = true)
   private String tisId;
   private String label;
+  private String curriculumSubType;
 }
