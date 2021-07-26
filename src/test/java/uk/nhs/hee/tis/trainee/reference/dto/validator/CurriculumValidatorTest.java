@@ -49,6 +49,7 @@ class CurriculumValidatorTest {
       "DELETE,MEDICAL_CURRICULUM,false",
       "CURRENT,Other,false",
       "CURRENT,MEDICAL_CURRICULUM,true",
+      "CURRENT,SUB_SPECIALTY, true",
       "CURRENT,,false",
       ",MEDICAL_CURRICULUM,false",
       ",,false"
