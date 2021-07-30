@@ -70,6 +70,9 @@ class CurriculumResourceTest {
   private static final String DEFAULT_LABEL_1 = "GP Returner";
   private static final String DEFAULT_LABEL_2 = "Paediatrics";
 
+  private static final String DEFAULT_CURRICULUM_SUBTYPE_1 = "MEDICAL_CURRICULUM";
+  private static final String DEFAULT_CURRICULUM_SUBTYPE_2 = "SUB_SPECIALTY";
+
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -110,16 +113,19 @@ class CurriculumResourceTest {
     dto.setId(DEFAULT_ID_1);
     dto.setTisId(DEFAULT_TIS_ID_1);
     dto.setLabel(DEFAULT_LABEL_1);
+    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
 
     entity1 = new Curriculum();
     entity1.setId(DEFAULT_ID_1);
     entity1.setTisId(DEFAULT_TIS_ID_1);
     entity1.setLabel(DEFAULT_LABEL_1);
+    entity1.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
 
     entity2 = new Curriculum();
     entity2.setId(DEFAULT_ID_2);
     entity2.setTisId(DEFAULT_TIS_ID_2);
     entity2.setLabel(DEFAULT_LABEL_2);
+    entity2.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_2);
   }
 
   @Test
@@ -149,7 +155,8 @@ class CurriculumResourceTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
+        .andExpect(jsonPath("$.curriculumSubType").value(is(DEFAULT_CURRICULUM_SUBTYPE_1)));
   }
 
   @Test
@@ -178,7 +185,8 @@ class CurriculumResourceTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
         .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
+        .andExpect(jsonPath("$.curriculumSubType").value(is(DEFAULT_CURRICULUM_SUBTYPE_1)));
   }
 
   @Test
