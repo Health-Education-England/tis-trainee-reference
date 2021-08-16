@@ -48,7 +48,7 @@ import uk.nhs.hee.tis.trainee.reference.service.DeclarationTypeService;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = DeclarationTypeResource.class)
-public class DeclarationTypeResourceTest {
+class DeclarationTypeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";

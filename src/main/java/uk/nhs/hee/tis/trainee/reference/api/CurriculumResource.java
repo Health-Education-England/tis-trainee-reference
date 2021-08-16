@@ -43,11 +43,11 @@ import uk.nhs.hee.tis.trainee.reference.service.CurriculumService;
 @RequestMapping("/api")
 public class CurriculumResource {
 
-  private CurriculumService service;
-  private CurriculumMapper mapper;
-  private CurriculumValidator validator;
+  private final CurriculumService service;
+  private final CurriculumMapper mapper;
+  private final CurriculumValidator validator;
 
-  public CurriculumResource(CurriculumService service, CurriculumMapper mapper,
+  CurriculumResource(CurriculumService service, CurriculumMapper mapper,
       CurriculumValidator validator) {
     this.service = service;
     this.mapper = mapper;

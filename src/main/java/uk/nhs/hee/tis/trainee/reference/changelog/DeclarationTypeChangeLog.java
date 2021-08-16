@@ -30,6 +30,11 @@ import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 @ChangeLog
 public class DeclarationTypeChangeLog {
 
+  /**
+   * Insert the initial data for the {@link DeclarationType} collection.
+   *
+   * @param mongockTemplate The mongo template for the dotabase.
+   */
   @ChangeSet(order = "001", id = "insertInitialDeclarationTypes", author = "")
   public void insertInitialDeclarationTypes(MongockTemplate mongockTemplate) {
     DeclarationType significantEvent = new DeclarationType();

@@ -30,6 +30,11 @@ import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 @ChangeLog
 public class CovidChangeCircumstanceChangeLog {
 
+  /**
+   * Insert the initial data for the {@link CovidChangeCircumstance} collection.
+   *
+   * @param mongockTemplate The mongo template for the dotabase.
+   */
   @ChangeSet(order = "001", id = "insertInitialCovidChangeCircumstances", author = "")
   public void insertInitialCovidChangeCircumstances(MongockTemplate mongockTemplate) {
     CovidChangeCircumstance selfIsolation = new CovidChangeCircumstance();
