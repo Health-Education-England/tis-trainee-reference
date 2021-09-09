@@ -32,4 +32,6 @@ public class DbcDto {
   private String id;
   private String tisId;
   private String label;
+  private String type;
+  private boolean internal;
 }

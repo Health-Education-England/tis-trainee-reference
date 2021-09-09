@@ -43,8 +43,8 @@ import uk.nhs.hee.tis.trainee.reference.service.DbcService;
 @RequestMapping("/api/dbc")
 public class DbcResource {
 
-  private DbcService service;
-  private DbcMapper mapper;
+  private final DbcService service;
+  private final DbcMapper mapper;
 
   public DbcResource(DbcService service, DbcMapper mapper) {
     this.service = service;

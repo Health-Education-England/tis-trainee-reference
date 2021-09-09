@@ -49,12 +49,18 @@ class DbcServiceTest {
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
   private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
 
+  private static final boolean DEFAULT_INTERNAL_1 = true;
+  private static final boolean DEFAULT_INTERNAL_2 = false;
+
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
   private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
+
+  private static final String DEFAULT_TYPE_1 = "DEFAULT_TYPE_1";
+  private static final String DEFAULT_TYPE_2 = "DEFAULT_TYPE_2";
 
   private DbcService service;
 
@@ -75,11 +81,15 @@ class DbcServiceTest {
     dbc1.setId(DEFAULT_ID_1);
     dbc1.setTisId(DEFAULT_TIS_ID_1);
     dbc1.setLabel(DEFAULT_LABEL_1);
+    dbc1.setType(DEFAULT_TYPE_1);
+    dbc1.setInternal(DEFAULT_INTERNAL_1);
 
     dbc2 = new Dbc();
     dbc2.setId(DEFAULT_ID_2);
     dbc2.setTisId(DEFAULT_TIS_ID_2);
     dbc2.setLabel(DEFAULT_LABEL_2);
+    dbc2.setType(DEFAULT_TYPE_2);
+    dbc2.setInternal(DEFAULT_INTERNAL_2);
   }
 
   @Test
@@ -107,6 +117,8 @@ class DbcServiceTest {
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected type.", dbc.getType(), is(DEFAULT_TYPE_2));
+    assertThat("Unexpected internal flag.", dbc.isInternal(), is(DEFAULT_INTERNAL_2));
   }
 
   @Test
@@ -119,6 +131,8 @@ class DbcServiceTest {
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected type.", dbc.getType(), is(DEFAULT_TYPE_2));
+    assertThat("Unexpected internal flag.", dbc.isInternal(), is(DEFAULT_INTERNAL_2));
   }
 
   @Test
@@ -131,6 +145,8 @@ class DbcServiceTest {
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected type.", dbc.getType(), is(DEFAULT_TYPE_2));
+    assertThat("Unexpected internal flag.", dbc.isInternal(), is(DEFAULT_INTERNAL_2));
   }
 
   @Test
@@ -143,6 +159,8 @@ class DbcServiceTest {
     assertThat("Unexpected id.", dbc.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", dbc.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", dbc.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected type.", dbc.getType(), is(DEFAULT_TYPE_2));
+    assertThat("Unexpected internal flag.", dbc.isInternal(), is(DEFAULT_INTERNAL_2));
   }
 
   @Test
