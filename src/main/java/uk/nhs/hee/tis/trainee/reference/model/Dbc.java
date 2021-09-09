@@ -36,4 +36,6 @@ public class Dbc {
   @Indexed(unique = true)
   private String tisId;
   private String label;
+  private String type;
+  private boolean internal;
 }
