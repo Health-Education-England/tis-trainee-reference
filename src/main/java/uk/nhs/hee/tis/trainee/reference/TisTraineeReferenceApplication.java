@@ -21,52 +21,15 @@
 
 package uk.nhs.hee.tis.trainee.reference;
 
-import static springfox.documentation.builders.PathSelectors.regex;
-
 import com.github.cloudyrock.spring.v5.EnableMongock;
-import java.util.Collections;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableMongock
 @SpringBootApplication
-@EnableSwagger2
 public class TisTraineeReferenceApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(TisTraineeReferenceApplication.class);
-  }
-
-  /**
-   * Configure swagger.
-   *
-   * @return The swagger configuration {@link Docket}.
-   */
-  @Bean
-  public Docket swaggerConfiguration() {
-    return new Docket(DocumentationType.SWAGGER_2)
-        .select()
-        .paths(regex("/api.*"))
-        .apis(RequestHandlerSelectors.basePackage("uk.nhs.hee.tis.trainee.reference"))
-        .build()
-        .apiInfo(apiDetails());
-  }
-
-  private ApiInfo apiDetails() {
-    return new ApiInfo(
-        "Trainee Reference API",
-        "The TIS-TRAINEE-REFERENCE microservice's APIs",
-        "1.0",
-        "These will be consumed by React UI or other microservices",
-        new springfox.documentation.service.Contact("Contact", "TIS Dev Team", "aaaa@hee.nhs.uk"),
-        "API Licence",
-        "TIS",
-        Collections.emptyList());
   }
 }
