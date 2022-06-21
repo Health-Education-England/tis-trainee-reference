@@ -30,6 +30,7 @@ import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 @Mapper(componentModel = "spring")
 public interface CurriculumMapper {
 
+  @Mapping(target = "status", ignore = true)
   CurriculumDto toDto(Curriculum curriculum);
 
   List<CurriculumDto> toDtos(List<Curriculum> curricula);
