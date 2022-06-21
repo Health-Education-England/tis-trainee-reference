@@ -7,7 +7,7 @@ Deployment Status: ![CI/CD Workflow](https://github.com/Health-Education-England
 This is a service to manage trainee reference data with the following
 technology:
 
- - Java 11
+ - Java 17
  - Spring Boot
  - Gradle
  - JUnit 5

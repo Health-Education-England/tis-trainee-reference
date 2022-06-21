@@ -21,7 +21,7 @@
 
 package uk.nhs.hee.tis.trainee.reference;
 
-import com.github.cloudyrock.spring.v5.EnableMongock;
+import io.mongock.runner.springboot.EnableMongock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
