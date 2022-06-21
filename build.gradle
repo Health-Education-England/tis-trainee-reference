@@ -11,7 +11,6 @@ plugins {
 
 group = "uk.nhs.hee.tis.trainee"
 version = "0.5.1"
-sourceCompatibility = "11"
 
 configurations {
   compileOnly {
@@ -53,6 +52,13 @@ dependencies {
 checkstyle {
   toolVersion = "8.29"
   config = resources.text.fromArchiveEntry(configurations.checkstyle[0], "google_checks.xml")
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+    vendor = JvmVendorSpec.ADOPTIUM
+  }
 }
 
 jacocoTestReport {
