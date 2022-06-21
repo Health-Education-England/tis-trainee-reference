@@ -31,6 +31,9 @@ import uk.nhs.hee.tis.trainee.reference.model.Grade;
 @Mapper(componentModel = "spring")
 public interface GradeMapper {
 
+  @Mapping(target = "placementGrade", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "trainingGrade", ignore = true)
   GradeDto toDto(Grade grade);
 
   List<GradeDto> toDtos(List<Grade> grades);

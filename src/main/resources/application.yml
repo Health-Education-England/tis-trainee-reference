@@ -1,5 +1,5 @@
 mongock:
-  change-logs-scan-package: uk.nhs.hee.tis.trainee.reference.changelog
+  migration-scan-package: uk.nhs.hee.tis.trainee.reference.changelog
 
 server:
   port: 8205
