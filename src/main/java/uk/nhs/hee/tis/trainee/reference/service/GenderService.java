@@ -21,12 +21,14 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.repository.GenderRepository;
 
 @Service
+@XRayEnabled
 public class GenderService extends AbstractReferenceService<Gender> {
 
   private GenderMapper mapper;

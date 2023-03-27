@@ -22,12 +22,15 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import java.util.List;
+
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 import uk.nhs.hee.tis.trainee.reference.repository.CovidChangeCircumstanceRepository;
 
 @Service
+@XRayEnabled
 public class CovidChangeCircumstanceService {
 
   CovidChangeCircumstanceRepository changeCircumstanceRepository;

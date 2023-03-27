@@ -21,12 +21,14 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
 import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
 
 @Service
+@XRayEnabled
 public class DbcService extends AbstractReferenceService<Dbc> {
 
   private DbcMapper mapper;

@@ -34,7 +34,7 @@ gradlew bootRun
 | DB_PASSWORD        | The password to access the MongoDB instance.  | pwd       |
 | AUTH_SOURCE        | The authentication database.                  | admin     |
 | SENTRY_DSN         | A Sentry error monitoring Data Source Name.   |           |
-| SENTRY_ENVIRONMENT | The environment to log Sentry events against. | local     |
+| ENVIRONMENT | The environment to log Sentry events against. | local     |
 
 #### Usage Examples
 

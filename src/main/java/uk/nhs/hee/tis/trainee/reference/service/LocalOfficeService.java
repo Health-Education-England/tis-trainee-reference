@@ -21,12 +21,14 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
 @Service
+@XRayEnabled
 public class LocalOfficeService extends AbstractReferenceService<LocalOffice> {
 
   private LocalOfficeMapper mapper;
