@@ -21,12 +21,14 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
 
 @Service
+@XRayEnabled
 public class CurriculumService extends AbstractReferenceService<Curriculum> {
 
   private CurriculumMapper mapper;
