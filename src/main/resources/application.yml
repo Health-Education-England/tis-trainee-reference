@@ -1,3 +1,6 @@
+application:
+  environment: ${ENVIRONMENT:local}
+
 mongock:
   migration-scan-package: uk.nhs.hee.tis.trainee.reference.changelog
 
@@ -13,7 +16,7 @@ spring:
 
 sentry:
   dsn: ${SENTRY_DSN:}
-  environment: ${ENVIRONMENT:local}
+  environment: ${application.environment}
 
 com:
   amazonaws:

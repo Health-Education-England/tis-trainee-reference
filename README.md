@@ -25,16 +25,16 @@ gradlew bootRun
 
 #### Environmental Variables
 
-| Name               | Description                                   | Default   |
-| ------------------ | --------------------------------------------- | --------- |
-| DB_HOST            | The MongoDB host to connect to.               | localhost |
-| DB_PORT            | The port to connect to MongoDB on.            | 27017     |
-| DB_NAME            | The name of the MongoDB database.             | reference |
-| DB_USER            | The username to access the MongoDB instance.  | admin     |
-| DB_PASSWORD        | The password to access the MongoDB instance.  | pwd       |
-| AUTH_SOURCE        | The authentication database.                  | admin     |
-| SENTRY_DSN         | A Sentry error monitoring Data Source Name.   |           |
-| ENVIRONMENT | The environment to log Sentry events against. | local     |
+| Name        | Description                                  | Default   |
+|-------------|----------------------------------------------|-----------|
+| DB_HOST     | The MongoDB host to connect to.              | localhost |
+| DB_PORT     | The port to connect to MongoDB on.           | 27017     |
+| DB_NAME     | The name of the MongoDB database.            | reference |
+| DB_USER     | The username to access the MongoDB instance. | admin     |
+| DB_PASSWORD | The password to access the MongoDB instance. | pwd       |
+| AUTH_SOURCE | The authentication database.                 | admin     |
+| ENVIRONMENT | The environment to log events against.       | local     |
+| SENTRY_DSN  | A Sentry error monitoring Data Source Name.  |           |
 
 #### Usage Examples
 
