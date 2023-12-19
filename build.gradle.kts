@@ -1,11 +1,11 @@
 plugins {
-  id "java"
+  java
   id("org.springframework.boot") version "2.7.5"
   id("io.spring.dependency-management") version "1.1.4"
 
   // Code quality plugins
-  id "checkstyle"
-  id "jacoco"
+  checkstyle
+  jacoco
   id("org.sonarqube") version "4.4.1.3373"
 }
 
@@ -14,7 +14,7 @@ version = "1.3.0"
 
 configurations {
   compileOnly {
-    extendsFrom(annotationProcessor)
+    extendsFrom(configurations.annotationProcessor.get())
   }
 }
 
@@ -38,12 +38,12 @@ dependencies {
   annotationProcessor("org.projectlombok:lombok")
 
   // MapStruct
-  ext.mapStructVersion = "1.5.5.Final"
+  val mapStructVersion = "1.5.5.Final"
   implementation("org.mapstruct:mapstruct:$mapStructVersion")
   annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 
   // Mongock
-  ext.mongockVersion = "5.3.6"
+  val mongockVersion = "5.3.6"
   implementation("io.mongock:mongock-springboot:${mongockVersion}")
   implementation("io.mongock:mongodb-springdata-v3-driver:${mongockVersion}")
 
@@ -52,7 +52,7 @@ dependencies {
 }
 
 checkstyle {
-  config = resources.text.fromArchiveEntry(configurations.checkstyle[0], "google_checks.xml")
+  config = resources.text.fromArchiveEntry(configurations.checkstyle.get().first(), "google_checks.xml")
 }
 
 java {
