@@ -26,7 +26,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 
-import com.github.cloudyrock.mongock.driver.mongodb.springdata.v3.decorator.impl.MongockTemplate;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +44,7 @@ class CovidChangeCircumstanceChangeLogTest {
   private CovidChangeCircumstanceChangeLog changeLog;
 
   @Mock
-  private MongockTemplate template;
+  private MongoTemplate template;
 
   @BeforeEach
   void setUp() {

@@ -23,20 +23,26 @@ package uk.nhs.hee.tis.trainee.reference.changelog;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
-import com.github.cloudyrock.mongock.driver.mongodb.springdata.v3.decorator.impl.MongockTemplate;
 import java.util.Set;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 
+/**
+ * Change logs for the CovidChangeCircumstance collection.
+ *
+ * @deprecated This approach was deprecated by Mongock in version 5.
+ */
+@Deprecated(since = "1.0.0")
 @ChangeLog
 public class CovidChangeCircumstanceChangeLog {
 
   /**
    * Insert the initial data for the {@link CovidChangeCircumstance} collection.
    *
-   * @param mongockTemplate The mongo template for the dotabase.
+   * @param mongoTemplate The mongo template for the dotabase.
    */
   @ChangeSet(order = "001", id = "insertInitialCovidChangeCircumstances", author = "")
-  public void insertInitialCovidChangeCircumstances(MongockTemplate mongockTemplate) {
+  public void insertInitialCovidChangeCircumstances(MongoTemplate mongoTemplate) {
     CovidChangeCircumstance selfIsolation = new CovidChangeCircumstance();
     selfIsolation.setLabel("Any Period of self-isolation");
 
@@ -52,6 +58,6 @@ public class CovidChangeCircumstanceChangeLog {
     CovidChangeCircumstance other = new CovidChangeCircumstance();
     other.setLabel("Other");
 
-    mongockTemplate.insertAll(Set.of(selfIsolation, highRisk, redeploy, limited, other));
+    mongoTemplate.insertAll(Set.of(selfIsolation, highRisk, redeploy, limited, other));
   }
 }

@@ -21,17 +21,21 @@
 
 package uk.nhs.hee.tis.trainee.reference.config;
 
-import com.amazonaws.xray.javax.servlet.AWSXRayServletFilter;
-import javax.servlet.Filter;
+import com.amazonaws.xray.jakarta.servlet.AWSXRayServletFilter;
+import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration for AWS X-Ray tracing.
+ */
 @Configuration
 @ConditionalOnExpression("!T(org.springframework.util.StringUtils)"
     + ".isEmpty('${com.amazonaws.xray.emitters.daemon-address}')")
 public class AwsXrayConfiguration {
+
   @Bean
   public Filter tracingFilter(@Value("${application.environment}") String environment) {
     return new AWSXRayServletFilter("tis-trainee-reference-" + environment);

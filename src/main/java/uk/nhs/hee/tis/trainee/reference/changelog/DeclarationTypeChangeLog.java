@@ -23,20 +23,26 @@ package uk.nhs.hee.tis.trainee.reference.changelog;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
-import com.github.cloudyrock.mongock.driver.mongodb.springdata.v3.decorator.impl.MongockTemplate;
 import java.util.Set;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 
+/**
+ * Change logs for the DeclarationType collection.
+ *
+ * @deprecated This approach was deprecated by Mongock in version 5.
+ */
+@Deprecated(since = "1.0.0")
 @ChangeLog
 public class DeclarationTypeChangeLog {
 
   /**
    * Insert the initial data for the {@link DeclarationType} collection.
    *
-   * @param mongockTemplate The mongo template for the dotabase.
+   * @param mongoTemplate The mongo template for the dotabase.
    */
   @ChangeSet(order = "001", id = "insertInitialDeclarationTypes", author = "")
-  public void insertInitialDeclarationTypes(MongockTemplate mongockTemplate) {
+  public void insertInitialDeclarationTypes(MongoTemplate mongoTemplate) {
     DeclarationType significantEvent = new DeclarationType();
     significantEvent.setLabel("Significant event");
 
@@ -46,6 +52,6 @@ public class DeclarationTypeChangeLog {
     DeclarationType otherInvestigation = new DeclarationType();
     otherInvestigation.setLabel("Other investigation");
 
-    mongockTemplate.insertAll(Set.of(significantEvent, complaint, otherInvestigation));
+    mongoTemplate.insertAll(Set.of(significantEvent, complaint, otherInvestigation));
   }
 }
