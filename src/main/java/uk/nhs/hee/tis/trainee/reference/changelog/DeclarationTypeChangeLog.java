@@ -27,6 +27,12 @@ import java.util.Set;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 
+/**
+ * Change logs for the DeclarationType collection.
+ *
+ * @deprecated This approach was deprecated by Mongock in version 5.
+ */
+@Deprecated(since = "1.0.0")
 @ChangeLog
 public class DeclarationTypeChangeLog {
 
