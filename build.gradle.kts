@@ -51,15 +51,15 @@ dependencies {
   implementation("io.sentry:sentry-spring-boot-starter:7.1.0")
 }
 
-checkstyle {
-  config = resources.text.fromArchiveEntry(configurations.checkstyle.get().first(), "google_checks.xml")
-}
-
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(17))
     vendor.set(JvmVendorSpec.ADOPTIUM)
   }
+}
+
+checkstyle {
+  config = resources.text.fromArchiveEntry(configurations.checkstyle.get().first(), "google_checks.xml")
 }
 
 sonarqube {
