@@ -31,15 +31,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class LocalOfficeContact {
 
   @Id
-  private String tisId;
+  private String tisId; //this table does not have the old numeric ID field
 
   @Indexed()
   private String localOfficeId;
-
   private String contactTypeId;
   private String contact;
 
-  //denormalised from related records
+  //denormalise from related records: enrichment of these fields will follow in next PR
   private String localOfficeName;
   private String contactTypeName;
 }

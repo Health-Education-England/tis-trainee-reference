@@ -23,9 +23,7 @@ package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import java.util.List;
-import java.util.Set;
 import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
@@ -44,11 +42,7 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
     this.repository = repository;
   }
 
-  public List<LocalOfficeContactDetailsDto> getByLocalOfficeName(String localOfficeName) {
-    return repository.findByLocalOfficeName(localOfficeName);
-  }
-
-  public List<LocalOfficeContact> getByLocalOfficeId(String localOfficeId) {
+  public List<LocalOfficeContact> getByLocalOfficeUuid(String localOfficeId) {
     return repository.findByLocalOfficeId(localOfficeId);
   }
 

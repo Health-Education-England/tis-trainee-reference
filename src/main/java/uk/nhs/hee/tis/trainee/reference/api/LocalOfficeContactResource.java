@@ -34,9 +34,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
-import uk.nhs.hee.tis.trainee.reference.facade.LocalOfficeContactEnricherFacade;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
@@ -49,26 +47,11 @@ public class LocalOfficeContactResource {
 
   private LocalOfficeContactService service;
   private LocalOfficeContactMapper mapper;
-  private LocalOfficeContactEnricherFacade facade;
 
   public LocalOfficeContactResource(LocalOfficeContactService service,
-      LocalOfficeContactMapper mapper, LocalOfficeContactEnricherFacade facade) {
+      LocalOfficeContactMapper mapper) {
     this.service = service;
     this.mapper = mapper;
-    this.facade = facade;
-  }
-
-  /**
-   * Get LocalOfficeContacts from reference table for the provided local office.
-   *
-   * @return list of LocalOfficeContacts.
-   */
-  @GetMapping("/local-office-contact-by-lo-name/{localOfficeName}")
-  public List<LocalOfficeContactDetailsDto> getLocalOfficeContactByLoName(
-      @PathVariable String localOfficeName) {
-    log.trace("Get all LocalOfficeContacts for '{}'", localOfficeName);
-    List<LocalOfficeContactDetailsDto> localOfficeContacts = service.getByLocalOfficeName(localOfficeName);
-    return  localOfficeContacts; // mapper.toDtos(localOfficeContacts);
   }
 
   /**
@@ -76,11 +59,11 @@ public class LocalOfficeContactResource {
    *
    * @return list of LocalOfficeContacts.
    */
-  @GetMapping("/local-office-contact-by-lo-id/{localOfficeId}")
-  public List<LocalOfficeContactDto> getLocalOfficeContactByLoId(
-      @PathVariable String localOfficeId) {
-    log.trace("Get all LocalOfficeContacts for '{}'", localOfficeId);
-    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeId(localOfficeId);
+  @GetMapping("/local-office-contact-by-lo-uuid/{localOfficeUuid}")
+  public List<LocalOfficeContactDto> getLocalOfficeContactsByLoUuid(
+      @PathVariable String localOfficeUuid) {
+    log.trace("Get all LocalOfficeContacts for Local office UUID '{}'", localOfficeUuid);
+    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeUuid(localOfficeUuid);
     return mapper.toDtos(localOfficeContacts);
   }
 
@@ -89,7 +72,7 @@ public class LocalOfficeContactResource {
    *
    * @return list of LocalOfficeContacts.
    */
-  @GetMapping("/local-office-contacts")
+  @GetMapping("/local-office-contact")
   public List<LocalOfficeContactDto> getLocalOfficeContacts() {
     log.trace("Get all LocalOfficeContacts");
     List<LocalOfficeContact> localOfficeContacts = service.get();
@@ -106,7 +89,6 @@ public class LocalOfficeContactResource {
   public ResponseEntity<LocalOfficeContactDto> createLocalOfficeContact(
       @RequestBody LocalOfficeContactDto localOfficeContactDto) {
     LocalOfficeContact localOfficeContact = mapper.toEntity(localOfficeContactDto);
-    localOfficeContact = facade.enrich(localOfficeContact);
     localOfficeContact = service.create(localOfficeContact);
     return ResponseEntity.created(URI.create("/api/localOfficeContact"))
         .body(mapper.toDto(localOfficeContact));
@@ -123,7 +105,6 @@ public class LocalOfficeContactResource {
   public ResponseEntity<LocalOfficeContactDto> updateLocalOfficeContact(
       @RequestBody LocalOfficeContactDto localOfficeContactDto) {
     LocalOfficeContact localOfficeContact = mapper.toEntity(localOfficeContactDto);
-    localOfficeContact = facade.enrich(localOfficeContact);
     localOfficeContact = service.update(localOfficeContact);
     return ResponseEntity.ok(mapper.toDto(localOfficeContact));
   }

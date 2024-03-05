@@ -32,4 +32,5 @@ public class LocalOfficeDto {
   private String id;
   private String tisId;
   private String label;
+  private String uuid;
 }

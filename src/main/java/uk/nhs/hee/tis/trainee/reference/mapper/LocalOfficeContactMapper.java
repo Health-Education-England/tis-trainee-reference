@@ -25,6 +25,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.web.bind.annotation.PostMapping;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
@@ -35,6 +36,8 @@ public interface LocalOfficeContactMapper {
 
   List<LocalOfficeContactDto> toDtos(List<LocalOfficeContact> localOfficeContacts);
 
+  @Mapping(target = "localOfficeName", ignore = true)
+  @Mapping(target = "contactTypeName", ignore = true)
   LocalOfficeContact toEntity(LocalOfficeContactDto localOfficeContactDto);
 
   List<LocalOfficeContact> toEntities(List<LocalOfficeContactDto> localOfficeContactDtos);

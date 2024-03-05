@@ -22,44 +22,12 @@
 package uk.nhs.hee.tis.trainee.reference.repository;
 
 import java.util.List;
-import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.stereotype.Repository;
-import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
 @Repository
 public interface LocalOfficeContactRepository extends ReferenceRepository<LocalOfficeContact> {
 
-  @Aggregation(pipeline = {
-      "{ $lookup: { "
-          + "from: 'LocalOffice', "
-          + "localField: 'localOfficeId', "
-          + "foreignField: 'uuid', "
-          + "as: 'localOffice' "
-          + "}}",
-      "{ $unwind: '$localOffice' }",
-      "{ $match: {"
-          + "'localOffice.label': ?0 "
-          + "}}",
-      "{ $lookup: { "
-          + "from: 'LocalOfficeContactType', "
-          + "localField: 'contactTypeId', "
-          + "foreignField: 'tisId', "
-          + "as: 'contactType' "
-          + "}}",
-      "{ $unwind: '$contactType' }",
-      "{ $project: {"
-          + "localOfficeId: '$localOfficeId', "
-          + "contactTypeId: '$contactTypeId', "
-          + "localOfficeContactId: '$tisId', "
-          + "contact: '$contact', "
-          + "localOfficeName: '$localOffice.label', "
-          + "contactTypeName: '$contactType.label' "
-          + "}}"
-  })
-  List<LocalOfficeContactDetailsDto> findByLocalOfficeName(String localOfficeName);
-
   List<LocalOfficeContact> findByLocalOfficeId(String localOfficeId);
 
-  List<LocalOfficeContact> findByContactTypeId(String contactTypeId);
 }

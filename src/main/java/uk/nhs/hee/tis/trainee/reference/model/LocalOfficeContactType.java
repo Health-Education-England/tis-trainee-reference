@@ -23,7 +23,6 @@ package uk.nhs.hee.tis.trainee.reference.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "LocalOfficeContactType")
@@ -31,7 +30,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class LocalOfficeContactType {
 
   @Id
-  private String tisId;
+  private String tisId; //this table does not have the old numeric ID field
 
   private String code;
   private String label;

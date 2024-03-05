@@ -36,4 +36,5 @@ public class LocalOffice {
   @Indexed(unique = true)
   private String tisId;
   private String label;
+  private String uuid;
 }
