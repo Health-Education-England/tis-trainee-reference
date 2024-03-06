@@ -90,10 +90,10 @@ class ProgrammeMembershipTypeServiceTest {
     when(repository.findAll(Sort.by("label"))).thenReturn(programmeMembershipTypes);
     List<ProgrammeMembershipType> allProgrammeMembershipTypes = service.get();
     assertThat("Unexpected size of returned ProgrammeMembershipType list",
-            allProgrammeMembershipTypes.size(), equalTo(programmeMembershipTypes.size()));
+        allProgrammeMembershipTypes.size(), equalTo(programmeMembershipTypes.size()));
     assertThat("The returned ProgrammeMembershipType list doesn't contain the expected "
-                + "ProgrammeMembershipType",
-            allProgrammeMembershipTypes, hasItem(programmeMembershipType1));
+            + "ProgrammeMembershipType",
+        allProgrammeMembershipTypes, hasItem(programmeMembershipType1));
   }
 
   @Test

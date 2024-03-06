@@ -91,7 +91,7 @@ class ImmigrationStatusServiceTest {
     assertThat("Unexpected size of returned ImmigrationStatus list",
         allImmigrationStatus.size(), equalTo(immigrationStatus.size()));
     assertThat("The returned immigration status list doesn't contain the expected immigration "
-            + "status", allImmigrationStatus, hasItem(immigrationStatus1));
+        + "status", allImmigrationStatus, hasItem(immigrationStatus1));
   }
 
   @Test

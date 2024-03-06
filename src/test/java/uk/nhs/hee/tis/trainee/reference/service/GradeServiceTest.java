@@ -88,7 +88,7 @@ class GradeServiceTest {
     grades.add(grade2);
     when(repository.findAll(Sort.by("label"))).thenReturn(grades);
     List<Grade> allGrades = service.get();
-    assertThat("Unexpected size of returned Ggrade list",
+    assertThat("Unexpected size of returned Grade list",
         allGrades.size(), equalTo(grades.size()));
     assertThat("The returned grade list doesn't contain the expected grade",
         allGrades, hasItem(grade1));

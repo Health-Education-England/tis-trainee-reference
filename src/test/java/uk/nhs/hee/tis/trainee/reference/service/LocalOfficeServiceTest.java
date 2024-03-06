@@ -96,7 +96,7 @@ class LocalOfficeServiceTest {
     when(repository.findAll(Sort.by("label"))).thenReturn(localOffices);
     List<LocalOffice> allLocalOffices = service.get();
     assertThat("Unexpected size of returned local office list",
-            allLocalOffices.size(), equalTo(localOffices.size()));
+        allLocalOffices.size(), equalTo(localOffices.size()));
     assertThat("The returned local office list doesn't contain the expected local office",
         allLocalOffices, hasItem(localOffice1));
   }

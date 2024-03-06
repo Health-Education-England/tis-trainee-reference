@@ -82,7 +82,7 @@ class CovidChangeCircumstanceServiceTest {
 
     assertThat("Unexpected size of returned CovidChangeCircumstance list",
         allCovidChangeCircs.size(), equalTo(covidChangeCircs.size()));
-    assertThat("The returned CovidChangeCircumstance list doesn't not contain the expected "
-            + "covid change item", allCovidChangeCircs, hasItem(covidChangeCirc1));
+    assertThat("The returned CovidChangeCircumstance list doesn't contain the expected "
+        + "covid change item", allCovidChangeCircs, hasItem(covidChangeCirc1));
   }
 }

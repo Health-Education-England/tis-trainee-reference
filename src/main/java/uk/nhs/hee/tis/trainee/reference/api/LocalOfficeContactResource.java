@@ -95,8 +95,8 @@ public class LocalOfficeContactResource {
   }
 
   /**
-   * Update a LocalOfficeContact with a matching tisId value, or creates a new LocalOfficeContact
-   * if the ID was not found.
+   * Update a LocalOfficeContact with a matching tisId value, or creates a new LocalOfficeContact if
+   * the ID was not found.
    *
    * @param localOfficeContactDto The LocalOfficeContact details to update.
    * @return The updated (or created) LocalOfficeContact.

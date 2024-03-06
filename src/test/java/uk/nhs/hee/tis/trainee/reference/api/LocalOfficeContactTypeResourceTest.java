@@ -114,10 +114,10 @@ class LocalOfficeContactTypeResourceTest {
 
   @Test
   void testGetAllLocalOfficeContactTypes() throws Exception {
-    List<LocalOfficeContactType> localOffices = new ArrayList<>();
-    localOffices.add(contactType1);
-    localOffices.add(contactType2);
-    when(localOfficeContactTypeServiceMock.get()).thenReturn(localOffices);
+    List<LocalOfficeContactType> contactTypes = new ArrayList<>();
+    contactTypes.add(contactType1);
+    contactTypes.add(contactType2);
+    when(localOfficeContactTypeServiceMock.get()).thenReturn(contactTypes);
     this.mockMvc.perform(get("/api/local-office-contact-type")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())

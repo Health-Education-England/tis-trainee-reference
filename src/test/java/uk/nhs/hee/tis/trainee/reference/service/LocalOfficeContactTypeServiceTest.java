@@ -92,9 +92,9 @@ class LocalOfficeContactTypeServiceTest {
     when(repository.findAll(Sort.by("label"))).thenReturn(contactTypes);
     List<LocalOfficeContactType> allContactTypes = service.get();
     assertThat("Unexpected size of returned LocalOfficeContactTypes list",
-            allContactTypes.size(), equalTo(contactTypes.size()));
+        allContactTypes.size(), equalTo(contactTypes.size()));
     assertThat("The contact types list doesn't contain an expected contact type",
-            allContactTypes, hasItem(contactType1));
+        allContactTypes, hasItem(contactType1));
   }
 
   @Test

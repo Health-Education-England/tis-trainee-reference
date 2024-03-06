@@ -98,9 +98,9 @@ class LocalOfficeContactServiceTest {
     when(repository.findAll(Sort.by("label"))).thenReturn(localOfficeContacts);
     List<LocalOfficeContact> allLocalOfficeContacts = service.get();
     assertThat("Unexpected size of returned LocalOfficeContact list",
-            allLocalOfficeContacts.size(), equalTo(localOfficeContacts.size()));
+        allLocalOfficeContacts.size(), equalTo(localOfficeContacts.size()));
     assertThat("The returned local office contact list doesn't contain the expected "
-                + "local office contact", allLocalOfficeContacts, hasItem(localOfficeContact1));
+        + "local office contact", allLocalOfficeContacts, hasItem(localOfficeContact1));
   }
 
   @Test

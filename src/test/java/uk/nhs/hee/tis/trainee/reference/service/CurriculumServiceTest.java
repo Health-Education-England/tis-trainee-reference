@@ -89,7 +89,7 @@ class CurriculumServiceTest {
     List<Curriculum> allCurriculums = service.get();
     assertThat("Unexpected size of returned Curriculum list",
         allCurriculums.size(), equalTo(curriculums.size()));
-    assertThat("The returned curriculum list doesn't not contain the expected curriculum",
+    assertThat("The returned curriculum list doesn't contain the expected curriculum",
         allCurriculums, hasItem(curriculum1));
   }
 

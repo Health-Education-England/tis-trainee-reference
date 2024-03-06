@@ -100,9 +100,9 @@ class DbcServiceTest {
     when(repository.findAll(Sort.by("label"))).thenReturn(dbcs);
     List<Dbc> allDbcs = service.get();
     assertThat("Unexpected size of returned Dbc list",
-            allDbcs.size(), equalTo(dbcs.size()));
+        allDbcs.size(), equalTo(dbcs.size()));
     assertThat("The returned dbc list doesn't contain the expected Dbc",
-            allDbcs, hasItem(dbc1));
+        allDbcs, hasItem(dbc1));
   }
 
   @Test

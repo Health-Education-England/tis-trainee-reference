@@ -88,9 +88,9 @@ class CollegeServiceTest {
     colleges.add(college2);
     when(repository.findAll(Sort.by("label"))).thenReturn(colleges);
     List<College> allColleges = service.get();
-    assertThat("The size of returned college list do not match the expected value",
+    assertThat("Unexpected size of returned College list",
         allColleges.size(), equalTo(colleges.size()));
-    assertThat("The returned college list doesn't not contain the expected college",
+    assertThat("The returned college list doesn't contain the expected college",
         allColleges, hasItem(college1));
   }
 

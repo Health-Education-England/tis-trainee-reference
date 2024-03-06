@@ -67,7 +67,7 @@ public class LocalOfficeContactTypeResource {
   }
 
   /**
-   * Create a LocalOfficeContactType, or update an existing LocalOfficeContactType if the tisID
+   * Create a LocalOfficeContactType, or update an existing LocalOfficeContactType if the tisId
    * matches.
    *
    * @param localOfficeContactTypeDto The LocalOfficeContactType to create.
