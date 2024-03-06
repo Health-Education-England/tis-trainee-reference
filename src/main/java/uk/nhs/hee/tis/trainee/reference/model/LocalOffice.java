@@ -26,6 +26,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Model for persisted local office records.
+ */
 @Document(collection = "LocalOffice")
 @Data
 public class LocalOffice {
@@ -36,4 +39,5 @@ public class LocalOffice {
   @Indexed(unique = true)
   private String tisId;
   private String label;
+  private String uuid;
 }

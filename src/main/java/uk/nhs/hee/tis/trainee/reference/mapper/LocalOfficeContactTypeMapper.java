@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,18 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.mapper;
 
-import lombok.Data;
+import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactTypeDto;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
 
 /**
- * A DTO for LocalOffice entity. Holds all options for LocalOffice.
+ * Mapper for local office contact types.
  */
-@Data
-public class LocalOfficeDto {
+@Mapper(componentModel = "spring")
+public interface LocalOfficeContactTypeMapper {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private String uuid;
+  LocalOfficeContactTypeDto toDto(LocalOfficeContactType localOfficeContactType);
+
+  List<LocalOfficeContactTypeDto> toDtos(List<LocalOfficeContactType> localOfficeContactTypes);
+
+  LocalOfficeContactType toEntity(LocalOfficeContactTypeDto localOfficeContactTypeDto);
+
+  List<LocalOfficeContactType> toEntities(
+      List<LocalOfficeContactTypeDto> localOfficeContactTypeDtos);
+
+  @Mapping(target = "tisId", ignore = true)
+  LocalOfficeContactType update(@MappingTarget LocalOfficeContactType target,
+      LocalOfficeContactType source);
 }

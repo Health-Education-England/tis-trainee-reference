@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,24 +51,27 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
-import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapper;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
+import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
 
-@ContextConfiguration(classes = {LocalOfficeMapper.class})
+@ContextConfiguration(classes = {LocalOfficeContactTypeMapper.class})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(LocalOfficeResource.class)
-class LocalOfficeResourceTest {
-
-  private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
-  private static final String DEFAULT_ID_2 = "DEFAULT_ID_2";
+@WebMvcTest(LocalOfficeContactResource.class)
+class LocalOfficeContactResourceTest {
 
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
-  private static final String DEFAULT_LABEL_2 =
-      "Northern Ireland Medical and Dental Training Agency";
+  private static final String DEFAULT_LOCAL_OFFICE_ID_1 = UUID.randomUUID().toString();
+  private static final String DEFAULT_LOCAL_OFFICE_ID_2 = UUID.randomUUID().toString();
+
+  private static final String DEFAULT_CONTACT_TYPE_ID_1 = UUID.randomUUID().toString();
+  private static final String DEFAULT_CONTACT_TYPE_ID_2 = UUID.randomUUID().toString();
+
+  private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
+  private static final String DEFAULT_CONTACT_2 = "england.ltft.eoe@nhs.net";
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -78,19 +82,19 @@ class LocalOfficeResourceTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private LocalOfficeService localOfficeServiceMock;
+  private LocalOfficeContactService localOfficeContactServiceMock;
 
-  private LocalOffice localOffice1;
-  private LocalOffice localOffice2;
+  private LocalOfficeContact contact1;
+  private LocalOfficeContact contact2;
 
   /**
    * Set up mocks before each test.
    */
   @BeforeEach
   void setup() {
-    LocalOfficeMapper mapper = Mappers.getMapper(LocalOfficeMapper.class);
-    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeServiceMock,
-        mapper);
+    LocalOfficeContactMapper mapper = Mappers.getMapper(LocalOfficeContactMapper.class);
+    LocalOfficeContactResource localOfficeResource
+        = new LocalOfficeContactResource(localOfficeContactServiceMock, mapper);
     mockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
         .setMessageConverters(jacksonMessageConverter)
         .build();
@@ -101,67 +105,86 @@ class LocalOfficeResourceTest {
    */
   @BeforeEach
   void initData() {
-    localOffice1 = new LocalOffice();
-    localOffice1.setId(DEFAULT_ID_1);
-    localOffice1.setTisId(DEFAULT_TIS_ID_1);
-    localOffice1.setLabel(DEFAULT_LABEL_1);
+    contact1 = new LocalOfficeContact();
+    contact1.setTisId(DEFAULT_TIS_ID_1);
+    contact1.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
+    contact1.setContactTypeId(DEFAULT_CONTACT_TYPE_ID_1);
+    contact1.setContact(DEFAULT_CONTACT_1);
 
-    localOffice2 = new LocalOffice();
-    localOffice2.setId(DEFAULT_ID_2);
-    localOffice2.setTisId(DEFAULT_TIS_ID_2);
-    localOffice2.setLabel(DEFAULT_LABEL_2);
+    contact2 = new LocalOfficeContact();
+    contact2.setTisId(DEFAULT_TIS_ID_2);
+    contact2.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_2);
+    contact2.setContactTypeId(DEFAULT_CONTACT_TYPE_ID_2);
+    contact2.setContact(DEFAULT_CONTACT_2);
   }
 
   @Test
-  void testGetAllLocalOffices() throws Exception {
-    List<LocalOffice> localOffices = new ArrayList<>();
-    localOffices.add(localOffice1);
-    localOffices.add(localOffice2);
-    when(localOfficeServiceMock.get()).thenReturn(localOffices);
-    this.mockMvc.perform(get("/api/local-office")
+  void testGetAllLocalOfficeContacts() throws Exception {
+    List<LocalOfficeContact> contacts = new ArrayList<>();
+    contacts.add(contact1);
+    contacts.add(contact2);
+    when(localOfficeContactServiceMock.get()).thenReturn(contacts);
+    this.mockMvc.perform(get("/api/local-office-contact")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_2)));
   }
 
   @Test
-  void testCreateLocalOffice() throws Exception {
-    when(localOfficeServiceMock.create(localOffice1)).thenReturn(localOffice1);
-
-    mockMvc.perform(post("/api/local-office")
-            .content(mapper.writeValueAsBytes(localOffice1))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
-  }
-
-  @Test
-  void testUpdateLocalOffice() throws Exception {
-    when(localOfficeServiceMock.update(localOffice1)).thenReturn(localOffice1);
-
-    mockMvc.perform(put("/api/local-office")
-            .content(mapper.writeValueAsBytes(localOffice1))
+  void testGetLocalOfficeContactsByLoUuid() throws Exception {
+    List<LocalOfficeContact> contacts = new ArrayList<>();
+    contacts.add(contact1);
+    when(localOfficeContactServiceMock.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1))
+        .thenReturn(contacts);
+    this.mockMvc.perform(get("/api/local-office-contact-by-lo-uuid/{loUuid}",
+            DEFAULT_LOCAL_OFFICE_ID_1)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+        .andExpect(jsonPath("$").value(hasSize(1)))
+        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_1)));
   }
 
   @Test
-  void testDeleteLocalOffice() throws Exception {
-    mockMvc.perform(delete("/api/local-office/{tisId}", DEFAULT_TIS_ID_1)
+  void testCreateLocalOfficeContact() throws Exception {
+    when(localOfficeContactServiceMock.create(contact1)).thenReturn(contact1);
+
+    mockMvc.perform(post("/api/local-office-contact")
+            .content(mapper.writeValueAsBytes(contact1))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.localOfficeId").value(is(DEFAULT_LOCAL_OFFICE_ID_1)))
+        .andExpect(jsonPath("$.contactTypeId").value(is(DEFAULT_CONTACT_TYPE_ID_1)))
+        .andExpect(jsonPath("$.contact").value(is(DEFAULT_CONTACT_1)));
+  }
+
+  @Test
+  void testUpdateLocalOfficeContact() throws Exception {
+    when(localOfficeContactServiceMock.update(contact1)).thenReturn(contact1);
+
+    mockMvc.perform(put("/api/local-office-contact")
+            .content(mapper.writeValueAsBytes(contact1))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
+        .andExpect(jsonPath("$.localOfficeId").value(is(DEFAULT_LOCAL_OFFICE_ID_1)))
+        .andExpect(jsonPath("$.contactTypeId").value(is(DEFAULT_CONTACT_TYPE_ID_1)))
+        .andExpect(jsonPath("$.contact").value(is(DEFAULT_CONTACT_1)));
+  }
+
+  @Test
+  void testDeleteLocalOfficeContact() throws Exception {
+    mockMvc.perform(delete("/api/local-office-contact/{tisId}", DEFAULT_TIS_ID_1)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent())
         .andExpect(jsonPath("$").doesNotExist());
 
-    verify(localOfficeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    verify(localOfficeContactServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

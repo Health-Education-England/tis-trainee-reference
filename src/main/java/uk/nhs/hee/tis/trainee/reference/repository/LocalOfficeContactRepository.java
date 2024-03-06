@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,18 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.repository;
 
-import lombok.Data;
+import java.util.List;
+import org.springframework.stereotype.Repository;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
 /**
- * A DTO for LocalOffice entity. Holds all options for LocalOffice.
+ * Repository for local office contacts.
  */
-@Data
-public class LocalOfficeDto {
+@Repository
+public interface LocalOfficeContactRepository extends ReferenceRepository<LocalOfficeContact> {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private String uuid;
+  List<LocalOfficeContact> findByLocalOfficeId(String localOfficeId);
+
 }

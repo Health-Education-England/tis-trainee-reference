@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,8 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,10 +88,10 @@ class CollegeServiceTest {
     colleges.add(college2);
     when(repository.findAll(Sort.by("label"))).thenReturn(colleges);
     List<College> allColleges = service.get();
-    MatcherAssert.assertThat("The size of returned college list do not match the expected value",
-        allColleges.size(), CoreMatchers.equalTo(colleges.size()));
-    MatcherAssert.assertThat("The returned college list doesn't not contain the expected college",
-        allColleges, CoreMatchers.hasItem(college1));
+    assertThat("Unexpected size of returned College list",
+        allColleges.size(), equalTo(colleges.size()));
+    assertThat("The returned college list doesn't contain the expected college",
+        allColleges, hasItem(college1));
   }
 
   @Test

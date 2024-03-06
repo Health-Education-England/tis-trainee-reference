@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,18 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.service;
 
-import lombok.Data;
+import com.amazonaws.xray.spring.aop.XRayEnabled;
+import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapper;
+import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 
 /**
- * A DTO for LocalOffice entity. Holds all options for LocalOffice.
+ * Service for local office contact types.
  */
-@Data
-public class LocalOfficeDto {
+@Service
+@XRayEnabled
+public class LocalOfficeContactTypeService
+    extends AbstractReferenceService<LocalOfficeContactType> {
 
-  private String id;
-  private String tisId;
-  private String label;
-  private String uuid;
+  private LocalOfficeContactTypeMapper mapper;
+
+  protected LocalOfficeContactTypeService(LocalOfficeContactTypeRepository repository,
+      LocalOfficeContactTypeMapper mapper) {
+    super(repository);
+    this.mapper = mapper;
+  }
+
+  @Override
+  protected String getTisId(LocalOfficeContactType entity) {
+    return entity.getTisId();
+  }
+
+  @Override
+  protected void copyAttributes(LocalOfficeContactType target, LocalOfficeContactType source) {
+    mapper.update(target, source);
+  }
 }

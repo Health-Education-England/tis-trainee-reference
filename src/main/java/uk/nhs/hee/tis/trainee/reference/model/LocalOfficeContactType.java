@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,18 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.model;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * A DTO for LocalOffice entity. Holds all options for LocalOffice.
+ * Model for persisted local office contact type records.
  */
+@Document(collection = "LocalOfficeContactType")
 @Data
-public class LocalOfficeDto {
+public class LocalOfficeContactType {
 
-  private String id;
-  private String tisId;
+  @Id
+  private String tisId; //this table does not have the old numeric ID field
+
+  private String code;
   private String label;
-  private String uuid;
 }

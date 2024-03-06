@@ -20,12 +20,13 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,13 +84,10 @@ class DeclarationTypeServiceTest {
     declarationType.add(declarationType1);
     declarationType.add(declarationType2);
     when(declarationTypeRepositoryMock.findAll(Sort.by("label"))).thenReturn(declarationType);
-    List<DeclarationType> allDeclarationType =
-        declarationTypeService.getDeclarationType();
-    MatcherAssert.assertThat(
-        "The size of returned declaration type list do not match the expected value",
-        allDeclarationType.size(), CoreMatchers.equalTo(declarationType.size()));
-    MatcherAssert.assertThat(
-        "The returned declaration type list doesn't not contain the expected gender",
-        allDeclarationType, CoreMatchers.hasItem(declarationType1));
+    List<DeclarationType> allDeclarationType = declarationTypeService.getDeclarationType();
+    assertThat("Unexpected size of returned DeclarationType list",
+        allDeclarationType.size(), equalTo(declarationType.size()));
+    assertThat("The returned declaration type list doesn't contain the expected declaration type",
+        allDeclarationType, hasItem(declarationType1));
   }
 }

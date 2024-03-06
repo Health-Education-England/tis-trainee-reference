@@ -20,6 +20,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -29,7 +31,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,10 +87,10 @@ class CurriculumServiceTest {
     curriculums.add(curriculum2);
     when(repository.findAll(Sort.by("label"))).thenReturn(curriculums);
     List<Curriculum> allCurriculums = service.get();
-    assertThat("The size of returned curriculum list do not match the expected value",
-        allCurriculums.size(), CoreMatchers.equalTo(curriculums.size()));
-    assertThat("The returned curriculum list doesn't not contain the expected curriculum",
-        allCurriculums, CoreMatchers.hasItem(curriculum1));
+    assertThat("Unexpected size of returned Curriculum list",
+        allCurriculums.size(), equalTo(curriculums.size()));
+    assertThat("The returned curriculum list doesn't contain the expected curriculum",
+        allCurriculums, hasItem(curriculum1));
   }
 
   @Test

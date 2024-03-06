@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,8 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,12 +99,10 @@ class DbcServiceTest {
     dbcs.add(dbc2);
     when(repository.findAll(Sort.by("label"))).thenReturn(dbcs);
     List<Dbc> allDbcs = service.get();
-    MatcherAssert
-        .assertThat("The size of returned dbc list do not match the expected value",
-            allDbcs.size(), CoreMatchers.equalTo(dbcs.size()));
-    MatcherAssert
-        .assertThat("The returned dbc list doesn't not contain the expected dbc",
-            allDbcs, CoreMatchers.hasItem(dbc1));
+    assertThat("Unexpected size of returned Dbc list",
+        allDbcs.size(), equalTo(dbcs.size()));
+    assertThat("The returned dbc list doesn't contain the expected Dbc",
+        allDbcs, hasItem(dbc1));
   }
 
   @Test

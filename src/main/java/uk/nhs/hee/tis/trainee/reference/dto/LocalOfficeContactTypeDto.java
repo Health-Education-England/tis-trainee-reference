@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2024 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,13 +24,12 @@ package uk.nhs.hee.tis.trainee.reference.dto;
 import lombok.Data;
 
 /**
- * A DTO for LocalOffice entity. Holds all options for LocalOffice.
+ * A DTO for LocalOfficeContactType entity. Holds all options for LocalOfficeContactType.
  */
 @Data
-public class LocalOfficeDto {
+public class LocalOfficeContactTypeDto {
 
-  private String id;
   private String tisId;
+  private String code;
   private String label;
-  private String uuid;
 }
