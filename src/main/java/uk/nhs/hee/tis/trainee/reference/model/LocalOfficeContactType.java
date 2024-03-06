@@ -25,6 +25,9 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Model for persisted local office contact type records.
+ */
 @Document(collection = "LocalOfficeContactType")
 @Data
 public class LocalOfficeContactType {

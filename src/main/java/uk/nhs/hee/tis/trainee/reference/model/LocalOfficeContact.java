@@ -26,6 +26,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Model for persisted local office contact records.
+ */
 @Document(collection = "LocalOfficeContact")
 @Data
 public class LocalOfficeContact {

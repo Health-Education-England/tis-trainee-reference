@@ -28,6 +28,9 @@ import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactTypeDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
 
+/**
+ * Mapper for local office contact types.
+ */
 @Mapper(componentModel = "spring")
 public interface LocalOfficeContactTypeMapper {
 

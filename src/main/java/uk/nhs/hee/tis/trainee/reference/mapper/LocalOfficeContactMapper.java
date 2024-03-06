@@ -25,10 +25,12 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.springframework.web.bind.annotation.PostMapping;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
+/**
+ * Mapper for local office contacts.
+ */
 @Mapper(componentModel = "spring")
 public interface LocalOfficeContactMapper {
 

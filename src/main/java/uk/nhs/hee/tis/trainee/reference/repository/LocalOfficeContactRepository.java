@@ -25,6 +25,9 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
+/**
+ * Repository for local office contacts.
+ */
 @Repository
 public interface LocalOfficeContactRepository extends ReferenceRepository<LocalOfficeContact> {
 

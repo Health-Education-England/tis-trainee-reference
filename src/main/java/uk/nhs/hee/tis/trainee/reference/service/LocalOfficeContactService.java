@@ -28,6 +28,9 @@ import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 
+/**
+ * Service for local office contacts.
+ */
 @Service
 @XRayEnabled
 public class LocalOfficeContactService extends AbstractReferenceService<LocalOfficeContact> {

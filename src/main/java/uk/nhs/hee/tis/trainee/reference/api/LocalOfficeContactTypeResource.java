@@ -39,6 +39,9 @@ import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactTypeService;
 
+/**
+ * Resource for local office contact types.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api")
