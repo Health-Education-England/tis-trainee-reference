@@ -20,6 +20,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -29,8 +31,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,12 +88,10 @@ class ImmigrationStatusServiceTest {
     immigrationStatus.add(immigrationStatus2);
     when(repository.findAll(Sort.by("label"))).thenReturn(immigrationStatus);
     List<ImmigrationStatus> allImmigrationStatus = service.get();
-    MatcherAssert.assertThat(
-        "The size of returned immigration status list do not match the expected value",
-        allImmigrationStatus.size(), CoreMatchers.equalTo(immigrationStatus.size()));
-    MatcherAssert.assertThat(
-        "The returned immigration status list doesn't not contain the expected gender",
-        allImmigrationStatus, CoreMatchers.hasItem(immigrationStatus1));
+    assertThat("Unexpected size of returned ImmigrationStatus list",
+        allImmigrationStatus.size(), equalTo(immigrationStatus.size()));
+    assertThat("The returned immigration status list doesn't contain the expected immigration "
+            + "status", allImmigrationStatus, hasItem(immigrationStatus1));
   }
 
   @Test

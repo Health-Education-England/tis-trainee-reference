@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,7 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,10 +88,10 @@ class GradeServiceTest {
     grades.add(grade2);
     when(repository.findAll(Sort.by("label"))).thenReturn(grades);
     List<Grade> allGrades = service.get();
-    assertThat("The size of returned grade list do not match the expected value",
-        allGrades.size(), CoreMatchers.equalTo(grades.size()));
-    assertThat("The returned grade list doesn't not contain the expected grade",
-        allGrades, CoreMatchers.hasItem(grade1));
+    assertThat("Unexpected size of returned Ggrade list",
+        allGrades.size(), equalTo(grades.size()));
+    assertThat("The returned grade list doesn't contain the expected grade",
+        allGrades, hasItem(grade1));
   }
 
   @Test

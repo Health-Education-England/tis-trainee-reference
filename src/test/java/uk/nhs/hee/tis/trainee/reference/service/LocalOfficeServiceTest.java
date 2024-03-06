@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,8 +32,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +57,9 @@ class LocalOfficeServiceTest {
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 
+  private static final String DEFAULT_UUID_1 = UUID.randomUUID().toString();
+  private static final String DEFAULT_UUID_2 = UUID.randomUUID().toString();
+
   private LocalOfficeService service;
 
   @Mock
@@ -75,11 +79,13 @@ class LocalOfficeServiceTest {
     localOffice1.setId(DEFAULT_ID_1);
     localOffice1.setTisId(DEFAULT_TIS_ID_1);
     localOffice1.setLabel(DEFAULT_LABEL_1);
+    localOffice1.setUuid(DEFAULT_UUID_1);
 
     localOffice2 = new LocalOffice();
     localOffice2.setId(DEFAULT_ID_2);
     localOffice2.setTisId(DEFAULT_TIS_ID_2);
     localOffice2.setLabel(DEFAULT_LABEL_2);
+    localOffice2.setUuid(DEFAULT_UUID_2);
   }
 
   @Test
@@ -89,12 +95,10 @@ class LocalOfficeServiceTest {
     localOffices.add(localOffice2);
     when(repository.findAll(Sort.by("label"))).thenReturn(localOffices);
     List<LocalOffice> allLocalOffices = service.get();
-    MatcherAssert
-        .assertThat("The size of returned local office list do not match the expected value",
-            allLocalOffices.size(), CoreMatchers.equalTo(localOffices.size()));
-    MatcherAssert
-        .assertThat("The returned local office list doesn't not contain the expected local office",
-            allLocalOffices, CoreMatchers.hasItem(localOffice1));
+    assertThat("Unexpected size of returned local office list",
+            allLocalOffices.size(), equalTo(localOffices.size()));
+    assertThat("The returned local office list doesn't contain the expected local office",
+        allLocalOffices, hasItem(localOffice1));
   }
 
   @Test
@@ -107,6 +111,7 @@ class LocalOfficeServiceTest {
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected UUID.", localOffice.getUuid(), is(DEFAULT_UUID_2));
   }
 
   @Test
@@ -119,6 +124,7 @@ class LocalOfficeServiceTest {
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected UUID.", localOffice.getUuid(), is(DEFAULT_UUID_2));
   }
 
   @Test
@@ -131,6 +137,7 @@ class LocalOfficeServiceTest {
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected UUID.", localOffice.getUuid(), is(DEFAULT_UUID_2));
   }
 
   @Test
@@ -143,6 +150,7 @@ class LocalOfficeServiceTest {
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected UUID.", localOffice.getUuid(), is(DEFAULT_UUID_2));
   }
 
   @Test

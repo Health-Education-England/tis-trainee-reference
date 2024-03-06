@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,8 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,14 +89,11 @@ class ProgrammeMembershipTypeServiceTest {
     programmeMembershipTypes.add(programmeMembershipType2);
     when(repository.findAll(Sort.by("label"))).thenReturn(programmeMembershipTypes);
     List<ProgrammeMembershipType> allProgrammeMembershipTypes = service.get();
-    MatcherAssert
-        .assertThat("Unexpected size of returned ProgrammeMembershipType list",
-            allProgrammeMembershipTypes.size(),
-            CoreMatchers.equalTo(programmeMembershipTypes.size()));
-    MatcherAssert
-        .assertThat("The returned ProgrammeMembershipType list doesn't contain the expected "
+    assertThat("Unexpected size of returned ProgrammeMembershipType list",
+            allProgrammeMembershipTypes.size(), equalTo(programmeMembershipTypes.size()));
+    assertThat("The returned ProgrammeMembershipType list doesn't contain the expected "
                 + "ProgrammeMembershipType",
-            allProgrammeMembershipTypes, CoreMatchers.hasItem(programmeMembershipType1));
+            allProgrammeMembershipTypes, hasItem(programmeMembershipType1));
   }
 
   @Test

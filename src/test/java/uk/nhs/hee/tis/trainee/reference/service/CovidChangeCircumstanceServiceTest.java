@@ -21,12 +21,13 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,11 +80,9 @@ class CovidChangeCircumstanceServiceTest {
     List<CovidChangeCircumstance> allCovidChangeCircs = covidChangeCircServiceImpl
         .getCovidChangeCircumstances();
 
-    MatcherAssert.assertThat(
-        "The size of returned CovidChangeCircumstance list do not match the expected value",
-        allCovidChangeCircs.size(), CoreMatchers.equalTo(covidChangeCircs.size()));
-    MatcherAssert.assertThat(
-        "The returned CovidChangeCircumstance list doesn't not contain the expected item",
-        allCovidChangeCircs, CoreMatchers.hasItem(covidChangeCirc1));
+    assertThat("Unexpected size of returned CovidChangeCircumstance list",
+        allCovidChangeCircs.size(), equalTo(covidChangeCircs.size()));
+    assertThat("The returned CovidChangeCircumstance list doesn't not contain the expected "
+            + "covid change item", allCovidChangeCircs, hasItem(covidChangeCirc1));
   }
 }

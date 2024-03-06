@@ -38,6 +38,7 @@ public interface LocalOfficeContactMapper {
 
   @Mapping(target = "localOfficeName", ignore = true)
   @Mapping(target = "contactTypeName", ignore = true)
+  @Mapping(target = "label", ignore = true)
   LocalOfficeContact toEntity(LocalOfficeContactDto localOfficeContactDto);
 
   List<LocalOfficeContact> toEntities(List<LocalOfficeContactDto> localOfficeContactDtos);

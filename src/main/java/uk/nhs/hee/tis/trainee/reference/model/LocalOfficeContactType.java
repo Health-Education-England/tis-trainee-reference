@@ -34,5 +34,4 @@ public class LocalOfficeContactType {
 
   private String code;
   private String label;
-  private String status;
 }

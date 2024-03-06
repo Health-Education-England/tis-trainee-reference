@@ -32,5 +32,4 @@ public class LocalOfficeContactTypeDto {
   private String tisId;
   private String code;
   private String label;
-  private String status;
 }

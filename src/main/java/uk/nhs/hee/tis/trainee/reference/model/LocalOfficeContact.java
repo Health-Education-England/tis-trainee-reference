@@ -37,6 +37,7 @@ public class LocalOfficeContact {
   private String localOfficeId;
   private String contactTypeId;
   private String contact;
+  private String label; //to be composed of local office, contact and contact type
 
   //denormalise from related records: enrichment of these fields will follow in next PR
   private String localOfficeName;
