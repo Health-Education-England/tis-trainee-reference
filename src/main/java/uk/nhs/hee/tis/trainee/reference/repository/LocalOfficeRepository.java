@@ -27,4 +27,5 @@ import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 @Repository
 public interface LocalOfficeRepository extends ReferenceRepository<LocalOffice> {
 
+  LocalOffice findByUuid(String uuid);
 }

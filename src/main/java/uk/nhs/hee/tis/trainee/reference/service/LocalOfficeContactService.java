@@ -90,9 +90,9 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
    * @param localOffice The local office that triggered the update.
    */
   public void updateAllForLocalOffice(LocalOffice localOffice) {
-    if (localOffice.getId() != null) {
+    if (localOffice.getUuid() != null) {
       List<LocalOfficeContact> localOfficeContactList = repository
-          .findByLocalOfficeId(localOffice.getId());
+          .findByLocalOfficeId(localOffice.getUuid());
       localOfficeContactList.forEach(c -> {
         log.info("Updating local office contact '{}' with local office '{}'", c.getTisId(),
             localOffice.getLabel());

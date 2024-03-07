@@ -21,13 +21,12 @@
 
 package uk.nhs.hee.tis.trainee.reference.facade;
 
-import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
-import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
@@ -35,13 +34,11 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 @Component
 public class LocalOfficeContactEnricherFacade {
 
-  private LocalOfficeRepository localOfficeRepository;
-  private LocalOfficeContactTypeRepository contactTypeRepository;
-
+  private final LocalOfficeRepository localOfficeRepository;
+  private final LocalOfficeContactTypeRepository contactTypeRepository;
 
   LocalOfficeContactEnricherFacade(LocalOfficeRepository localOfficeRepository,
-      LocalOfficeContactTypeRepository contactTypeRepository,
-      LocalOfficeContactRepository contactRepository) {
+      LocalOfficeContactTypeRepository contactTypeRepository) {
     this.localOfficeRepository = localOfficeRepository;
     this.contactTypeRepository = contactTypeRepository;
   }
@@ -55,21 +52,23 @@ public class LocalOfficeContactEnricherFacade {
    * @return The enriched local office contact.
    */
   public LocalOfficeContact enrich(LocalOfficeContact localOfficeContact) {
-    LocalOffice localOffice;
-    LocalOfficeContactType contactType;
-    if (localOfficeContact.getLocalOfficeId() != null) {
-      localOffice = localOfficeRepository.findByTisId(localOfficeContact.getLocalOfficeId());
-      if (localOffice != null) {
-        localOfficeContact.setLocalOfficeName(localOffice.getLabel());
+    if (localOfficeContact != null) {
+      LocalOffice localOffice;
+      LocalOfficeContactType contactType;
+      if (localOfficeContact.getLocalOfficeId() != null) {
+        localOffice = localOfficeRepository.findByUuid(localOfficeContact.getLocalOfficeId());
+        if (localOffice != null) {
+          localOfficeContact.setLocalOfficeName(localOffice.getLabel());
+        }
       }
-    }
-    if (localOfficeContact.getContactTypeId() != null) {
-      contactType = contactTypeRepository.findByTisId(localOfficeContact.getContactTypeId());
-      if (contactType != null) {
-        localOfficeContact.setContactTypeName(contactType.getLabel());
+      if (localOfficeContact.getContactTypeId() != null) {
+        contactType = contactTypeRepository.findByTisId(localOfficeContact.getContactTypeId());
+        if (contactType != null) {
+          localOfficeContact.setContactTypeName(contactType.getLabel());
+        }
       }
+      localOfficeContact.setLabel(generateLabel(localOfficeContact));
     }
-    localOfficeContact.setLabel(generateLabel(localOfficeContact));
     return localOfficeContact;
   }
 
@@ -81,8 +80,10 @@ public class LocalOfficeContactEnricherFacade {
    */
   public LocalOfficeContact enrichWithLocalOffice(LocalOfficeContact localOfficeContact,
       String localOfficeName) {
-    localOfficeContact.setLocalOfficeName(localOfficeName);
-    localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    if (localOfficeContact != null) {
+      localOfficeContact.setLocalOfficeName(localOfficeName);
+      localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    }
     return localOfficeContact;
   }
 
@@ -94,8 +95,10 @@ public class LocalOfficeContactEnricherFacade {
    */
   public LocalOfficeContact enrichWithContactType(LocalOfficeContact localOfficeContact,
       String contactTypeName) {
-    localOfficeContact.setContactTypeName(contactTypeName);
-    localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    if (localOfficeContact != null) {
+      localOfficeContact.setContactTypeName(contactTypeName);
+      localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    }
     return localOfficeContact;
   }
 
@@ -107,9 +110,11 @@ public class LocalOfficeContactEnricherFacade {
    */
   public LocalOfficeContact enrichWithLocalOfficeAndContactType(
       LocalOfficeContact localOfficeContact, String localOfficeName, String contactTypeName) {
-    localOfficeContact.setLocalOfficeName(localOfficeName);
-    localOfficeContact.setContactTypeName(contactTypeName);
-    localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    if (localOfficeContact != null) {
+      localOfficeContact.setLocalOfficeName(localOfficeName);
+      localOfficeContact.setContactTypeName(contactTypeName);
+      localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    }
     return localOfficeContact;
   }
 
@@ -119,7 +124,7 @@ public class LocalOfficeContactEnricherFacade {
    * @param localOfficeContact The local office contact.
    * @return The label string.
    */
-  private String generateLabel(LocalOfficeContact localOfficeContact) {
+  protected String generateLabel(LocalOfficeContact localOfficeContact) {
     String label = localOfficeContact.getContact();
     if (localOfficeContact.getContactTypeName() != null) {
       label = label + " (" + localOfficeContact.getContactTypeName() + ")";

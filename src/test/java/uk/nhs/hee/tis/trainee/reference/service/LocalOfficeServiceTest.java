@@ -27,6 +27,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +114,8 @@ class LocalOfficeServiceTest {
 
     LocalOffice localOffice = service.create(localOffice2);
 
+    verify(contactService).updateAllForLocalOffice(localOffice2);
+
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
@@ -124,6 +128,8 @@ class LocalOfficeServiceTest {
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
     LocalOffice localOffice = service.create(localOffice2);
+
+    verify(contactService, atLeastOnce()).updateAllForLocalOffice(localOffice1);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
@@ -138,6 +144,8 @@ class LocalOfficeServiceTest {
 
     LocalOffice localOffice = service.update(localOffice2);
 
+    verify(contactService, atLeastOnce()).updateAllForLocalOffice(localOffice2);
+
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_2));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", localOffice.getLabel(), is(DEFAULT_LABEL_2));
@@ -150,6 +158,8 @@ class LocalOfficeServiceTest {
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
     LocalOffice localOffice = service.update(localOffice2);
+
+    verify(contactService).updateAllForLocalOffice(localOffice1);
 
     assertThat("Unexpected id.", localOffice.getId(), is(DEFAULT_ID_1));
     assertThat("Unexpected TIS id.", localOffice.getTisId(), is(DEFAULT_TIS_ID_1));
