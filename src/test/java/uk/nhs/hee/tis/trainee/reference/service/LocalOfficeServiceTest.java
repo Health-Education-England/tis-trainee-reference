@@ -65,6 +65,9 @@ class LocalOfficeServiceTest {
   @Mock
   private LocalOfficeRepository repository;
 
+  @Mock
+  private LocalOfficeContactService contactService;
+
   private LocalOffice localOffice1;
   private LocalOffice localOffice2;
 
@@ -73,7 +76,8 @@ class LocalOfficeServiceTest {
    */
   @BeforeEach
   void initData() {
-    service = new LocalOfficeService(repository, Mappers.getMapper(LocalOfficeMapper.class));
+    service = new LocalOfficeService(repository, Mappers.getMapper(LocalOfficeMapper.class),
+        contactService);
 
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);

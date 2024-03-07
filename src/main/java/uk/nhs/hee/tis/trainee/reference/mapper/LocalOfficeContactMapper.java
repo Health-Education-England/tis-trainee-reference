@@ -25,6 +25,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 
@@ -37,6 +38,10 @@ public interface LocalOfficeContactMapper {
   LocalOfficeContactDto toDto(LocalOfficeContact localOfficeContact);
 
   List<LocalOfficeContactDto> toDtos(List<LocalOfficeContact> localOfficeContacts);
+
+  LocalOfficeContactDetailsDto toDetailsDto(LocalOfficeContact localOfficeContact);
+
+  List<LocalOfficeContactDetailsDto> toDetailsDtos(List<LocalOfficeContact> localOfficeContacts);
 
   @Mapping(target = "localOfficeName", ignore = true)
   @Mapping(target = "contactTypeName", ignore = true)

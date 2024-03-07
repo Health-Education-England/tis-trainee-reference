@@ -40,6 +40,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import uk.nhs.hee.tis.trainee.reference.facade.LocalOfficeContactEnricherFacade;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
@@ -64,6 +65,9 @@ class LocalOfficeContactServiceTest {
   @Mock
   private LocalOfficeContactRepository repository;
 
+  @Mock
+  private LocalOfficeContactEnricherFacade facade;
+
   private LocalOfficeContact localOfficeContact1;
   private LocalOfficeContact localOfficeContact2;
 
@@ -73,7 +77,7 @@ class LocalOfficeContactServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeContactService(repository,
-        Mappers.getMapper(LocalOfficeContactMapper.class));
+        Mappers.getMapper(LocalOfficeContactMapper.class), facade);
 
     localOfficeContact1 = new LocalOfficeContact();
     localOfficeContact1.setTisId(DEFAULT_TIS_ID_1);

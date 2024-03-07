@@ -62,6 +62,9 @@ class LocalOfficeContactTypeServiceTest {
   @Mock
   private LocalOfficeContactTypeRepository repository;
 
+  @Mock
+  private LocalOfficeContactService contactService;
+
   private LocalOfficeContactType contactType1;
   private LocalOfficeContactType contactType2;
 
@@ -71,7 +74,7 @@ class LocalOfficeContactTypeServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeContactTypeService(repository,
-        Mappers.getMapper(LocalOfficeContactTypeMapper.class));
+        Mappers.getMapper(LocalOfficeContactTypeMapper.class), contactService);
 
     contactType1 = new LocalOfficeContactType();
     contactType1.setTisId(DEFAULT_TIS_ID_1);

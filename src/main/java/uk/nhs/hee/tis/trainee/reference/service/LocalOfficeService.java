@@ -32,10 +32,40 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 public class LocalOfficeService extends AbstractReferenceService<LocalOffice> {
 
   private LocalOfficeMapper mapper;
+  private LocalOfficeContactService localOfficeContactService;
 
-  protected LocalOfficeService(LocalOfficeRepository repository, LocalOfficeMapper mapper) {
+  protected LocalOfficeService(LocalOfficeRepository repository, LocalOfficeMapper mapper,
+      LocalOfficeContactService localOfficeContactService) {
     super(repository);
     this.mapper = mapper;
+    this.localOfficeContactService = localOfficeContactService;
+  }
+
+
+  /**
+   * Override the default create to enrich any related local office contacts after saving it.
+   *
+   * @param entity The entity to create.
+   * @return The saved entity.
+   */
+  @Override
+  public LocalOffice create(LocalOffice entity) {
+    entity = super.create(entity);
+    localOfficeContactService.updateAllForLocalOffice(entity);
+    return entity;
+  }
+
+  /**
+   * Override the default update to enrich any related local office contacts after saving it.
+   *
+   * @param entity The entity to update.
+   * @return The saved entity.
+   */
+  @Override
+  public LocalOffice update(LocalOffice entity) {
+    entity = super.update(entity);
+    localOfficeContactService.updateAllForLocalOffice(entity);
+    return entity;
   }
 
   @Override

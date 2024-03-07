@@ -19,21 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.repository;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
-import java.util.List;
-import org.springframework.stereotype.Repository;
-import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
+import lombok.Data;
 
 /**
- * Repository for local office contacts.
+ * A DTO for LocalOfficeContact entity. Holds all options for LocalOfficeContact.
  */
-@Repository
-public interface LocalOfficeContactRepository extends ReferenceRepository<LocalOfficeContact> {
+@Data
+public class LocalOfficeContactDetailsDto {
 
-  List<LocalOfficeContact> findByLocalOfficeId(String localOfficeId);
-
-  List<LocalOfficeContact> findByContactTypeId(String contactTypeId);
-
-  List<LocalOfficeContact> findByLocalOfficeName(String localOfficeName);
+  private String tisId;
+  private String localOfficeId;
+  private String contactTypeId;
+  private String contact;
+  private String label;
+  private String localOfficeName;
+  private String contactTypeName;
 }
