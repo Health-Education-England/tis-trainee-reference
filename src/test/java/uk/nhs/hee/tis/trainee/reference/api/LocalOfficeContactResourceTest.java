@@ -73,6 +73,8 @@ class LocalOfficeContactResourceTest {
   private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
   private static final String DEFAULT_CONTACT_2 = "england.ltft.eoe@nhs.net";
 
+  private static final String DEFAULT_LOCAL_OFFICE_NAME_1 = "Local office name";
+
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -141,6 +143,21 @@ class LocalOfficeContactResourceTest {
         .thenReturn(contacts);
     this.mockMvc.perform(get("/api/local-office-contact-by-lo-uuid/{loUuid}",
             DEFAULT_LOCAL_OFFICE_ID_1)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").value(hasSize(1)))
+        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_1)));
+  }
+
+  @Test
+  void testGetLocalOfficeContactsByLoName() throws Exception {
+    List<LocalOfficeContact> contacts = new ArrayList<>();
+    contacts.add(contact1);
+    when(localOfficeContactServiceMock.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1))
+        .thenReturn(contacts);
+    this.mockMvc.perform(get("/api/local-office-contact-by-lo-name/{loName}",
+            DEFAULT_LOCAL_OFFICE_NAME_1)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
