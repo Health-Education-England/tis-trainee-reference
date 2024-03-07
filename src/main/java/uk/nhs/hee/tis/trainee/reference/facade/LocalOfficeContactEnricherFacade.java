@@ -105,22 +105,6 @@ public class LocalOfficeContactEnricherFacade {
   }
 
   /**
-   * Enrich a local office contact with its local office name and contact type name.
-   *
-   * @param localOfficeContact The local office contact to enrich.
-   * @return The enriched local office contact.
-   */
-  public LocalOfficeContact enrichWithLocalOfficeAndContactType(
-      LocalOfficeContact localOfficeContact, String localOfficeName, String contactTypeName) {
-    if (localOfficeContact != null) {
-      localOfficeContact.setLocalOfficeName(localOfficeName);
-      localOfficeContact.setContactTypeName(contactTypeName);
-      localOfficeContact.setLabel(generateLabel(localOfficeContact));
-    }
-    return localOfficeContact;
-  }
-
-  /**
    * Generates a local office contact label string.
    *
    * @param localOfficeContact The local office contact.

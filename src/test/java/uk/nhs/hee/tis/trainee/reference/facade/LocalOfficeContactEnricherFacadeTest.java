@@ -116,20 +116,6 @@ class LocalOfficeContactEnricherFacadeTest {
   }
 
   @Test
-  void enrichWithLocalOfficeAndContactTypeShouldUpdateLocalOfficeContact() {
-
-    facade.enrichWithLocalOfficeAndContactType(localOfficeContact1, "a local office name",
-        "a contact type name");
-
-    assertThat("Unexpected local office name", localOfficeContact1.getLocalOfficeName(),
-        is("a local office name"));
-    assertThat("Unexpected contact type name", localOfficeContact1.getContactTypeName(),
-        is("a contact type name"));
-    assertThat("Unexpected label", localOfficeContact1.getLabel(),
-        is(facade.generateLabel(localOfficeContact1)));
-  }
-
-  @Test
   void enrichShouldReturnNullLocalOfficeContact() {
     LocalOfficeContact enriched = facade.enrich(null);
     assertNull(enriched, "Unexpected local office contact");
