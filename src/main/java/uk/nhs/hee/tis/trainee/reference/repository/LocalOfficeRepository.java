@@ -24,6 +24,9 @@ package uk.nhs.hee.tis.trainee.reference.repository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 
+/**
+ * A repository for local offices.
+ */
 @Repository
 public interface LocalOfficeRepository extends ReferenceRepository<LocalOffice> {
 

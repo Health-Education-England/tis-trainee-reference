@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.facade;
 
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
@@ -30,6 +29,9 @@ import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
+/**
+ * A facade for enriching local office contacts with associated information.
+ */
 @Slf4j
 @Component
 public class LocalOfficeContactEnricherFacade {
