@@ -69,6 +69,7 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
   @Override
   public LocalOfficeContact create(LocalOfficeContact entity) {
     entity = facade.enrich(entity);
+    log.info("Creating local office contact '{}'", entity);
     return super.create(entity);
   }
 
@@ -81,6 +82,7 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
   @Override
   public LocalOfficeContact update(LocalOfficeContact entity) {
     entity = facade.enrich(entity);
+    log.info("Updating local office contact '{}'", entity);
     return super.update(entity);
   }
 
