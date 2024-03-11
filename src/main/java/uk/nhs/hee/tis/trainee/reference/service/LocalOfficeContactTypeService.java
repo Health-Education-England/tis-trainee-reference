@@ -36,11 +36,39 @@ public class LocalOfficeContactTypeService
     extends AbstractReferenceService<LocalOfficeContactType> {
 
   private LocalOfficeContactTypeMapper mapper;
+  private LocalOfficeContactService localOfficeContactService;
 
   protected LocalOfficeContactTypeService(LocalOfficeContactTypeRepository repository,
-      LocalOfficeContactTypeMapper mapper) {
+      LocalOfficeContactTypeMapper mapper, LocalOfficeContactService localOfficeContactService) {
     super(repository);
     this.mapper = mapper;
+    this.localOfficeContactService = localOfficeContactService;
+  }
+
+  /**
+   * Override the default create to enrich any related local office contacts after saving it.
+   *
+   * @param entity The entity to create.
+   * @return The saved entity.
+   */
+  @Override
+  public LocalOfficeContactType create(LocalOfficeContactType entity) {
+    entity = super.create(entity);
+    localOfficeContactService.updateAllForContactType(entity);
+    return entity;
+  }
+
+  /**
+   * Override the default update to enrich any related local office contacts after saving it.
+   *
+   * @param entity The entity to update.
+   * @return The saved entity.
+   */
+  @Override
+  public LocalOfficeContactType update(LocalOfficeContactType entity) {
+    entity = super.update(entity);
+    localOfficeContactService.updateAllForContactType(entity);
+    return entity;
   }
 
   @Override

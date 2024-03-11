@@ -33,4 +33,7 @@ public interface LocalOfficeContactRepository extends ReferenceRepository<LocalO
 
   List<LocalOfficeContact> findByLocalOfficeId(String localOfficeId);
 
+  List<LocalOfficeContact> findByContactTypeId(String contactTypeId);
+
+  List<LocalOfficeContact> findByLocalOfficeName(String localOfficeName);
 }

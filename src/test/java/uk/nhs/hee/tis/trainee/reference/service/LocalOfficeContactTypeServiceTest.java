@@ -27,6 +27,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +63,9 @@ class LocalOfficeContactTypeServiceTest {
   @Mock
   private LocalOfficeContactTypeRepository repository;
 
+  @Mock
+  private LocalOfficeContactService contactService;
+
   private LocalOfficeContactType contactType1;
   private LocalOfficeContactType contactType2;
 
@@ -71,7 +75,7 @@ class LocalOfficeContactTypeServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeContactTypeService(repository,
-        Mappers.getMapper(LocalOfficeContactTypeMapper.class));
+        Mappers.getMapper(LocalOfficeContactTypeMapper.class), contactService);
 
     contactType1 = new LocalOfficeContactType();
     contactType1.setTisId(DEFAULT_TIS_ID_1);
@@ -104,6 +108,8 @@ class LocalOfficeContactTypeServiceTest {
 
     LocalOfficeContactType contactType = service.create(contactType2);
 
+    verify(contactService).updateAllForContactType(contactType2);
+
     assertThat("Unexpected TIS id.", contactType.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", contactType.getLabel(), is(DEFAULT_LABEL_2));
     assertThat("Unexpected code.", contactType.getCode(), is(DEFAULT_CODE_2));
@@ -115,6 +121,8 @@ class LocalOfficeContactTypeServiceTest {
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
     LocalOfficeContactType contactType = service.create(contactType2);
+
+    verify(contactService, atLeastOnce()).updateAllForContactType(contactType1);
 
     assertThat("Unexpected TIS id.", contactType.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", contactType.getLabel(), is(DEFAULT_LABEL_2));
@@ -128,6 +136,8 @@ class LocalOfficeContactTypeServiceTest {
 
     LocalOfficeContactType contactType = service.update(contactType2);
 
+    verify(contactService, atLeastOnce()).updateAllForContactType(contactType2);
+
     assertThat("Unexpected TIS id.", contactType.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", contactType.getLabel(), is(DEFAULT_LABEL_2));
     assertThat("Unexpected code.", contactType.getCode(), is(DEFAULT_CODE_2));
@@ -139,6 +149,8 @@ class LocalOfficeContactTypeServiceTest {
     when(repository.save(any())).thenAnswer(returnsFirstArg());
 
     LocalOfficeContactType contactType = service.update(contactType2);
+
+    verify(contactService).updateAllForContactType(contactType1);
 
     assertThat("Unexpected TIS id.", contactType.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", contactType.getLabel(), is(DEFAULT_LABEL_2));
