@@ -1,5 +1,7 @@
 application:
   environment: ${ENVIRONMENT:local}
+  exclude-filters:
+    pm-type: LAT,Visitor
 
 mongock:
   migration-scan-package: uk.nhs.hee.tis.trainee.reference.changelog
