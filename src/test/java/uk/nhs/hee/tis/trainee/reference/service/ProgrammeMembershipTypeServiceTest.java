@@ -21,8 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -30,16 +28,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import uk.nhs.hee.tis.trainee.reference.mapper.ProgrammeMembershipTypeMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.ProgrammeMembershipTypeMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.ProgrammeMembershipType;
 import uk.nhs.hee.tis.trainee.reference.repository.ProgrammeMembershipTypeRepository;
 
@@ -55,6 +52,9 @@ class ProgrammeMembershipTypeServiceTest {
   private static final String DEFAULT_LABEL_1 = "Substantive";
   private static final String DEFAULT_LABEL_2 = "Military";
 
+  private static final String EXCLUDED_LABEL_1 = "excluded1";
+  private static final String EXCLUDED_LABEL_2 = "excluded2";
+
   private ProgrammeMembershipTypeService service;
 
   @Mock
@@ -68,8 +68,8 @@ class ProgrammeMembershipTypeServiceTest {
    */
   @BeforeEach
   void initData() {
-    service = new ProgrammeMembershipTypeService(repository, Mappers.getMapper(
-        ProgrammeMembershipTypeMapper.class));
+    service = new ProgrammeMembershipTypeService(repository,
+        new ProgrammeMembershipTypeMapperImpl(), List.of(EXCLUDED_LABEL_1, EXCLUDED_LABEL_2));
 
     programmeMembershipType1 = new ProgrammeMembershipType();
     programmeMembershipType1.setId(DEFAULT_ID_1);
@@ -84,16 +84,31 @@ class ProgrammeMembershipTypeServiceTest {
 
   @Test
   void getAllProgrammeMembershipTypeShouldReturnAllProgrammeMembershipTypes() {
-    List<ProgrammeMembershipType> programmeMembershipTypes = new ArrayList<>();
-    programmeMembershipTypes.add(programmeMembershipType1);
-    programmeMembershipTypes.add(programmeMembershipType2);
+    ProgrammeMembershipType excludedType1 = new ProgrammeMembershipType();
+    excludedType1.setId(UUID.randomUUID().toString());
+    excludedType1.setTisId(UUID.randomUUID().toString());
+    excludedType1.setLabel(EXCLUDED_LABEL_1);
+
+    ProgrammeMembershipType excludedType2 = new ProgrammeMembershipType();
+    excludedType2.setId(UUID.randomUUID().toString());
+    excludedType2.setTisId(UUID.randomUUID().toString());
+    excludedType2.setLabel(EXCLUDED_LABEL_2);
+
+    List<ProgrammeMembershipType> programmeMembershipTypes = List.of(
+        programmeMembershipType1,
+        programmeMembershipType2,
+        excludedType1,
+        excludedType2
+    );
     when(repository.findAll(Sort.by("label"))).thenReturn(programmeMembershipTypes);
-    List<ProgrammeMembershipType> allProgrammeMembershipTypes = service.get();
-    assertThat("Unexpected size of returned ProgrammeMembershipType list",
-        allProgrammeMembershipTypes.size(), equalTo(programmeMembershipTypes.size()));
-    assertThat("The returned ProgrammeMembershipType list doesn't contain the expected "
-            + "ProgrammeMembershipType",
-        allProgrammeMembershipTypes, hasItem(programmeMembershipType1));
+    List<ProgrammeMembershipType> returnedTypes = service.get();
+    assertThat("Unexpected number of PM types", returnedTypes.size(), is(2));
+
+    ProgrammeMembershipType returnedType1 = returnedTypes.get(0);
+    assertThat("Unexpected PM type", returnedType1, is(programmeMembershipType1));
+
+    ProgrammeMembershipType returnedType2 = returnedTypes.get(1);
+    assertThat("Unexpected PM type", returnedType2, is(programmeMembershipType2));
   }
 
   @Test
