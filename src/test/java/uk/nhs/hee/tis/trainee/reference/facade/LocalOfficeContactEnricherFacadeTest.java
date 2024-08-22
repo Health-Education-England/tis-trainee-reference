@@ -44,7 +44,7 @@ class LocalOfficeContactEnricherFacadeTest {
   private static final String DEFAULT_LOCAL_OFFICE_ID_1 = UUID.randomUUID().toString();
   private static final String DEFAULT_CONTACT_TYPE_ID_1 = UUID.randomUUID().toString();
   private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
-  private static final String DEFAULT_LOCAL_OFFICE_1 = "Health Education England South London";
+  private static final String DEFAULT_LOCAL_OFFICE_1 = "South London";
   private static final String DEFAULT_CONTACT_TYPE_1 = "Less Than Full Time";
 
   private LocalOfficeContact localOfficeContact1;
