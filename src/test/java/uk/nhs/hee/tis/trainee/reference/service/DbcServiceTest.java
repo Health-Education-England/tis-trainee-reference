@@ -55,7 +55,7 @@ class DbcServiceTest {
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
 
-  private static final String DEFAULT_LABEL_1 = "Health Education England East of England";
+  private static final String DEFAULT_LABEL_1 = "East of England";
   private static final String DEFAULT_LABEL_2 =
       "Northern Ireland Medical and Dental Training Agency";
 

@@ -64,8 +64,8 @@ class LocalOfficeContactServiceTest {
   private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
   private static final String DEFAULT_CONTACT_2 = "england.ltft.eoe@nhs.net";
 
-  private static final String DEFAULT_LOCAL_OFFICE_1 = "Health Education England South London";
-  private static final String DEFAULT_LOCAL_OFFICE_2 = "Health Education England Thames Valley";
+  private static final String DEFAULT_LOCAL_OFFICE_1 = "South London";
+  private static final String DEFAULT_LOCAL_OFFICE_2 = "Thames Valley";
 
   private static final String DEFAULT_CONTACT_TYPE_1 = "Less Than Full Time";
   private static final String DEFAULT_CONTACT_TYPE_2 = "Deferral";
