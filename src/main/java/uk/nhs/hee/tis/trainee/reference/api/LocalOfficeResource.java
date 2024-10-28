@@ -45,8 +45,8 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeService;
 @XRayEnabled
 public class LocalOfficeResource {
 
-  private LocalOfficeService service;
-  private LocalOfficeMapper mapper;
+  private final LocalOfficeService service;
+  private final LocalOfficeMapper mapper;
 
   public LocalOfficeResource(LocalOfficeService service, LocalOfficeMapper mapper) {
     this.service = service;
@@ -59,7 +59,7 @@ public class LocalOfficeResource {
    * @return list of LocalOffices.
    */
   @GetMapping("/local-office")
-  public List<LocalOfficeDto> getLocalOffice() {
+  public List<LocalOfficeDto> getLocalOffices() {
     log.trace("Get all LocalOffices");
     List<LocalOffice> localOffices = service.get();
     return mapper.toDtos(localOffices);
@@ -72,11 +72,11 @@ public class LocalOfficeResource {
    * @return The created (or updated) LocalOffice.
    */
   @PostMapping("/local-office")
-  public ResponseEntity<LocalOfficeDto> createLocalOffice(
+  public ResponseEntity<LocalOfficeDto> createLocalOffices(
       @RequestBody LocalOfficeDto localOfficeDto) {
     LocalOffice localOffice = mapper.toEntity(localOfficeDto);
     localOffice = service.create(localOffice);
-    return ResponseEntity.created(URI.create("/api/localOffice")).body(mapper.toDto(localOffice));
+    return ResponseEntity.created(URI.create("/api/local-office")).body(mapper.toDto(localOffice));
   }
 
   /**

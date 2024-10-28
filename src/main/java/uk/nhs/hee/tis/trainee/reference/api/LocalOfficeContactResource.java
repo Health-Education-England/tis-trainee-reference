@@ -49,8 +49,8 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
 @XRayEnabled
 public class LocalOfficeContactResource {
 
-  private LocalOfficeContactService service;
-  private LocalOfficeContactMapper mapper;
+  private final LocalOfficeContactService service;
+  private final LocalOfficeContactMapper mapper;
 
   public LocalOfficeContactResource(LocalOfficeContactService service,
       LocalOfficeContactMapper mapper) {
@@ -107,7 +107,7 @@ public class LocalOfficeContactResource {
       @RequestBody LocalOfficeContactDto localOfficeContactDto) {
     LocalOfficeContact localOfficeContact = mapper.toEntity(localOfficeContactDto);
     localOfficeContact = service.create(localOfficeContact);
-    return ResponseEntity.created(URI.create("/api/localOfficeContact"))
+    return ResponseEntity.created(URI.create("/api/local-office-contact"))
         .body(mapper.toDetailsDto(localOfficeContact));
   }
 

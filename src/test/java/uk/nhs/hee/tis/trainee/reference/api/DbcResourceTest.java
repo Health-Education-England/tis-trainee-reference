@@ -21,42 +21,29 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
+import org.springframework.http.ResponseEntity;
+import uk.nhs.hee.tis.trainee.reference.dto.DbcDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
 import uk.nhs.hee.tis.trainee.reference.service.DbcService;
 
-@ContextConfiguration(classes = {DbcMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(DbcResource.class)
 class DbcResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -75,31 +62,13 @@ class DbcResourceTest {
   private static final String DEFAULT_TYPE_1 = "DEFAULT_TYPE_1";
   private static final String DEFAULT_TYPE_2 = "DEFAULT_TYPE_2";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private DbcResource controller;
+  private DbcService service;
 
-  @Autowired
-  private ObjectMapper mapper;
-
-  private MockMvc mockMvc;
-
-  @MockBean
-  private DbcService dbcServiceMock;
-
-  private Dbc dbc1;
-  private Dbc dbc2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    DbcMapper mapper = Mappers.getMapper(DbcMapper.class);
-    DbcResource dbcResource = new DbcResource(dbcServiceMock,
-        mapper);
-    mockMvc = MockMvcBuilders.standaloneSetup(dbcResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
+    service = mock(DbcService.class);
+    controller = new DbcResource(service, new DbcMapperImpl());
   }
 
   /**
@@ -107,75 +76,121 @@ class DbcResourceTest {
    */
   @BeforeEach
   void initData() {
-    dbc1 = new Dbc();
-    dbc1.setId(DEFAULT_ID_1);
-    dbc1.setTisId(DEFAULT_TIS_ID_1);
-    dbc1.setLabel(DEFAULT_LABEL_1);
-    dbc1.setType(DEFAULT_TYPE_1);
-    dbc1.setInternal(DEFAULT_INTERNAL_1);
+    Dbc entity1 = new Dbc();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+    entity1.setType(DEFAULT_TYPE_1);
+    entity1.setInternal(DEFAULT_INTERNAL_1);
 
-    dbc2 = new Dbc();
-    dbc2.setId(DEFAULT_ID_2);
-    dbc2.setTisId(DEFAULT_TIS_ID_2);
-    dbc2.setLabel(DEFAULT_LABEL_2);
-    dbc2.setType(DEFAULT_TYPE_2);
-    dbc2.setInternal(DEFAULT_INTERNAL_2);
+    Dbc entity2 = new Dbc();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+    entity2.setType(DEFAULT_TYPE_2);
+    entity2.setInternal(DEFAULT_INTERNAL_2);
   }
 
   @Test
-  void testGetAllDbcs() throws Exception {
-    List<Dbc> dbcs = new ArrayList<>();
-    dbcs.add(dbc1);
-    dbcs.add(dbc2);
-    when(dbcServiceMock.get()).thenReturn(dbcs);
-    this.mockMvc.perform(get("/api/dbc")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllDbcs() {
+    Dbc entity1 = new Dbc();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+    entity1.setType(DEFAULT_TYPE_1);
+    entity1.setInternal(DEFAULT_INTERNAL_1);
+
+    Dbc entity2 = new Dbc();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+    entity2.setType(DEFAULT_TYPE_2);
+    entity2.setInternal(DEFAULT_INTERNAL_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    List<DbcDto> dtos = controller.getDbcs();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    DbcDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected type.", dto1.getType(), is(DEFAULT_TYPE_1));
+    assertThat("Unexpected internal flag.", dto1.isInternal(), is(DEFAULT_INTERNAL_1));
+
+    DbcDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected type.", dto2.getType(), is(DEFAULT_TYPE_2));
+    assertThat("Unexpected internal flag.", dto2.isInternal(), is(DEFAULT_INTERNAL_2));
   }
 
   @Test
-  void testCreateDbc() throws Exception {
-    when(dbcServiceMock.create(dbc1)).thenReturn(dbc1);
+  void shouldCreateDbc() {
+    DbcDto dto = new DbcDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setType(DEFAULT_TYPE_1);
+    dto.setInternal(DEFAULT_INTERNAL_1);
 
-    mockMvc.perform(post("/api/dbc")
-        .content(mapper.writeValueAsBytes(dbc1))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
-        .andExpect(jsonPath("$.type").value(is(DEFAULT_TYPE_1)))
-        .andExpect(jsonPath("$.internal").value(is(DEFAULT_INTERNAL_1)));
+    when(service.create(any())).thenAnswer(inv -> {
+      Dbc entity = inv.getArgument(0);
+      assertThat("Unexpected ID.", entity.getId(), nullValue());
+      entity.setId(DEFAULT_ID_1);
+      return entity;
+    });
+
+    ResponseEntity<DbcDto> response = controller.createDbc(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        is(URI.create("/api/dbc")));
+
+    DbcDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected type.", body.getType(), is(DEFAULT_TYPE_1));
+    assertThat("Unexpected internal flag.", body.isInternal(), is(DEFAULT_INTERNAL_1));
   }
 
   @Test
-  void testUpdateDbc() throws Exception {
-    when(dbcServiceMock.update(dbc1)).thenReturn(dbc2);
+  void shouldUpdateDbc() {
+    DbcDto dto = new DbcDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setType(DEFAULT_TYPE_1);
+    dto.setInternal(DEFAULT_INTERNAL_1);
 
-    mockMvc.perform(put("/api/dbc")
-        .content(mapper.writeValueAsBytes(dbc1))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_2)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_2)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_2)))
-        .andExpect(jsonPath("$.type").value(is(DEFAULT_TYPE_2)))
-        .andExpect(jsonPath("$.internal").value(is(DEFAULT_INTERNAL_2)));
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<DbcDto> response = controller.updateDbc(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(true));
+
+    DbcDto body = response.getBody();
+
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected type.", body.getType(), is(DEFAULT_TYPE_1));
+    assertThat("Unexpected internal flag.", body.isInternal(), is(DEFAULT_INTERNAL_1));
   }
 
   @Test
-  void testDeleteDbc() throws Exception {
-    mockMvc.perform(delete("/api/dbc/{tisId}", DEFAULT_TIS_ID_1)
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteDbc() {
+    ResponseEntity<Void> response = controller.deleteDbc(DEFAULT_TIS_ID_1);
 
-    verify(dbcServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    assertThat("Unexpected status code.", response.getStatusCode(), is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }
