@@ -79,7 +79,8 @@ class ProgrammeMembershipTypeResourceTest {
 
     when(service.get()).thenReturn(List.of(entity1, entity2));
 
-    ResponseEntity<List<ProgrammeMembershipTypeDto>> response = controller.getProgrammeMembershipTypes();
+    ResponseEntity<List<ProgrammeMembershipTypeDto>> response
+        = controller.getProgrammeMembershipTypes();
 
     assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
 
