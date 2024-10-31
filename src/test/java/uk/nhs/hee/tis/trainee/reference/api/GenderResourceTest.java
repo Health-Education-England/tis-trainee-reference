@@ -21,42 +21,29 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
+import org.springframework.http.ResponseEntity;
+import uk.nhs.hee.tis.trainee.reference.dto.GenderDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
 import uk.nhs.hee.tis.trainee.reference.service.GenderService;
 
-@ContextConfiguration(classes = {GenderMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(GenderResource.class)
 class GenderResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -68,30 +55,13 @@ class GenderResourceTest {
   private static final String DEFAULT_LABEL_1 = "Male";
   private static final String DEFAULT_LABEL_2 = "Female";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private GenderResource controller;
+  private GenderService service;
 
-  @Autowired
-  private ObjectMapper mapper;
-
-  private MockMvc mockMvc;
-
-  @MockBean
-  private GenderService genderServiceMock;
-
-  private Gender gender1;
-  private Gender gender2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    GenderMapper mapper = Mappers.getMapper(GenderMapper.class);
-    GenderResource genderResource = new GenderResource(genderServiceMock, mapper);
-    mockMvc = MockMvcBuilders.standaloneSetup(genderResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
+    service = mock(GenderService.class);
+    controller = new GenderResource(service, new GenderMapperImpl());
   }
 
   /**
@@ -99,67 +69,99 @@ class GenderResourceTest {
    */
   @BeforeEach
   void initData() {
-    gender1 = new Gender();
-    gender1.setId(DEFAULT_ID_1);
-    gender1.setTisId(DEFAULT_TIS_ID_1);
-    gender1.setLabel(DEFAULT_LABEL_1);
+    Gender entity1 = new Gender();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
 
-    gender2 = new Gender();
-    gender2.setId(DEFAULT_ID_2);
-    gender2.setTisId(DEFAULT_TIS_ID_2);
-    gender2.setLabel(DEFAULT_LABEL_2);
+    Gender entity2 = new Gender();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void testGetAllGenders() throws Exception {
-    List<Gender> genders = new ArrayList<>();
-    genders.add(gender1);
-    genders.add(gender2);
-    when(genderServiceMock.get()).thenReturn(genders);
-    this.mockMvc.perform(get("/api/gender")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllGenders() {
+    Gender entity1 = new Gender();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    Gender entity2 = new Gender();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    List<GenderDto> dtos = controller.getGenders();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    GenderDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), CoreMatchers.is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), CoreMatchers.is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), CoreMatchers.is(DEFAULT_LABEL_1));
+
+    GenderDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), CoreMatchers.is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), CoreMatchers.is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), CoreMatchers.is(DEFAULT_LABEL_2));
   }
 
   @Test
-  void testCreateGender() throws Exception {
-    when(genderServiceMock.create(gender1)).thenReturn(gender1);
+  void shouldCreateGender() {
+    GenderDto dto = new GenderDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(post("/api/gender")
-        .content(mapper.writeValueAsBytes(gender1))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+    when(service.create(any())).thenAnswer(inv -> {
+      Gender entity = inv.getArgument(0);
+      assertThat("Unexpected ID.", entity.getId(), nullValue());
+      entity.setId(DEFAULT_ID_1);
+      return entity;
+    });
+
+    ResponseEntity<GenderDto> response = controller.createGender(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), CoreMatchers.is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        CoreMatchers.is(URI.create("/api/gender")));
+
+    GenderDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), CoreMatchers.is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), CoreMatchers.is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), CoreMatchers.is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testUpdateGender() throws Exception {
-    when(genderServiceMock.update(gender1)).thenReturn(gender1);
+  void shouldUpdateGender() {
+    GenderDto dto = new GenderDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(put("/api/gender")
-        .content(mapper.writeValueAsBytes(gender1))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<GenderDto> response = controller.updateGender(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), CoreMatchers.is(OK));
+
+    GenderDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), CoreMatchers.is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), CoreMatchers.is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), CoreMatchers.is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testDeleteGender() throws Exception {
-    mockMvc.perform(delete("/api/gender/{tisId}", DEFAULT_TIS_ID_1)
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteGender() {
+    ResponseEntity<Void> response = controller.deleteGender(DEFAULT_TIS_ID_1);
 
-    verify(genderServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    assertThat("Unexpected status code.", response.getStatusCode(), CoreMatchers.is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), CoreMatchers.is(false));
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

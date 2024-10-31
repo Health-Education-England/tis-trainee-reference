@@ -20,34 +20,20 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.nhs.hee.tis.trainee.reference.dto.DeclarationTypeDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.DeclarationTypeMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.DeclarationTypeMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.DeclarationType;
 import uk.nhs.hee.tis.trainee.reference.service.DeclarationTypeService;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = DeclarationTypeResource.class)
 class DeclarationTypeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -56,72 +42,37 @@ class DeclarationTypeResourceTest {
   private static final String DEFAULT_LABEL_1 = "Significant event";
   private static final String DEFAULT_LABEL_2 = "Other investigation";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private DeclarationTypeResource controller;
+  private DeclarationTypeService service;
 
-  private MockMvc mockMvc;
-
-  @MockBean
-  private DeclarationTypeService declarationTypeServiceMock;
-
-  @MockBean
-  private DeclarationTypeMapper declarationTypeMapperMock;
-
-  private DeclarationType declarationType1;
-  private DeclarationType declarationType2;
-  private DeclarationTypeDto declarationTypeDto1;
-  private DeclarationTypeDto declarationTypeDto2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   public void setup() {
-    DeclarationTypeResource declarationTypeResource =
-        new DeclarationTypeResource(declarationTypeServiceMock, declarationTypeMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(declarationTypeResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
-  }
-
-  /**
-   * Set up data.
-   */
-  @BeforeEach
-  public void initData() {
-    declarationType1 = new DeclarationType();
-    declarationType1.setId(DEFAULT_ID_1);
-    declarationType1.setLabel(DEFAULT_LABEL_1);
-
-    declarationType2 = new DeclarationType();
-    declarationType2.setId(DEFAULT_ID_2);
-    declarationType2.setLabel(DEFAULT_LABEL_2);
-
-    declarationTypeDto1 = new DeclarationTypeDto();
-    declarationTypeDto1.setId(DEFAULT_ID_1);
-    declarationTypeDto1.setLabel(DEFAULT_LABEL_1);
-
-    declarationTypeDto2 = new DeclarationTypeDto();
-    declarationTypeDto2.setId(DEFAULT_ID_2);
-    declarationTypeDto2.setLabel(DEFAULT_LABEL_2);
+    service = mock(DeclarationTypeService.class);
+    controller = new DeclarationTypeResource(service, new DeclarationTypeMapperImpl());
   }
 
   @Test
-  void testGetAllDeclarationType() throws Exception {
-    List<DeclarationType> declarationType = new ArrayList<>();
-    declarationType.add(declarationType1);
-    declarationType.add(declarationType2);
-    List<DeclarationTypeDto> declarationTypeDtos = new ArrayList<>();
-    declarationTypeDtos.add(declarationTypeDto1);
-    declarationTypeDtos.add(declarationTypeDto2);
-    when(declarationTypeServiceMock.getDeclarationType()).thenReturn(declarationType);
-    when(declarationTypeMapperMock.toDtos(declarationType)).thenReturn(declarationTypeDtos);
-    this.mockMvc.perform(get("/api/declaration-type")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(declarationTypeDtos.size())))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllDeclarationType() {
+    DeclarationType entity1 = new DeclarationType();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    DeclarationType entity2 = new DeclarationType();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.getDeclarationType()).thenReturn(List.of(entity1, entity2));
+
+    List<DeclarationTypeDto> dtos = controller.getDeclarationTypes();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    DeclarationTypeDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+
+    DeclarationTypeDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
   }
 }

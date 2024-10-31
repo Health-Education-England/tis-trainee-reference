@@ -21,43 +21,29 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapper;
+import org.springframework.http.ResponseEntity;
+import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactTypeDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactTypeService;
 
-@ContextConfiguration(classes = {LocalOfficeContactTypeMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(LocalOfficeContactTypeResource.class)
 class LocalOfficeContactTypeResourceTest {
 
   private static final String DEFAULT_TIS_ID_1 = UUID.randomUUID().toString();
@@ -69,99 +55,96 @@ class LocalOfficeContactTypeResourceTest {
   private static final String DEFAULT_CODE_1 = "DEFERRAL";
   private static final String DEFAULT_CODE_2 = "ONBOARDING_SUPPORT";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private LocalOfficeContactTypeResource controller;
+  private LocalOfficeContactTypeService service;
 
-  @Autowired
-  private ObjectMapper mapper;
-
-  private MockMvc mockMvc;
-
-  @MockBean
-  private LocalOfficeContactTypeService localOfficeContactTypeServiceMock;
-
-  private LocalOfficeContactType contactType1;
-  private LocalOfficeContactType contactType2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    LocalOfficeContactTypeMapper mapper = Mappers.getMapper(LocalOfficeContactTypeMapper.class);
-    LocalOfficeContactTypeResource localOfficeResource
-        = new LocalOfficeContactTypeResource(localOfficeContactTypeServiceMock, mapper);
-    mockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
-  }
-
-  /**
-   * Set up data.
-   */
-  @BeforeEach
-  void initData() {
-    contactType1 = new LocalOfficeContactType();
-    contactType1.setTisId(DEFAULT_TIS_ID_1);
-    contactType1.setLabel(DEFAULT_LABEL_1);
-    contactType1.setCode(DEFAULT_CODE_1);
-
-    contactType2 = new LocalOfficeContactType();
-    contactType2.setTisId(DEFAULT_TIS_ID_2);
-    contactType2.setLabel(DEFAULT_LABEL_2);
-    contactType2.setCode(DEFAULT_CODE_2);
+    service = mock(LocalOfficeContactTypeService.class);
+    controller = new LocalOfficeContactTypeResource(service,
+        new LocalOfficeContactTypeMapperImpl());
   }
 
   @Test
-  void testGetAllLocalOfficeContactTypes() throws Exception {
-    List<LocalOfficeContactType> contactTypes = new ArrayList<>();
-    contactTypes.add(contactType1);
-    contactTypes.add(contactType2);
-    when(localOfficeContactTypeServiceMock.get()).thenReturn(contactTypes);
-    this.mockMvc.perform(get("/api/local-office-contact-type")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.[*].tisId").value(hasItem(DEFAULT_TIS_ID_2)));
+  void shouldGetAllLocalOfficeContactTypes() {
+    LocalOfficeContactType entity1 = new LocalOfficeContactType();
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setCode(DEFAULT_CODE_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    LocalOfficeContactType entity2 = new LocalOfficeContactType();
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setCode(DEFAULT_CODE_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    List<LocalOfficeContactTypeDto> dtos = controller.getLocalOfficeContactTypes();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    LocalOfficeContactTypeDto dto1 = dtos.get(0);
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected code.", dto1.getCode(), is(DEFAULT_CODE_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+
+    LocalOfficeContactTypeDto dto2 = dtos.get(1);
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected code.", dto2.getCode(), is(DEFAULT_CODE_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
-  void testCreateLocalOfficeContactType() throws Exception {
-    when(localOfficeContactTypeServiceMock.create(contactType1)).thenReturn(contactType1);
+  void shouldCreateLocalOfficeContactType() {
+    LocalOfficeContactTypeDto dto = new LocalOfficeContactTypeDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setCode(DEFAULT_CODE_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(post("/api/local-office-contact-type")
-            .content(mapper.writeValueAsBytes(contactType1))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
-        .andExpect(jsonPath("$.code").value(is(DEFAULT_CODE_1)));
+    when(service.create(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<LocalOfficeContactTypeDto> response = controller.createLocalOfficeContactType(
+        dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        is(URI.create("/api/local-office-contact-type")));
+
+    LocalOfficeContactTypeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected code.", body.getCode(), is(DEFAULT_CODE_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testUpdateLocalOfficeContactType() throws Exception {
-    when(localOfficeContactTypeServiceMock.update(contactType1)).thenReturn(contactType1);
+  void shouldUpdateLocalOfficeContactType() {
+    LocalOfficeContactTypeDto dto = new LocalOfficeContactTypeDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setCode(DEFAULT_CODE_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(put("/api/local-office-contact-type")
-            .content(mapper.writeValueAsBytes(contactType1))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
-        .andExpect(jsonPath("$.code").value(is(DEFAULT_CODE_1)));
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<LocalOfficeContactTypeDto> response = controller.updateLocalOfficeContactType(
+        dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    LocalOfficeContactTypeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected code.", body.getCode(), is(DEFAULT_CODE_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testDeleteLocalOfficeContactType() throws Exception {
-    mockMvc.perform(delete("/api/local-office-contact-type/{tisId}", DEFAULT_TIS_ID_1)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteLocalOfficeContactType() {
+    ResponseEntity<Void> response = controller.deleteLocalOfficeContactType(DEFAULT_TIS_ID_1);
 
-    verify(localOfficeContactTypeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    assertThat("Unexpected status code.", response.getStatusCode(), is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

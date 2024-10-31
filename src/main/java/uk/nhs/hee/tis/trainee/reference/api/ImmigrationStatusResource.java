@@ -44,8 +44,8 @@ import uk.nhs.hee.tis.trainee.reference.service.ImmigrationStatusService;
 @XRayEnabled
 public class ImmigrationStatusResource {
 
-  private ImmigrationStatusService service;
-  private ImmigrationStatusMapper mapper;
+  private final ImmigrationStatusService service;
+  private final ImmigrationStatusMapper mapper;
 
   public ImmigrationStatusResource(ImmigrationStatusService service,
       ImmigrationStatusMapper mapper) {
@@ -59,7 +59,7 @@ public class ImmigrationStatusResource {
    * @return list of ImmigrationStatus.
    */
   @GetMapping("/immigration-status")
-  public List<ImmigrationStatusDto> getImmigrationStatus() {
+  public List<ImmigrationStatusDto> getImmigrationStatuses() {
     log.trace("Get all ImmigrationStatus");
     List<ImmigrationStatus> immigrationStatus = service.get();
     return mapper.toDtos(immigrationStatus);
@@ -76,7 +76,7 @@ public class ImmigrationStatusResource {
       @RequestBody ImmigrationStatusDto immigrationStatusDto) {
     ImmigrationStatus immigrationStatus = mapper.toEntity(immigrationStatusDto);
     immigrationStatus = service.create(immigrationStatus);
-    return ResponseEntity.created(URI.create("/api/immigrationStatus"))
+    return ResponseEntity.created(URI.create("/api/immigration-status"))
         .body(mapper.toDto(immigrationStatus));
   }
 

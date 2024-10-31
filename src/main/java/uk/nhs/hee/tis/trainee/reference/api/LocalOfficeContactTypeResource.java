@@ -48,8 +48,8 @@ import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactTypeService;
 @XRayEnabled
 public class LocalOfficeContactTypeResource {
 
-  private LocalOfficeContactTypeService service;
-  private LocalOfficeContactTypeMapper mapper;
+  private final LocalOfficeContactTypeService service;
+  private final LocalOfficeContactTypeMapper mapper;
 
   public LocalOfficeContactTypeResource(LocalOfficeContactTypeService service,
       LocalOfficeContactTypeMapper mapper) {
@@ -63,7 +63,7 @@ public class LocalOfficeContactTypeResource {
    * @return list of LocalOfficeContactTypes.
    */
   @GetMapping("/local-office-contact-type")
-  public List<LocalOfficeContactTypeDto> getLocalOfficeContactType() {
+  public List<LocalOfficeContactTypeDto> getLocalOfficeContactTypes() {
     log.trace("Get all LocalOfficeContactTypes");
     List<LocalOfficeContactType> localOfficeContactTypes = service.get();
     return mapper.toDtos(localOfficeContactTypes);
@@ -81,7 +81,7 @@ public class LocalOfficeContactTypeResource {
       @RequestBody LocalOfficeContactTypeDto localOfficeContactTypeDto) {
     LocalOfficeContactType localOfficeContactType = mapper.toEntity(localOfficeContactTypeDto);
     localOfficeContactType = service.create(localOfficeContactType);
-    return ResponseEntity.created(URI.create("/api/localOfficeContactType"))
+    return ResponseEntity.created(URI.create("/api/local-office-contact-type"))
         .body(mapper.toDto(localOfficeContactType));
   }
 

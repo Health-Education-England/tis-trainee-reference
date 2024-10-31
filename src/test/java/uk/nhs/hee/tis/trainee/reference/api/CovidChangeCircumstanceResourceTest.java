@@ -21,34 +21,20 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.nhs.hee.tis.trainee.reference.dto.CovidChangeCircumstanceDto;
-import uk.nhs.hee.tis.trainee.reference.mapper.CovidChangeCircumstanceMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.CovidChangeCircumstanceMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.CovidChangeCircumstance;
 import uk.nhs.hee.tis.trainee.reference.service.CovidChangeCircumstanceService;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = CovidChangeCircumstanceResource.class)
 class CovidChangeCircumstanceResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -57,72 +43,38 @@ class CovidChangeCircumstanceResourceTest {
   private static final String DEFAULT_LABEL_1 = "DEFAULT_LABEL_1";
   private static final String DEFAULT_LABEL_2 = "DEFAULT_LABEL_2";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private CovidChangeCircumstanceResource controller;
+  private CovidChangeCircumstanceService service;
 
-  private MockMvc mockMvc;
-
-  @MockBean
-  private CovidChangeCircumstanceService covidChangeCircServiceMock;
-
-  @MockBean
-  private CovidChangeCircumstanceMapper covidChangeCircMapperMock;
-
-  private CovidChangeCircumstance covidChangeCirc1;
-  private CovidChangeCircumstance covidChangeCirc2;
-  private CovidChangeCircumstanceDto covidChangeCircDto1;
-  private CovidChangeCircumstanceDto covidChangeCircDto2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   public void setup() {
-    CovidChangeCircumstanceResource collegeChangeCircResource = new CovidChangeCircumstanceResource(
-        covidChangeCircServiceMock, covidChangeCircMapperMock);
-    mockMvc = MockMvcBuilders.standaloneSetup(collegeChangeCircResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
-  }
-
-  /**
-   * Set up data.
-   */
-  @BeforeEach
-  public void initData() {
-    covidChangeCirc1 = new CovidChangeCircumstance();
-    covidChangeCirc1.setId(DEFAULT_ID_1);
-    covidChangeCirc1.setLabel(DEFAULT_LABEL_1);
-
-    covidChangeCirc2 = new CovidChangeCircumstance();
-    covidChangeCirc2.setId(DEFAULT_ID_2);
-    covidChangeCirc2.setLabel(DEFAULT_LABEL_2);
-
-    covidChangeCircDto1 = new CovidChangeCircumstanceDto();
-    covidChangeCircDto1.setId(DEFAULT_ID_1);
-    covidChangeCircDto1.setLabel(DEFAULT_LABEL_1);
-
-    covidChangeCircDto2 = new CovidChangeCircumstanceDto();
-    covidChangeCircDto2.setId(DEFAULT_ID_2);
-    covidChangeCircDto2.setLabel(DEFAULT_LABEL_2);
+    service = mock(CovidChangeCircumstanceService.class);
+    controller = new CovidChangeCircumstanceResource(service,
+        new CovidChangeCircumstanceMapperImpl());
   }
 
   @Test
-  void testGetAllCovidChangeCircs() throws Exception {
-    List<CovidChangeCircumstance> covidChangeCircs = new ArrayList<>();
-    covidChangeCircs.add(covidChangeCirc1);
-    covidChangeCircs.add(covidChangeCirc2);
-    List<CovidChangeCircumstanceDto> covidChangeCircsDtos = new ArrayList<>();
-    covidChangeCircsDtos.add(covidChangeCircDto1);
-    covidChangeCircsDtos.add(covidChangeCircDto2);
-    when(covidChangeCircServiceMock.getCovidChangeCircumstances()).thenReturn(covidChangeCircs);
-    when(covidChangeCircMapperMock.toDtos(covidChangeCircs)).thenReturn(covidChangeCircsDtos);
-    this.mockMvc.perform(get("/api/covid-change-circs")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(covidChangeCircsDtos.size())))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllCovidChangeCircumstances() {
+    CovidChangeCircumstance entity1 = new CovidChangeCircumstance();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    CovidChangeCircumstance entity2 = new CovidChangeCircumstance();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.getCovidChangeCircumstances()).thenReturn(List.of(entity1, entity2));
+
+    List<CovidChangeCircumstanceDto> dtos = controller.getCovidChangeCircumstance();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    CovidChangeCircumstanceDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+
+    CovidChangeCircumstanceDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
   }
 }

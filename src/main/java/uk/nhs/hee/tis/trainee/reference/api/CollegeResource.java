@@ -45,8 +45,8 @@ import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 @XRayEnabled
 public class CollegeResource {
 
-  private CollegeService service;
-  private CollegeMapper mapper;
+  private final CollegeService service;
+  private final CollegeMapper mapper;
 
   public CollegeResource(CollegeService service, CollegeMapper mapper) {
     this.service = service;
@@ -59,7 +59,7 @@ public class CollegeResource {
    * @return list of Colleges.
    */
   @GetMapping("/college")
-  public List<CollegeDto> getCollege() {
+  public List<CollegeDto> getColleges() {
     log.trace("Get all College");
     List<College> colleges = service.get();
     return mapper.toDtos(colleges);

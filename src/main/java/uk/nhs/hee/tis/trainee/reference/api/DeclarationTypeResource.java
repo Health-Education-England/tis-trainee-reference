@@ -39,8 +39,8 @@ public class DeclarationTypeResource {
 
   private static final Logger log = LoggerFactory.getLogger(DeclarationTypeResource.class);
 
-  private DeclarationTypeService declarationTypeService;
-  private DeclarationTypeMapper declarationTypeMapper;
+  private final DeclarationTypeService declarationTypeService;
+  private final DeclarationTypeMapper declarationTypeMapper;
 
   public DeclarationTypeResource(DeclarationTypeService declarationTypeService,
       DeclarationTypeMapper declarationTypeMapper) {
@@ -54,7 +54,7 @@ public class DeclarationTypeResource {
    * @return list of DeclarationTypes.
    */
   @GetMapping("/declaration-type")
-  public List<DeclarationTypeDto> getDeclarationType() {
+  public List<DeclarationTypeDto> getDeclarationTypes() {
     log.trace("Get all DeclarationType");
     List<DeclarationType> declarationTypes = declarationTypeService.getDeclarationType();
     return declarationTypeMapper.toDtos(declarationTypes);

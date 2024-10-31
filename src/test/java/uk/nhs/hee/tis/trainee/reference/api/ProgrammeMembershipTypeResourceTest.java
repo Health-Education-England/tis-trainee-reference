@@ -21,42 +21,29 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.nhs.hee.tis.trainee.reference.mapper.ProgrammeMembershipTypeMapper;
+import org.springframework.http.ResponseEntity;
+import uk.nhs.hee.tis.trainee.reference.dto.ProgrammeMembershipTypeDto;
+import uk.nhs.hee.tis.trainee.reference.mapper.ProgrammeMembershipTypeMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.ProgrammeMembershipType;
 import uk.nhs.hee.tis.trainee.reference.service.ProgrammeMembershipTypeService;
 
-@ContextConfiguration(classes = {ProgrammeMembershipTypeMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(DbcResource.class)
 class ProgrammeMembershipTypeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -68,101 +55,104 @@ class ProgrammeMembershipTypeResourceTest {
   private static final String DEFAULT_LABEL_1 = "Substantive";
   private static final String DEFAULT_LABEL_2 = "Military";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private ProgrammeMembershipTypeResource controller;
+  private ProgrammeMembershipTypeService service;
 
-  @Autowired
-  private ObjectMapper mapper;
-
-  private MockMvc mockMvc;
-
-  @MockBean
-  private ProgrammeMembershipTypeService programmeMembershipTypeServiceMock;
-
-  private ProgrammeMembershipType programmeMembershipType1;
-  private ProgrammeMembershipType programmeMembershipType2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    ProgrammeMembershipTypeMapper mapper = Mappers.getMapper(ProgrammeMembershipTypeMapper.class);
-    ProgrammeMembershipTypeResource programmeMembershipTypeResource
-        = new ProgrammeMembershipTypeResource(programmeMembershipTypeServiceMock, mapper);
-    mockMvc = MockMvcBuilders.standaloneSetup(programmeMembershipTypeResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
-  }
-
-  /**
-   * Set up data.
-   */
-  @BeforeEach
-  void initData() {
-    programmeMembershipType1 = new ProgrammeMembershipType();
-    programmeMembershipType1.setId(DEFAULT_ID_1);
-    programmeMembershipType1.setTisId(DEFAULT_TIS_ID_1);
-    programmeMembershipType1.setLabel(DEFAULT_LABEL_1);
-
-    programmeMembershipType2 = new ProgrammeMembershipType();
-    programmeMembershipType2.setId(DEFAULT_ID_2);
-    programmeMembershipType2.setTisId(DEFAULT_TIS_ID_2);
-    programmeMembershipType2.setLabel(DEFAULT_LABEL_2);
+    service = mock(ProgrammeMembershipTypeService.class);
+    controller = new ProgrammeMembershipTypeResource(service,
+        new ProgrammeMembershipTypeMapperImpl());
   }
 
   @Test
-  void testGetAllProgrammeMembershipTypes() throws Exception {
-    List<ProgrammeMembershipType> programmeMembershipTypes = new ArrayList<>();
-    programmeMembershipTypes.add(programmeMembershipType1);
-    programmeMembershipTypes.add(programmeMembershipType2);
-    when(programmeMembershipTypeServiceMock.get()).thenReturn(programmeMembershipTypes);
-    this.mockMvc.perform(get("/api/programme-membership-type")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllProgrammeMembershipTypes() {
+    ProgrammeMembershipType entity1 = new ProgrammeMembershipType();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    ProgrammeMembershipType entity2 = new ProgrammeMembershipType();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    ResponseEntity<List<ProgrammeMembershipTypeDto>> response
+        = controller.getProgrammeMembershipTypes();
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    List<ProgrammeMembershipTypeDto> dtos = response.getBody();
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    ProgrammeMembershipTypeDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+
+    ProgrammeMembershipTypeDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
-  void testCreateProgrammeMembershipType() throws Exception {
-    when(programmeMembershipTypeServiceMock.create(programmeMembershipType1)).thenReturn(
-        programmeMembershipType1);
+  void shouldCreateProgrammeMembershipType() {
+    ProgrammeMembershipTypeDto dto = new ProgrammeMembershipTypeDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(post("/api/programme-membership-type")
-            .content(mapper.writeValueAsBytes(programmeMembershipType1))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+    when(service.create(any())).thenAnswer(inv -> {
+      ProgrammeMembershipType entity = inv.getArgument(0);
+      assertThat("Unexpected ID.", entity.getId(), nullValue());
+      entity.setId(DEFAULT_ID_1);
+      return entity;
+    });
+
+    ResponseEntity<ProgrammeMembershipTypeDto> response = controller.createProgrammeMembershipType(
+        dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        is(URI.create("/api/programme-membership-type")));
+
+    ProgrammeMembershipTypeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testUpdateProgrammeMembershipType() throws Exception {
-    when(programmeMembershipTypeServiceMock.update(programmeMembershipType1)).thenReturn(
-        programmeMembershipType2);
+  void shouldUpdateProgrammeMembershipType() {
+    ProgrammeMembershipTypeDto dto = new ProgrammeMembershipTypeDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
 
-    mockMvc.perform(put("/api/programme-membership-type")
-            .content(mapper.writeValueAsBytes(programmeMembershipType1))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_2)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_2)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_2)));
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<ProgrammeMembershipTypeDto> response = controller.updateProgrammeMembershipType(
+        dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    ProgrammeMembershipTypeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
   }
 
   @Test
-  void testDeleteProgrammeMembershipType() throws Exception {
-    mockMvc.perform(delete("/api/programme-membership-type/{tisId}", DEFAULT_TIS_ID_1)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteProgrammeMembershipType() {
+    ResponseEntity<Void> response = controller.deleteProgrammeMembershipType(DEFAULT_TIS_ID_1);
 
-    verify(programmeMembershipTypeServiceMock).deleteByTisId(DEFAULT_TIS_ID_1);
+    assertThat("Unexpected status code.", response.getStatusCode(), is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
+
+    verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }
 }

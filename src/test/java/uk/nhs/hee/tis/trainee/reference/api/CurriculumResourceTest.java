@@ -20,45 +20,34 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static uk.nhs.hee.tis.trainee.reference.dto.Status.CURRENT;
+import static uk.nhs.hee.tis.trainee.reference.dto.Status.INACTIVE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.ResponseEntity;
 import uk.nhs.hee.tis.trainee.reference.dto.CurriculumDto;
 import uk.nhs.hee.tis.trainee.reference.dto.validator.CurriculumValidator;
-import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.service.CurriculumService;
 
-@ContextConfiguration(classes = {CurriculumMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = CurriculumResource.class)
 class CurriculumResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -73,142 +62,160 @@ class CurriculumResourceTest {
   private static final String DEFAULT_CURRICULUM_SUBTYPE_1 = "MEDICAL_CURRICULUM";
   private static final String DEFAULT_CURRICULUM_SUBTYPE_2 = "SUB_SPECIALTY";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  private CurriculumResource controller;
 
-  private MockMvc mockMvc;
-
-  @Autowired
-  private ObjectMapper mapper;
-
-  @MockBean
   private CurriculumService service;
-
-  @MockBean
   private CurriculumValidator validator;
 
-  private CurriculumDto dto;
-
-  private Curriculum entity1;
-  private Curriculum entity2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    CurriculumMapper mapper = Mappers.getMapper(CurriculumMapper.class);
-    CurriculumResource curriculumResource = new CurriculumResource(service, mapper, validator);
-    mockMvc = MockMvcBuilders.standaloneSetup(curriculumResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
+    service = mock(CurriculumService.class);
+    validator = mock(CurriculumValidator.class);
+    controller = new CurriculumResource(service, new CurriculumMapperImpl(), validator);
   }
 
-  /**
-   * Set up data.
-   */
-  @BeforeEach
-  void initData() {
-    dto = new CurriculumDto();
-    dto.setId(DEFAULT_ID_1);
-    dto.setTisId(DEFAULT_TIS_ID_1);
-    dto.setLabel(DEFAULT_LABEL_1);
-    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
-
-    entity1 = new Curriculum();
+  @Test
+  void shouldGetAllCurricula() {
+    Curriculum entity1 = new Curriculum();
     entity1.setId(DEFAULT_ID_1);
     entity1.setTisId(DEFAULT_TIS_ID_1);
     entity1.setLabel(DEFAULT_LABEL_1);
     entity1.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
 
-    entity2 = new Curriculum();
+    Curriculum entity2 = new Curriculum();
     entity2.setId(DEFAULT_ID_2);
     entity2.setTisId(DEFAULT_TIS_ID_2);
     entity2.setLabel(DEFAULT_LABEL_2);
     entity2.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    List<CurriculumDto> dtos = controller.getCurricula();
+
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    CurriculumDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected sub-type.", dto1.getCurriculumSubType(),
+        is(DEFAULT_CURRICULUM_SUBTYPE_1));
+    assertThat("Unexpected status.", dto1.getStatus(), nullValue());
+
+    CurriculumDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
+    assertThat("Unexpected sub-type.", dto2.getCurriculumSubType(),
+        is(DEFAULT_CURRICULUM_SUBTYPE_2));
+    assertThat("Unexpected status.", dto2.getStatus(), nullValue());
   }
 
   @Test
-  void shouldGetAllCurricula() throws Exception {
-    List<Curriculum> curricula = new ArrayList<>();
-    curricula.add(entity1);
-    curricula.add(entity2);
-    when(service.get()).thenReturn(curricula);
-    mockMvc.perform(get("/api/curriculum")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
-  }
+  void shouldCreateCurriculumWhenCreateValid() {
+    CurriculumDto dto = new CurriculumDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
+    dto.setStatus(CURRENT);
 
-  @Test
-  void shouldCreateCurriculumWhenCreateValid() throws Exception {
     when(validator.isValid(dto)).thenReturn(true);
-    when(service.create(entity1)).thenReturn(entity1);
 
-    mockMvc.perform(post("/api/curriculum")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
-        .andExpect(jsonPath("$.curriculumSubType").value(is(DEFAULT_CURRICULUM_SUBTYPE_1)));
+    when(service.create(any())).thenAnswer(inv -> {
+      Curriculum entity = inv.getArgument(0);
+      assertThat("Unexpected ID.", entity.getId(), nullValue());
+      entity.setId(DEFAULT_ID_1);
+      return entity;
+    });
+
+    ResponseEntity<CurriculumDto> response = controller.createCurriculum(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        is(URI.create("/api/curriculum")));
+
+    CurriculumDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected sub-type.", body.getCurriculumSubType(),
+        is(DEFAULT_CURRICULUM_SUBTYPE_1));
+    assertThat("Unexpected status.", body.getStatus(), nullValue());
   }
 
   @Test
-  void shouldDeleteCurriculumWhenCreateInvalid() throws Exception {
+  void shouldDeleteCurriculumWhenCreateInvalid() {
+    CurriculumDto dto = new CurriculumDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
+    dto.setStatus(INACTIVE);
+
     when(validator.isValid(dto)).thenReturn(false);
 
-    mockMvc.perform(post("/api/curriculum")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$").doesNotExist());
+    ResponseEntity<CurriculumDto> response = controller.createCurriculum(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(UNPROCESSABLE_ENTITY));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
     verifyNoMoreInteractions(service);
   }
 
   @Test
-  void shouldUpdateCurriculumWhenUpdateValid() throws Exception {
-    when(validator.isValid(dto)).thenReturn(true);
-    when(service.update(entity1)).thenReturn(entity1);
+  void shouldUpdateCurriculumWhenUpdateValid() {
+    CurriculumDto dto = new CurriculumDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
+    dto.setStatus(CURRENT);
 
-    mockMvc.perform(put("/api/curriculum")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)))
-        .andExpect(jsonPath("$.curriculumSubType").value(is(DEFAULT_CURRICULUM_SUBTYPE_1)));
+    when(validator.isValid(dto)).thenReturn(true);
+
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<CurriculumDto> response = controller.updateCurriculum(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    CurriculumDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected sub-type.", body.getCurriculumSubType(),
+        is(DEFAULT_CURRICULUM_SUBTYPE_1));
+    assertThat("Unexpected status.", body.getStatus(), nullValue());
   }
 
   @Test
-  void shouldDeleteCurriculumWhenUpdateInvalid() throws Exception {
+  void shouldDeleteCurriculumWhenUpdateInvalid() {
+    CurriculumDto dto = new CurriculumDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setCurriculumSubType(DEFAULT_CURRICULUM_SUBTYPE_1);
+    dto.setStatus(INACTIVE);
+
     when(validator.isValid(dto)).thenReturn(false);
 
-    mockMvc.perform(put("/api/curriculum")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$").doesNotExist());
+    ResponseEntity<CurriculumDto> response = controller.updateCurriculum(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(UNPROCESSABLE_ENTITY));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
     verifyNoMoreInteractions(service);
   }
 
   @Test
-  void shouldDeleteCurriculum() throws Exception {
-    mockMvc.perform(delete("/api/curriculum/{tisId}", DEFAULT_TIS_ID_1)
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteCurriculum() {
+    ResponseEntity<Void> response = controller.deleteCurriculum(DEFAULT_TIS_ID_1);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }

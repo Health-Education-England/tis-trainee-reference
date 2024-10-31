@@ -59,7 +59,7 @@ public class DbcResource {
    * @return list of Dbcs.
    */
   @GetMapping
-  public List<DbcDto> getDbc() {
+  public List<DbcDto> getDbcs() {
     log.trace("Get all Dbcs");
     List<Dbc> dbcs = service.get();
     return mapper.toDtos(dbcs);

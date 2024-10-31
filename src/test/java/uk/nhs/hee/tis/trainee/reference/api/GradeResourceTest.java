@@ -21,45 +21,34 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static uk.nhs.hee.tis.trainee.reference.dto.Status.CURRENT;
+import static uk.nhs.hee.tis.trainee.reference.dto.Status.INACTIVE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.ResponseEntity;
 import uk.nhs.hee.tis.trainee.reference.dto.GradeDto;
 import uk.nhs.hee.tis.trainee.reference.dto.validator.GradeValidator;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.Grade;
 import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 
-@ContextConfiguration(classes = {GradeMapper.class})
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(GradeResource.class)
 class GradeResourceTest {
 
   private static final String DEFAULT_ID_1 = "DEFAULT_ID_1";
@@ -71,35 +60,15 @@ class GradeResourceTest {
   private static final String DEFAULT_LABEL_1 = "Foundation Year 1";
   private static final String DEFAULT_LABEL_2 = "Core Training Year 2";
 
-  @Autowired
-  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-  @Autowired
-  private ObjectMapper mapper;
-
-  private MockMvc mockMvc;
-
-  @MockBean
+  private GradeResource controller;
   private GradeService service;
-
-  @MockBean
   private GradeValidator validator;
 
-  private GradeDto dto;
-
-  private Grade entity1;
-  private Grade entity2;
-
-  /**
-   * Set up mocks before each test.
-   */
   @BeforeEach
   void setup() {
-    GradeMapper mapper = Mappers.getMapper(GradeMapper.class);
-    GradeResource gradeResource = new GradeResource(service, mapper, validator);
-    mockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
-        .setMessageConverters(jacksonMessageConverter)
-        .build();
+    service = mock(GradeService.class);
+    validator = mock(GradeValidator.class);
+    controller = new GradeResource(service, new GradeMapperImpl(), validator);
   }
 
   /**
@@ -107,101 +76,163 @@ class GradeResourceTest {
    */
   @BeforeEach
   void initData() {
-    dto = new GradeDto();
+    GradeDto dto = new GradeDto();
     dto.setId(DEFAULT_ID_1);
     dto.setTisId(DEFAULT_TIS_ID_1);
     dto.setLabel(DEFAULT_LABEL_1);
 
-    entity1 = new Grade();
+    Grade entity1 = new Grade();
     entity1.setId(DEFAULT_ID_1);
     entity1.setTisId(DEFAULT_TIS_ID_1);
     entity1.setLabel(DEFAULT_LABEL_1);
 
-    entity2 = new Grade();
+    Grade entity2 = new Grade();
     entity2.setId(DEFAULT_ID_2);
     entity2.setTisId(DEFAULT_TIS_ID_2);
     entity2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void shouldGetAllGrades() throws Exception {
-    List<Grade> grades = new ArrayList<>();
-    grades.add(entity1);
-    grades.add(entity2);
-    when(service.get()).thenReturn(grades);
-    mockMvc.perform(get("/api/grade")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").value(hasSize(2)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID_2)));
+  void shouldGetAllGrades() {
+    Grade entity1 = new Grade();
+    entity1.setId(DEFAULT_ID_1);
+    entity1.setTisId(DEFAULT_TIS_ID_1);
+    entity1.setLabel(DEFAULT_LABEL_1);
+
+    Grade entity2 = new Grade();
+    entity2.setId(DEFAULT_ID_2);
+    entity2.setTisId(DEFAULT_TIS_ID_2);
+    entity2.setLabel(DEFAULT_LABEL_2);
+
+    when(service.get()).thenReturn(List.of(entity1, entity2));
+
+    ResponseEntity<List<GradeDto>> response = controller.getGrades();
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    List<GradeDto> dtos = response.getBody();
+    assertThat("Unexpected response count.", dtos, hasSize(2));
+
+    GradeDto dto1 = dtos.get(0);
+    assertThat("Unexpected ID.", dto1.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", dto1.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", dto1.getLabel(), is(DEFAULT_LABEL_1));
+
+    GradeDto dto2 = dtos.get(1);
+    assertThat("Unexpected ID.", dto2.getId(), is(DEFAULT_ID_2));
+    assertThat("Unexpected TIS ID.", dto2.getTisId(), is(DEFAULT_TIS_ID_2));
+    assertThat("Unexpected label.", dto2.getLabel(), is(DEFAULT_LABEL_2));
   }
 
   @Test
-  void shouldCreateGradeWhenCreateValid() throws Exception {
+  void shouldCreateGradeWhenCreateValid() {
+    GradeDto dto = new GradeDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setPlacementGrade(true);
+    dto.setTrainingGrade(false);
+    dto.setStatus(CURRENT);
+
     when(validator.isValid(dto)).thenReturn(true);
-    when(service.create(entity1)).thenReturn(entity1);
 
-    mockMvc.perform(post("/api/grade")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+    when(service.create(any())).thenAnswer(inv -> {
+      Grade entity = inv.getArgument(0);
+      assertThat("Unexpected ID.", entity.getId(), nullValue());
+      entity.setId(DEFAULT_ID_1);
+      return entity;
+    });
+
+    ResponseEntity<GradeDto> response = controller.createGrade(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(CREATED));
+    assertThat("Unexpected location.", response.getHeaders().getLocation(),
+        is(URI.create("/api/grade")));
+
+    GradeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected placement grade flag.", body.isPlacementGrade(), is(false));
+    assertThat("Unexpected training grade flag.", body.isTrainingGrade(), is(false));
+    assertThat("Unexpected status.", body.getStatus(), nullValue());
   }
 
   @Test
-  void shouldDeleteGradeWhenCreateInvalid() throws Exception {
+  void shouldDeleteGradeWhenCreateInvalid() {
+    GradeDto dto = new GradeDto();
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setPlacementGrade(true);
+    dto.setTrainingGrade(false);
+    dto.setStatus(INACTIVE);
+
     when(validator.isValid(dto)).thenReturn(false);
 
-    mockMvc.perform(post("/api/grade")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$").doesNotExist());
+    ResponseEntity<GradeDto> response = controller.createGrade(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(UNPROCESSABLE_ENTITY));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
     verifyNoMoreInteractions(service);
   }
 
   @Test
-  void shouldUpdateGradeWhenUpdateValid() throws Exception {
-    when(validator.isValid(dto)).thenReturn(true);
-    when(service.update(entity1)).thenReturn(entity1);
+  void shouldUpdateGradeWhenUpdateValid() {
+    GradeDto dto = new GradeDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setPlacementGrade(true);
+    dto.setTrainingGrade(false);
+    dto.setStatus(CURRENT);
 
-    mockMvc.perform(put("/api/grade")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(is(DEFAULT_ID_1)))
-        .andExpect(jsonPath("$.tisId").value(is(DEFAULT_TIS_ID_1)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL_1)));
+    when(validator.isValid(dto)).thenReturn(true);
+
+    when(service.update(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    ResponseEntity<GradeDto> response = controller.updateGrade(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(OK));
+
+    GradeDto body = response.getBody();
+    assertThat("Unexpected body.", body, notNullValue());
+    assertThat("Unexpected ID.", body.getId(), is(DEFAULT_ID_1));
+    assertThat("Unexpected TIS ID.", body.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", body.getLabel(), is(DEFAULT_LABEL_1));
+    assertThat("Unexpected placement grade flag.", body.isPlacementGrade(), is(false));
+    assertThat("Unexpected training grade flag.", body.isTrainingGrade(), is(false));
+    assertThat("Unexpected status.", body.getStatus(), nullValue());
   }
 
   @Test
-  void shouldDeleteGradeWhenUpdateInvalid() throws Exception {
+  void shouldDeleteGradeWhenUpdateInvalid() {
+    GradeDto dto = new GradeDto();
+    dto.setId(DEFAULT_ID_1);
+    dto.setTisId(DEFAULT_TIS_ID_1);
+    dto.setLabel(DEFAULT_LABEL_1);
+    dto.setPlacementGrade(true);
+    dto.setTrainingGrade(false);
+    dto.setStatus(INACTIVE);
+
     when(validator.isValid(dto)).thenReturn(false);
 
-    mockMvc.perform(put("/api/grade")
-        .content(mapper.writeValueAsBytes(dto))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$").doesNotExist());
+    ResponseEntity<GradeDto> response = controller.updateGrade(dto);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(UNPROCESSABLE_ENTITY));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
     verifyNoMoreInteractions(service);
   }
 
   @Test
-  void shouldDeleteGrade() throws Exception {
-    mockMvc.perform(delete("/api/grade/{tisId}", DEFAULT_TIS_ID_1)
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
-        .andExpect(jsonPath("$").doesNotExist());
+  void shouldDeleteGrade() {
+    ResponseEntity<Void> response = controller.deleteGrade(DEFAULT_TIS_ID_1);
+
+    assertThat("Unexpected status code.", response.getStatusCode(), is(NO_CONTENT));
+    assertThat("Unexpected response body presence.", response.hasBody(), is(false));
 
     verify(service).deleteByTisId(DEFAULT_TIS_ID_1);
   }

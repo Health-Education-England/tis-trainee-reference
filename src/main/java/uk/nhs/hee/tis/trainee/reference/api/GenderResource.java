@@ -47,8 +47,8 @@ public class GenderResource {
 
   private static final Logger log = LoggerFactory.getLogger(GenderResource.class);
 
-  private GenderService service;
-  private GenderMapper mapper;
+  private final GenderService service;
+  private final GenderMapper mapper;
 
   public GenderResource(GenderService service, GenderMapper mapper) {
     this.service = service;
@@ -61,7 +61,7 @@ public class GenderResource {
    * @return list of Genders.
    */
   @GetMapping("/gender")
-  public List<GenderDto> getGender() {
+  public List<GenderDto> getGenders() {
     log.trace("Get all Genders");
     List<Gender> genders = service.get();
     return mapper.toDtos(genders);
