@@ -1,30 +1,22 @@
 plugins {
   java
-  id("org.springframework.boot") version "3.3.0"
-  id("io.spring.dependency-management") version "1.1.4"
+  alias(libs.plugins.spring.boot)
+  alias(libs.plugins.spring.dependency.management)
 
   // Code quality plugins
   checkstyle
   jacoco
-  id("org.sonarqube") version "4.4.1.3373"
+  alias(libs.plugins.sonarqube)
 }
 
 group = "uk.nhs.hee.tis.trainee"
-version = "1.6.0"
+version = "1.6.1"
 
 configurations {
   compileOnly {
     extendsFrom(configurations.annotationProcessor.get())
   }
 }
-
-repositories {
-  mavenCentral()
-}
-
-val mapstructVersion = "1.5.5.Final"
-val mongockVersion = "5.4.2"
-val sentryVersion = "7.10.0"
 
 dependencies {
   // Spring Boot starters
@@ -34,22 +26,21 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
 
   // AWS-XRay
-  implementation("com.amazonaws:aws-xray-recorder-sdk-spring:2.16.0")
+  implementation(libs.aws.xray)
 
   // Lombok
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
 
   // MapStruct
-  implementation("org.mapstruct:mapstruct:$mapstructVersion")
-  annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+  implementation(libs.mapstruct.core)
+  annotationProcessor(libs.mapstruct.processor)
 
   // Mongock
-  implementation("io.mongock:mongock-springboot:${mongockVersion}")
-  implementation("io.mongock:mongodb-springdata-v4-driver:${mongockVersion}")
+  implementation(libs.bundles.mongock)
 
   // Sentry reporting
-  implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
+  implementation(libs.sentry.core)
 }
 
 java {
@@ -90,7 +81,7 @@ testing {
 
     val test by getting(JvmTestSuite::class) {
       dependencies {
-        annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+        annotationProcessor(libs.mapstruct.processor)
       }
     }
 
