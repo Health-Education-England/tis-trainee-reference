@@ -26,7 +26,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
 
   // AWS-XRay
-  implementation(libs.aws.xray)
+  implementation(libs.aws.xray.spring)
 
   // Lombok
   compileOnly("org.projectlombok:lombok")
