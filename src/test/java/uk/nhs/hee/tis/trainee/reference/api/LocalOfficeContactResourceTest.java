@@ -39,9 +39,12 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.ResponseEntity;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
+import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
@@ -96,8 +99,9 @@ class LocalOfficeContactResourceTest {
     entity2.setContact(DEFAULT_CONTACT_2);
   }
 
-  @Test
-  void shouldGetAllLocalOfficeContacts() {
+  @ParameterizedTest
+  @EnumSource(TraineeType.class)
+  void shouldGetAllLocalOfficeContacts(TraineeType traineeType) {
     LocalOfficeContact entity1 = new LocalOfficeContact();
     entity1.setTisId(DEFAULT_TIS_ID_1);
     entity1.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -116,9 +120,9 @@ class LocalOfficeContactResourceTest {
     entity2.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_2);
     entity2.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_2);
 
-    when(service.get()).thenReturn(List.of(entity1, entity2));
+    when(service.get(traineeType)).thenReturn(List.of(entity1, entity2));
 
-    List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContacts();
+    List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContacts(traineeType);
 
     assertThat("Unexpected response count.", dtos, hasSize(2));
 
@@ -149,8 +153,9 @@ class LocalOfficeContactResourceTest {
         is(DEFAULT_CONTACT_TYPE_NAME_2));
   }
 
-  @Test
-  void shouldGetLocalOfficeContactsByLoUuid() {
+  @ParameterizedTest
+  @EnumSource(TraineeType.class)
+  void shouldGetLocalOfficeContactsByLoUuid(TraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
     entity.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -160,10 +165,11 @@ class LocalOfficeContactResourceTest {
     entity.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1);
     entity.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_1);
 
-    when(service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1)).thenReturn(List.of(entity));
+    when(service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1, traineeType)).thenReturn(
+        List.of(entity));
 
     List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContactsByLoUuid(
-        DEFAULT_LOCAL_OFFICE_ID_1);
+        DEFAULT_LOCAL_OFFICE_ID_1, traineeType);
 
     assertThat("Unexpected response count.", dtos, hasSize(1));
 
@@ -181,8 +187,9 @@ class LocalOfficeContactResourceTest {
         is(DEFAULT_CONTACT_TYPE_NAME_1));
   }
 
-  @Test
-  void shouldGetLocalOfficeContactsByLoName() {
+  @ParameterizedTest
+  @EnumSource(TraineeType.class)
+  void shouldGetLocalOfficeContactsByLoName(TraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
     entity.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -192,10 +199,11 @@ class LocalOfficeContactResourceTest {
     entity.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1);
     entity.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_1);
 
-    when(service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1)).thenReturn(List.of(entity));
+    when(service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1, traineeType)).thenReturn(
+        List.of(entity));
 
     List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContactsByLoName(
-        DEFAULT_LOCAL_OFFICE_NAME_1);
+        DEFAULT_LOCAL_OFFICE_NAME_1, traineeType);
 
     assertThat("Unexpected response count.", dtos, hasSize(1));
 
