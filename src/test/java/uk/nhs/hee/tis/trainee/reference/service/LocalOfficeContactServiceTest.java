@@ -21,16 +21,18 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +40,15 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.facade.LocalOfficeContactEnricherFacade;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
@@ -54,12 +61,16 @@ class LocalOfficeContactServiceTest {
 
   private static final String DEFAULT_TIS_ID_1 = "1";
   private static final String DEFAULT_TIS_ID_2 = "2";
+  private static final String DEFAULT_FOUNDATION_TIS_ID_1 = "10";
+  private static final String DEFAULT_FOUNDATION_TIS_ID_2 = "20";
 
   private static final String DEFAULT_LOCAL_OFFICE_ID_1 = UUID.randomUUID().toString();
   private static final String DEFAULT_LOCAL_OFFICE_ID_2 = UUID.randomUUID().toString();
 
   private static final String DEFAULT_CONTACT_TYPE_ID_1 = UUID.randomUUID().toString();
   private static final String DEFAULT_CONTACT_TYPE_ID_2 = UUID.randomUUID().toString();
+  private static final String DEFAULT_FOUNDATION_CONTACT_TYPE_ID_1 = UUID.randomUUID().toString();
+  private static final String DEFAULT_FOUNDATION_CONTACT_TYPE_ID_2 = UUID.randomUUID().toString();
 
   private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
   private static final String DEFAULT_CONTACT_2 = "england.ltft.eoe@nhs.net";
@@ -69,6 +80,9 @@ class LocalOfficeContactServiceTest {
 
   private static final String DEFAULT_CONTACT_TYPE_1 = "Less Than Full Time";
   private static final String DEFAULT_CONTACT_TYPE_2 = "Deferral";
+  private static final String
+      DEFAULT_FOUNDATION_CONTACT_TYPE_1 = "Less Than Full Time - Foundation";
+  private static final String DEFAULT_FOUNDATION_CONTACT_TYPE_2 = "Deferral - Foundation";
 
   private static final String DEFAULT_LABEL_1 = "Label 1";
   private static final String DEFAULT_LABEL_2 = "Label 2";
@@ -83,6 +97,8 @@ class LocalOfficeContactServiceTest {
 
   private LocalOfficeContact localOfficeContact1;
   private LocalOfficeContact localOfficeContact2;
+  private LocalOfficeContact localOfficeFoundationContact1;
+  private LocalOfficeContact localOfficeFoundationContact2;
 
   /**
    * Set up data.
@@ -109,51 +125,146 @@ class LocalOfficeContactServiceTest {
     localOfficeContact2.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_2);
     localOfficeContact2.setContactTypeName(DEFAULT_CONTACT_TYPE_2);
     localOfficeContact2.setLabel(DEFAULT_LABEL_2);
+
+    localOfficeFoundationContact1 = new LocalOfficeContact();
+    localOfficeFoundationContact1.setTisId(DEFAULT_FOUNDATION_TIS_ID_1);
+    localOfficeFoundationContact1.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
+    localOfficeFoundationContact1.setContactTypeId(DEFAULT_FOUNDATION_CONTACT_TYPE_ID_1);
+    localOfficeFoundationContact1.setContact(DEFAULT_CONTACT_1);
+    localOfficeFoundationContact1.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_1);
+    localOfficeFoundationContact1.setContactTypeName(DEFAULT_FOUNDATION_CONTACT_TYPE_1);
+    localOfficeFoundationContact1.setLabel(DEFAULT_LABEL_1);
+
+    localOfficeFoundationContact2 = new LocalOfficeContact();
+    localOfficeFoundationContact2.setTisId(DEFAULT_FOUNDATION_TIS_ID_2);
+    localOfficeFoundationContact2.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_2);
+    localOfficeFoundationContact2.setContactTypeId(DEFAULT_FOUNDATION_CONTACT_TYPE_ID_2);
+    localOfficeFoundationContact2.setContact(DEFAULT_CONTACT_2);
+    localOfficeFoundationContact2.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_2);
+    localOfficeFoundationContact2.setContactTypeName(DEFAULT_FOUNDATION_CONTACT_TYPE_2);
+    localOfficeFoundationContact2.setLabel(DEFAULT_LABEL_2);
   }
 
   @Test
-  void getAllLocalOfficeContactShouldReturnAllLocalOfficeContacts() {
-    List<LocalOfficeContact> localOfficeContacts = new ArrayList<>();
-    localOfficeContacts.add(localOfficeContact1);
-    localOfficeContacts.add(localOfficeContact2);
+  void getAllLocalOfficeContactShouldReturnSpecialtyLocalOfficeContacts() {
+    List<LocalOfficeContact> localOfficeContacts = List.of(
+        localOfficeContact1,
+        localOfficeContact2,
+        localOfficeFoundationContact1,
+        localOfficeFoundationContact2
+    );
     when(repository.findAll(Sort.by("label"))).thenReturn(localOfficeContacts);
 
     List<LocalOfficeContact> allLocalOfficeContacts = service.get();
 
-    assertThat("Unexpected size of returned LocalOfficeContact list",
-        allLocalOfficeContacts.size(), equalTo(localOfficeContacts.size()));
+    assertThat("Unexpected size of returned LocalOfficeContact list", allLocalOfficeContacts,
+        hasSize(2));
     assertThat("The returned local office contact list doesn't contain the expected "
-        + "local office contact", allLocalOfficeContacts, hasItem(localOfficeContact1));
+            + "local office contact", allLocalOfficeContacts,
+        hasItems(localOfficeContact1, localOfficeContact2));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  void getAllLocalOfficeContactShouldReturnNonFoundationLocalOfficeContactsForNonFoundation(
+      TraineeType traineeType) {
+    List<LocalOfficeContact> localOfficeContacts = List.of(
+        localOfficeContact1,
+        localOfficeContact2,
+        localOfficeFoundationContact1,
+        localOfficeFoundationContact2
+    );
+    when(repository.findAll(Sort.by("label"))).thenReturn(localOfficeContacts);
+
+    List<LocalOfficeContact> allLocalOfficeContacts = service.get(traineeType);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", allLocalOfficeContacts,
+        hasSize(2));
+    assertThat("The returned local office contact list doesn't contain the expected "
+            + "local office contact", allLocalOfficeContacts,
+        hasItems(localOfficeContact1, localOfficeContact2));
   }
 
   @Test
-  void getLocalOfficeContactByLocalOfficeUuidShouldReturnCorrectLocalOfficeContacts() {
-    List<LocalOfficeContact> localOfficeContacts = new ArrayList<>();
-    localOfficeContacts.add(localOfficeContact1);
-    when(repository.findByLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1)).thenReturn(localOfficeContacts);
+  void getAllLocalOfficeContactShouldReturnFoundationLocalOfficeContactsForFoundation() {
+    List<LocalOfficeContact> localOfficeContacts = List.of(
+        localOfficeContact1,
+        localOfficeContact2,
+        localOfficeFoundationContact1,
+        localOfficeFoundationContact2
+    );
+    when(repository.findAll(Sort.by("label"))).thenReturn(localOfficeContacts);
+
+    List<LocalOfficeContact> allLocalOfficeContacts = service.get(FOUNDATION);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", allLocalOfficeContacts,
+        hasSize(2));
+    assertThat("The returned local office contact list doesn't contain the expected "
+            + "local office contact", allLocalOfficeContacts,
+        hasItems(localOfficeFoundationContact1, localOfficeFoundationContact2));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  void getLocalOfficeContactByUuidShouldReturnCorrectLocalOfficeContactsForNonFoundation(
+      TraineeType traineeType) {
+    when(repository.findByLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1))
+        .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
 
     List<LocalOfficeContact> foundLocalOfficeContacts
-        = service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1);
+        = service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1, traineeType);
 
-    assertThat("Unexpected size of returned LocalOfficeContact list",
-        foundLocalOfficeContacts.size(), equalTo(localOfficeContacts.size()));
+    assertThat("Unexpected size of returned LocalOfficeContact list", foundLocalOfficeContacts,
+        hasSize(1));
     assertThat("The returned local office contact list doesn't contain the expected "
         + "local office contact", foundLocalOfficeContacts, hasItem(localOfficeContact1));
   }
 
   @Test
-  void getLocalOfficeContactByLocalOfficeNameShouldReturnCorrectLocalOfficeContacts() {
-    List<LocalOfficeContact> localOfficeContacts = new ArrayList<>();
-    localOfficeContacts.add(localOfficeContact1);
-    when(repository.findByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1)).thenReturn(localOfficeContacts);
+  void getLocalOfficeContactByUuidShouldReturnCorrectLocalOfficeContactsForFoundation() {
+    when(repository.findByLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1))
+        .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
 
     List<LocalOfficeContact> foundLocalOfficeContacts
-        = service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1);
+        = service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1, FOUNDATION);
 
-    assertThat("Unexpected size of returned LocalOfficeContact list",
-        foundLocalOfficeContacts.size(), equalTo(localOfficeContacts.size()));
+    assertThat("Unexpected size of returned LocalOfficeContact list", foundLocalOfficeContacts,
+        hasSize(1));
+    assertThat("The returned local office contact list doesn't contain the expected "
+        + "local office contact", foundLocalOfficeContacts, hasItem(localOfficeFoundationContact1));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  void getLocalOfficeContactByNameShouldReturnCorrectLocalOfficeContactsForNonFoundation(
+      TraineeType traineeType) {
+    when(repository.findByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1))
+        .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
+
+    List<LocalOfficeContact> foundLocalOfficeContacts
+        = service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1, traineeType);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", foundLocalOfficeContacts,
+        hasSize(1));
     assertThat("The returned local office contact list doesn't contain the expected "
         + "local office contact", foundLocalOfficeContacts, hasItem(localOfficeContact1));
+  }
+
+  @Test
+  void getLocalOfficeContactByNameShouldReturnCorrectLocalOfficeContactsForFoundation() {
+    when(repository.findByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1))
+        .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
+
+    List<LocalOfficeContact> foundLocalOfficeContacts
+        = service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1, FOUNDATION);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", foundLocalOfficeContacts,
+        hasSize(1));
+    assertThat("The returned local office contact list doesn't contain the expected "
+        + "local office contact", foundLocalOfficeContacts, hasItem(localOfficeFoundationContact1));
   }
 
   @Test

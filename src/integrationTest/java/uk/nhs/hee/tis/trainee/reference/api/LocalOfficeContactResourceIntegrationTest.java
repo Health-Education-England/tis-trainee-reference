@@ -64,6 +64,8 @@ class LocalOfficeContactResourceIntegrationTest {
   private static final String LOCAL_OFFICE_NAME = "Default Local Office Name";
   private static final String CONTACT_TYPE_ID = UUID.randomUUID().toString();
   private static final String CONTACT_TYPE_NAME = "Default Contact Type Name";
+  private static final String
+      FOUNDATION_CONTACT_TYPE_NAME = "Default Contact Type Name - Foundation";
   private static final String CONTACT = "Default Contact";
 
   @Container
@@ -94,20 +96,28 @@ class LocalOfficeContactResourceIntegrationTest {
   }
 
   @Test
-  void shouldGetLocalOfficeContactsOrderedByLabel() throws Exception {
+  void shouldGetSpecialtyLocalOfficeContactsOrderedByLabel() throws Exception {
     LocalOfficeContact entity1 = new LocalOfficeContact();
     entity1.setTisId(ObjectId.get().toString());
     entity1.setLabel("c");
+    entity1.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity2 = new LocalOfficeContact();
     entity2.setTisId(ObjectId.get().toString());
     entity2.setLabel("a");
+    entity2.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity3 = new LocalOfficeContact();
     entity3.setTisId(ObjectId.get().toString());
     entity3.setLabel("b");
+    entity3.setContactTypeName(CONTACT_TYPE_NAME);
 
-    mongoTemplate.insertAll(List.of(entity1, entity2, entity3));
+    LocalOfficeContact entity4 = new LocalOfficeContact();
+    entity4.setTisId(ObjectId.get().toString());
+    entity4.setLabel("d");
+    entity4.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2, entity3, entity4));
 
     mockMvc.perform(get("/api/local-office-contact"))
         .andExpect(status().isOk())
@@ -120,19 +130,62 @@ class LocalOfficeContactResourceIntegrationTest {
   }
 
   @Test
-  void shouldGetLocalOfficeContactsByLocalOfficeUuid() throws Exception {
+  void shouldGetFoundationLocalOfficeContactsOrderedByLabel() throws Exception {
+    LocalOfficeContact entity1 = new LocalOfficeContact();
+    entity1.setTisId(ObjectId.get().toString());
+    entity1.setLabel("c");
+    entity1.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    LocalOfficeContact entity2 = new LocalOfficeContact();
+    entity2.setTisId(ObjectId.get().toString());
+    entity2.setLabel("a");
+    entity2.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    LocalOfficeContact entity3 = new LocalOfficeContact();
+    entity3.setTisId(ObjectId.get().toString());
+    entity3.setLabel("b");
+    entity3.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    LocalOfficeContact entity4 = new LocalOfficeContact();
+    entity4.setTisId(ObjectId.get().toString());
+    entity4.setLabel("d");
+    entity4.setContactTypeName(CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2, entity3, entity4));
+
+    mockMvc.perform(get("/api/local-office-contact")
+            .queryParam("traineeType", "FOUNDATION"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(3))
+        .andExpect(jsonPath("$.[0].tisId").value(entity2.getTisId()))
+        .andExpect(jsonPath("$.[1].tisId").value(entity3.getTisId()))
+        .andExpect(jsonPath("$.[2].tisId").value(entity1.getTisId()));
+  }
+
+  @Test
+  void shouldGetSpecialtyLocalOfficeContactsByLocalOfficeUuid() throws Exception {
     LocalOfficeContact entity1 = new LocalOfficeContact();
     entity1.setTisId(TIS_ID);
     entity1.setLocalOfficeId(LOCAL_OFFICE_ID);
+    entity1.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity2 = new LocalOfficeContact();
     entity2.setTisId(ObjectId.get().toString());
     entity2.setLocalOfficeId(LOCAL_OFFICE_ID);
+    entity2.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity3 = new LocalOfficeContact();
     entity3.setTisId(ObjectId.get().toString());
+    entity3.setContactTypeName(CONTACT_TYPE_NAME);
 
-    mongoTemplate.insertAll(List.of(entity1, entity2, entity3));
+    LocalOfficeContact entity4 = new LocalOfficeContact();
+    entity4.setTisId(ObjectId.get().toString());
+    entity2.setLocalOfficeId(LOCAL_OFFICE_ID);
+    entity4.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2, entity3, entity4));
 
     mockMvc.perform(get("/api/local-office-contact-by-lo-uuid/{localOfficeUuid}", LOCAL_OFFICE_ID))
         .andExpect(status().isOk())
@@ -144,19 +197,50 @@ class LocalOfficeContactResourceIntegrationTest {
   }
 
   @Test
-  void shouldGetLocalOfficeContactsByLocalOfficeName() throws Exception {
+  void shouldGetFoundationLocalOfficeContactsByLocalOfficeUuid() throws Exception {
+    LocalOfficeContact entity1 = new LocalOfficeContact();
+    entity1.setTisId(TIS_ID);
+    entity1.setLocalOfficeId(LOCAL_OFFICE_ID);
+    entity1.setContactTypeName(CONTACT_TYPE_NAME);
+
+    LocalOfficeContact entity2 = new LocalOfficeContact();
+    entity2.setTisId(ObjectId.get().toString());
+    entity2.setLocalOfficeId(LOCAL_OFFICE_ID);
+    entity2.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2));
+
+    mockMvc.perform(get("/api/local-office-contact-by-lo-uuid/{localOfficeUuid}", LOCAL_OFFICE_ID)
+            .queryParam("traineeType", "FOUNDATION"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].tisId").value(entity2.getTisId()));
+  }
+
+  @Test
+  void shouldGetSpecialtyLocalOfficeContactsByLocalOfficeName() throws Exception {
     LocalOfficeContact entity1 = new LocalOfficeContact();
     entity1.setTisId(TIS_ID);
     entity1.setLocalOfficeName(LOCAL_OFFICE_NAME);
+    entity1.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity2 = new LocalOfficeContact();
     entity2.setTisId(ObjectId.get().toString());
     entity2.setLocalOfficeName(LOCAL_OFFICE_NAME);
+    entity2.setContactTypeName(CONTACT_TYPE_NAME);
 
     LocalOfficeContact entity3 = new LocalOfficeContact();
     entity3.setTisId(ObjectId.get().toString());
+    entity3.setContactTypeName(CONTACT_TYPE_NAME);
 
-    mongoTemplate.insertAll(List.of(entity1, entity2, entity3));
+    LocalOfficeContact entity4 = new LocalOfficeContact();
+    entity4.setTisId(ObjectId.get().toString());
+    entity4.setLocalOfficeName(LOCAL_OFFICE_NAME);
+    entity4.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2, entity3, entity4));
 
     mockMvc.perform(
             get("/api/local-office-contact-by-lo-name/{localOfficeName}", LOCAL_OFFICE_NAME))
@@ -166,6 +250,30 @@ class LocalOfficeContactResourceIntegrationTest {
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(jsonPath("$.[0].tisId").value(entity1.getTisId()))
         .andExpect(jsonPath("$.[1].tisId").value(entity2.getTisId()));
+  }
+
+  @Test
+  void shouldGetFoundationLocalOfficeContactsByLocalOfficeName() throws Exception {
+    LocalOfficeContact entity1 = new LocalOfficeContact();
+    entity1.setTisId(TIS_ID);
+    entity1.setLocalOfficeName(LOCAL_OFFICE_NAME);
+    entity1.setContactTypeName(CONTACT_TYPE_NAME);
+
+    LocalOfficeContact entity2 = new LocalOfficeContact();
+    entity2.setTisId(ObjectId.get().toString());
+    entity2.setLocalOfficeName(LOCAL_OFFICE_NAME);
+    entity2.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(entity1, entity2));
+
+    mockMvc.perform(
+            get("/api/local-office-contact-by-lo-name/{localOfficeName}", LOCAL_OFFICE_NAME)
+                .queryParam("traineeType", "FOUNDATION"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].tisId").value(entity2.getTisId()));
   }
 
   @Test

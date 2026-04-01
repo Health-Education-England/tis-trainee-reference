@@ -33,9 +33,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
+import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
@@ -65,9 +67,11 @@ public class LocalOfficeContactResource {
    */
   @GetMapping("/local-office-contact-by-lo-uuid/{localOfficeUuid}")
   public List<LocalOfficeContactDetailsDto> getLocalOfficeContactsByLoUuid(
-      @PathVariable String localOfficeUuid) {
+      @PathVariable String localOfficeUuid,
+      @RequestParam(defaultValue = "SPECIALTY") TraineeType traineeType) {
     log.trace("Get all LocalOfficeContacts for Local office UUID '{}'", localOfficeUuid);
-    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeUuid(localOfficeUuid);
+    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeUuid(localOfficeUuid,
+        traineeType);
     return mapper.toDetailsDtos(localOfficeContacts);
   }
 
@@ -78,9 +82,11 @@ public class LocalOfficeContactResource {
    */
   @GetMapping("/local-office-contact-by-lo-name/{localOfficeName}")
   public List<LocalOfficeContactDetailsDto> getLocalOfficeContactsByLoName(
-      @PathVariable String localOfficeName) {
+      @PathVariable String localOfficeName,
+      @RequestParam(defaultValue = "SPECIALTY") TraineeType traineeType) {
     log.trace("Get all LocalOfficeContacts for Local office '{}'", localOfficeName);
-    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeName(localOfficeName);
+    List<LocalOfficeContact> localOfficeContacts = service.getByLocalOfficeName(localOfficeName,
+        traineeType);
     return mapper.toDetailsDtos(localOfficeContacts);
   }
 
@@ -90,9 +96,10 @@ public class LocalOfficeContactResource {
    * @return list of LocalOfficeContacts.
    */
   @GetMapping("/local-office-contact")
-  public List<LocalOfficeContactDetailsDto> getLocalOfficeContacts() {
+  public List<LocalOfficeContactDetailsDto> getLocalOfficeContacts(
+      @RequestParam(defaultValue = "SPECIALTY") TraineeType traineeType) {
     log.trace("Get all LocalOfficeContacts");
-    List<LocalOfficeContact> localOfficeContacts = service.get();
+    List<LocalOfficeContact> localOfficeContacts = service.get(traineeType);
     return mapper.toDetailsDtos(localOfficeContacts);
   }
 
