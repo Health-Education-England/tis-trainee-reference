@@ -40,6 +40,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.ResponseEntity;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
@@ -154,6 +155,29 @@ class LocalOfficeContactResourceTest {
   }
 
   @ParameterizedTest
+  @CsvSource(delimiter = '|', textBlock = """
+      FOUNDATION    | ' - Foundation'
+      SPECIALTY     | ''
+      """)
+  void shouldGetAllLocalOfficeContactsWithoutTraineeTypeSuffix(TraineeType traineeType,
+      String suffix) {
+    LocalOfficeContact entity = new LocalOfficeContact();
+    entity.setTisId(DEFAULT_TIS_ID_1);
+    entity.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_1 + suffix);
+
+    when(service.get(traineeType)).thenReturn(List.of(entity));
+
+    List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContacts(traineeType);
+
+    assertThat("Unexpected response count.", dtos, hasSize(1));
+
+    LocalOfficeContactDetailsDto dto = dtos.get(0);
+    assertThat("Unexpected TIS ID.", dto.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected contact type name.", dto.getContactTypeName(),
+        is(DEFAULT_CONTACT_TYPE_NAME_1));
+  }
+
+  @ParameterizedTest
   @EnumSource(TraineeType.class)
   void shouldGetLocalOfficeContactsByLoUuid(TraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
@@ -188,6 +212,34 @@ class LocalOfficeContactResourceTest {
   }
 
   @ParameterizedTest
+  @CsvSource(delimiter = '|', textBlock = """
+      FOUNDATION    | ' - Foundation'
+      SPECIALTY     | ''
+      """)
+  void shouldGetLocalOfficeContactsByLoUuidWithoutTraineeTypeSuffix(TraineeType traineeType,
+      String suffix) {
+    LocalOfficeContact entity = new LocalOfficeContact();
+    entity.setTisId(DEFAULT_TIS_ID_1);
+    entity.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
+    entity.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_1 + suffix);
+
+    when(service.getByLocalOfficeUuid(DEFAULT_LOCAL_OFFICE_ID_1, traineeType)).thenReturn(
+        List.of(entity));
+
+    List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContactsByLoUuid(
+        DEFAULT_LOCAL_OFFICE_ID_1, traineeType);
+
+    assertThat("Unexpected response count.", dtos, hasSize(1));
+
+    LocalOfficeContactDetailsDto dto = dtos.get(0);
+    assertThat("Unexpected TIS ID.", dto.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected local office ID.", dto.getLocalOfficeId(),
+        is(DEFAULT_LOCAL_OFFICE_ID_1));
+    assertThat("Unexpected contact type name.", dto.getContactTypeName(),
+        is(DEFAULT_CONTACT_TYPE_NAME_1));
+  }
+
+  @ParameterizedTest
   @EnumSource(TraineeType.class)
   void shouldGetLocalOfficeContactsByLoName(TraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
@@ -218,6 +270,34 @@ class LocalOfficeContactResourceTest {
     assertThat("Unexpected local office name.", dto1.getLocalOfficeName(),
         is(DEFAULT_LOCAL_OFFICE_NAME_1));
     assertThat("Unexpected contact type name.", dto1.getContactTypeName(),
+        is(DEFAULT_CONTACT_TYPE_NAME_1));
+  }
+
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', textBlock = """
+      FOUNDATION    | ' - Foundation'
+      SPECIALTY     | ''
+      """)
+  void shouldGetLocalOfficeContactsByLoNameWithoutTraineeTypeSuffix(TraineeType traineeType,
+      String suffix) {
+    LocalOfficeContact entity = new LocalOfficeContact();
+    entity.setTisId(DEFAULT_TIS_ID_1);
+    entity.setLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1);
+    entity.setContactTypeName(DEFAULT_CONTACT_TYPE_NAME_1 + suffix);
+
+    when(service.getByLocalOfficeName(DEFAULT_LOCAL_OFFICE_NAME_1, traineeType)).thenReturn(
+        List.of(entity));
+
+    List<LocalOfficeContactDetailsDto> dtos = controller.getLocalOfficeContactsByLoName(
+        DEFAULT_LOCAL_OFFICE_NAME_1, traineeType);
+
+    assertThat("Unexpected response count.", dtos, hasSize(1));
+
+    LocalOfficeContactDetailsDto dto = dtos.get(0);
+    assertThat("Unexpected TIS ID.", dto.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected local office name.", dto.getLocalOfficeName(),
+        is(DEFAULT_LOCAL_OFFICE_NAME_1));
+    assertThat("Unexpected contact type name.", dto.getContactTypeName(),
         is(DEFAULT_CONTACT_TYPE_NAME_1));
   }
 

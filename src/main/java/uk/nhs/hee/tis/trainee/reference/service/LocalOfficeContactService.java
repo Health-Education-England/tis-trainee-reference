@@ -44,6 +44,8 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 @Slf4j
 public class LocalOfficeContactService extends AbstractReferenceService<LocalOfficeContact> {
 
+  private static final String FOUNDATION_LABEL_SUFFIX = " - Foundation";
+
   private final LocalOfficeContactMapper mapper;
   private final LocalOfficeContactRepository repository;
   private final LocalOfficeContactEnricherFacade facade;
@@ -111,10 +113,10 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
 
           if (traineeType == FOUNDATION) {
             // Foundation contact types are suffixed with " - Foundation".
-            return contactTypeName.endsWith(" - Foundation");
+            return contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
           } else {
             // Assume specialty, which has no suffix.
-            return !contactTypeName.endsWith(" - Foundation");
+            return !contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
           }
         })
         .toList();
