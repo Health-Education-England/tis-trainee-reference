@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -52,4 +53,20 @@ public interface LocalOfficeContactMapper {
 
   @Mapping(target = "tisId", ignore = true)
   LocalOfficeContact update(@MappingTarget LocalOfficeContact target, LocalOfficeContact source);
+
+  /**
+   * A temporary fix to remove the trainee type workaround suffix from the contact type name until
+   * TIS is updated to remove it. This is needed here so downstream services do not have to know
+   * about the internal workaround.
+   *
+   * @param dto The DTO to update.
+   */
+  @AfterMapping
+  default void trimTraineeTypeSuffix(@MappingTarget LocalOfficeContactDetailsDto dto) {
+    String contactTypeName = dto.getContactTypeName();
+
+    if (contactTypeName != null) {
+      dto.setContactTypeName(contactTypeName.replaceAll(" - Foundation$", ""));
+    }
+  }
 }
