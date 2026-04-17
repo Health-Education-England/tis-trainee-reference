@@ -18,12 +18,22 @@ configurations {
   }
 }
 
+dependencyManagement {
+  imports {
+    mavenBom(libs.spring.cloud.dependencies.aws.get().toString())
+    mavenBom(libs.spring.cloud.dependencies.core.get().toString())
+  }
+}
+
 dependencies {
   // Spring Boot starters
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-aop")
   implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
   implementation("org.springframework.boot:spring-boot-starter-web")
+
+  //AWS
+  implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
 
   // AWS-XRay
   implementation(libs.aws.xray.spring)
@@ -41,6 +51,10 @@ dependencies {
 
   // Sentry reporting
   implementation(libs.sentry.core)
+
+  //Testing
+  implementation("org.testcontainers:localstack")
+  implementation("org.awaitility:awaitility")
 }
 
 java {
