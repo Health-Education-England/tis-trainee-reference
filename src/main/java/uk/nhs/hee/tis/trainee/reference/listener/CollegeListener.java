@@ -31,6 +31,9 @@ import uk.nhs.hee.tis.trainee.reference.event.CdcPatchEvent;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
+/**
+ * A listener for College CDC patch events.
+ */
 @Slf4j
 @Component
 @XRayEnabled
