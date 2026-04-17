@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2021 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,37 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.service;
-
-import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Dbc;
-import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
+package uk.nhs.hee.tis.trainee.reference.mapper;
 
 /**
- * Service for managing DBC reference data.
+ * A mapper interface for converting between an entity and its CDC patch DTO representation.
+ *
+ * @param <T> The entity type.
+ * @param <D> The patch DTO type.
  */
-@Service
-@XRayEnabled
-public class DbcService extends AbstractReferenceService<Dbc, Dbc> {
+public interface PatchMapper<T, D> {
 
-  private final DbcMapper mapper;
+  /**
+   * Convert an entity to its patch DTO representation.
+   *
+   * @param entity The entity to convert.
+   * @return The patch DTO.
+   */
+  D toPatchDto(T entity);
 
-  protected DbcService(DbcRepository repository, DbcMapper mapper,
-      ObjectMapper objectMapper) {
-    super(repository, objectMapper);
-    this.mapper = mapper;
-  }
+  /**
+   * Convert a patch DTO to an entity.
+   *
+   * @param dto The patch DTO to convert.
+   * @return The entity.
+   */
+  T toEntity(D dto);
 
-  @Override
-  protected String getTisId(Dbc entity) {
-    return entity.getTisId();
-  }
-
-  @Override
-  protected void copyAttributes(Dbc target, Dbc source) {
-    mapper.update(target, source);
-  }
+  /**
+   * Copy the entity ID from one patch DTO to another. This is needed to preserve identity fields
+   * that are excluded from JSON serialisation during patch application.
+   *
+   * @param source The DTO to copy the entity ID from.
+   * @param target The DTO to copy the entity ID to.
+   */
+  void copyEntityId(D source, D target);
 }

@@ -22,25 +22,28 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
 
+/**
+ * Service for managing LocalOffice reference data.
+ */
 @Service
 @XRayEnabled
-public class LocalOfficeService extends AbstractReferenceService<LocalOffice> {
+public class LocalOfficeService extends AbstractReferenceService<LocalOffice, LocalOffice> {
 
-  private LocalOfficeMapper mapper;
-  private LocalOfficeContactService localOfficeContactService;
+  private final LocalOfficeMapper mapper;
+  private final LocalOfficeContactService localOfficeContactService;
 
   protected LocalOfficeService(LocalOfficeRepository repository, LocalOfficeMapper mapper,
-      LocalOfficeContactService localOfficeContactService) {
-    super(repository);
+      LocalOfficeContactService localOfficeContactService, ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
     this.localOfficeContactService = localOfficeContactService;
   }
-
 
   /**
    * Override the default create to enrich any related local office contacts after saving it.

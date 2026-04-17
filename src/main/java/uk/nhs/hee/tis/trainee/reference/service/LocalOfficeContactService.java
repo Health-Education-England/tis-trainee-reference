@@ -25,6 +25,7 @@ import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
 import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.SPECIALTY;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,8 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 @Service
 @XRayEnabled
 @Slf4j
-public class LocalOfficeContactService extends AbstractReferenceService<LocalOfficeContact> {
+public class LocalOfficeContactService
+    extends AbstractReferenceService<LocalOfficeContact, LocalOfficeContact> {
 
   private static final String FOUNDATION_LABEL_SUFFIX = " - Foundation";
 
@@ -51,8 +53,9 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
   private final LocalOfficeContactEnricherFacade facade;
 
   protected LocalOfficeContactService(LocalOfficeContactRepository repository,
-      LocalOfficeContactMapper mapper, LocalOfficeContactEnricherFacade facade) {
-    super(repository);
+      LocalOfficeContactMapper mapper, LocalOfficeContactEnricherFacade facade,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
     this.repository = repository;
     this.facade = facade;
@@ -98,8 +101,7 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
   }
 
   /**
-   * Filter a list of local office contacts by trainee type. Foundation contacts are identified by a
-   * " - Foundation" suffix in their contact type name, while specialty contacts have no suffix.
+   * Filter a list of local office contacts by trainee type.
    *
    * @param contacts    The list of local office contacts to filter.
    * @param traineeType The trainee type to filter by.
@@ -110,12 +112,9 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
     return contacts.stream()
         .filter(c -> {
           String contactTypeName = c.getContactTypeName();
-
           if (traineeType == FOUNDATION) {
-            // Foundation contact types are suffixed with " - Foundation".
             return contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
           } else {
-            // Assume specialty, which has no suffix.
             return !contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
           }
         })

@@ -22,20 +22,32 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import uk.nhs.hee.tis.trainee.reference.dto.CollegePatchDto;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
+import uk.nhs.hee.tis.trainee.reference.mapper.PatchMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
 
+/**
+ * Service for managing College reference data.
+ */
 @Service
 @XRayEnabled
-public class CollegeService extends AbstractReferenceService<College> {
+public class CollegeService extends AbstractReferenceService<College, CollegePatchDto> {
 
-  private CollegeMapper mapper;
+  private final CollegeMapper mapper;
 
-  protected CollegeService(CollegeRepository repository, CollegeMapper mapper) {
-    super(repository);
+  protected CollegeService(CollegeRepository repository, CollegeMapper mapper,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
+  }
+
+  @Override
+  protected PatchMapper<College, CollegePatchDto> getPatchMapper() {
+    return mapper;
   }
 
   @Override

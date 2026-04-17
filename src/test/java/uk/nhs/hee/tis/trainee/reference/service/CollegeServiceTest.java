@@ -25,11 +25,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +73,7 @@ class CollegeServiceTest {
    */
   @BeforeEach
   void initData() {
-    service = new CollegeService(repository, Mappers.getMapper(CollegeMapper.class));
+    service = new CollegeService(repository, Mappers.getMapper(CollegeMapper.class), new ObjectMapper());
 
     college1 = new College();
     college1.setId(DEFAULT_ID_1);
@@ -147,5 +152,49 @@ class CollegeServiceTest {
     service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
+  }
+
+  @Test
+  void shouldCreateCollegeWithPatch() throws JsonPatchException, IOException {
+    String patch = """
+        [{"op":"add","path":"","value":{"id":"%s","name":"New College"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    when(repository.insert(any(College.class))).thenAnswer(inv -> inv.getArgument(0));
+
+    College result = service.create(new College(), jsonPatch);
+
+    assertThat("Unexpected TIS ID.", result.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", result.getLabel(), is("New College"));
+  }
+
+  @Test
+  void shouldUpdateCollegeWithPatch() throws JsonPatchException, IOException {
+    String patch = """
+        [{"op":"replace","path":"","value":{"id":"%s","name":"Updated College"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    when(repository.findByTisId(DEFAULT_TIS_ID_1)).thenReturn(college1);
+    when(repository.save(any(College.class))).thenAnswer(inv -> inv.getArgument(0));
+
+    College result = service.update(DEFAULT_TIS_ID_1, jsonPatch);
+
+    assertThat("Unexpected TIS ID.", result.getTisId(), is(DEFAULT_TIS_ID_1));
+    assertThat("Unexpected label.", result.getLabel(), is("Updated College"));
+  }
+
+  @Test
+  void shouldThrowWhenUpdatingUnknownCollege() throws IOException {
+    String patch = """
+        [{"op":"replace","path":"/name","value":"Updated"}]
+        """;
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    when(repository.findByTisId(DEFAULT_TIS_ID_1)).thenReturn(null);
+
+    assertThrows(IllegalArgumentException.class,
+        () -> service.update(DEFAULT_TIS_ID_1, jsonPatch));
   }
 }

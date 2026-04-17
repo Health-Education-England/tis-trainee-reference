@@ -24,13 +24,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,7 +74,7 @@ class ImmigrationStatusServiceTest {
   @BeforeEach
   void initData() {
     service = new ImmigrationStatusService(repository,
-        Mappers.getMapper(ImmigrationStatusMapper.class));
+        Mappers.getMapper(ImmigrationStatusMapper.class), new ObjectMapper());
 
     immigrationStatus1 = new ImmigrationStatus();
     immigrationStatus1.setId(DEFAULT_ID_1);
@@ -147,5 +153,32 @@ class ImmigrationStatusServiceTest {
     service.deleteByTisId(DEFAULT_TIS_ID_1);
 
     verify(repository).deleteByTisId(DEFAULT_TIS_ID_1);
+  }
+
+  @Test
+  void shouldThrowExceptionCreatingImmigrationStatusWithPatch() throws IOException {
+    String patch = """
+        [{"op":"add","path":"","value":{"id":"%s","name":"New"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    assertThrows(NotImplementedException.class,
+        () -> service.create(new ImmigrationStatus(), jsonPatch));
+
+    verify(repository, never()).insert(any(ImmigrationStatus.class));
+  }
+
+  @Test
+  void shouldThrowExceptionUpdatingImmigrationStatusWithPatch() throws IOException {
+    String patch = """
+        [{"op":"replace","path":"","value":{"id":"%s","name":"Updated"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    when(repository.findByTisId(DEFAULT_TIS_ID_1)).thenReturn(immigrationStatus1);
+
+    assertThrows(NotImplementedException.class, () -> service.update(DEFAULT_TIS_ID_1, jsonPatch));
+
+    verify(repository, never()).save(any());
   }
 }

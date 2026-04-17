@@ -22,19 +22,24 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.CurriculumMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Curriculum;
 import uk.nhs.hee.tis.trainee.reference.repository.CurriculumRepository;
 
+/**
+ * Service for managing Curriculum reference data.
+ */
 @Service
 @XRayEnabled
-public class CurriculumService extends AbstractReferenceService<Curriculum> {
+public class CurriculumService extends AbstractReferenceService<Curriculum, Curriculum> {
 
-  private CurriculumMapper mapper;
+  private final CurriculumMapper mapper;
 
-  protected CurriculumService(CurriculumRepository repository, CurriculumMapper mapper) {
-    super(repository);
+  protected CurriculumService(CurriculumRepository repository, CurriculumMapper mapper,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
   }
 

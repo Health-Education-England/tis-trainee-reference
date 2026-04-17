@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2021 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,37 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.service;
-
-import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Dbc;
-import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
 /**
- * Service for managing DBC reference data.
+ * The type of change captured by a CDC event.
+ *
+ * <p>These values map to patch operations: {@link #INSERT} for an add at the root path,
+ * {@link #DELETE} for a remove at the root path, and {@link #UPDATE} for all other operations.
  */
-@Service
-@XRayEnabled
-public class DbcService extends AbstractReferenceService<Dbc, Dbc> {
+public enum CdcEventType {
 
-  private final DbcMapper mapper;
+  INSERT,
+  UPDATE,
+  DELETE
 
-  protected DbcService(DbcRepository repository, DbcMapper mapper,
-      ObjectMapper objectMapper) {
-    super(repository, objectMapper);
-    this.mapper = mapper;
-  }
-
-  @Override
-  protected String getTisId(Dbc entity) {
-    return entity.getTisId();
-  }
-
-  @Override
-  protected void copyAttributes(Dbc target, Dbc source) {
-    mapper.update(target, source);
-  }
 }
