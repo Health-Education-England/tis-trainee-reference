@@ -1,2 +1,5 @@
 mongock:
   enabled: false
+application:
+  queues:
+    college-patch: college-patch-queue

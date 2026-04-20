@@ -69,7 +69,7 @@ class CollegeListenerIntegrationTest {
 
   @DynamicPropertySource
   static void overrideProperties(DynamicPropertyRegistry registry) {
-    registry.add("application.queues.college", () -> COLLEGE_QUEUE);
+    registry.add("application.queues.college-patch", () -> COLLEGE_QUEUE);
     registry.add("application.queues.curriculum", () -> UUID.randomUUID().toString());
     registry.add("application.queues.dbc", () -> UUID.randomUUID().toString());
     registry.add("application.queues.gender", () -> UUID.randomUUID().toString());
