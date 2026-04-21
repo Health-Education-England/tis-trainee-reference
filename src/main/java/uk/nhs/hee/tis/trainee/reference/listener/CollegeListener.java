@@ -18,13 +18,16 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 package uk.nhs.hee.tis.trainee.reference.listener;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.event.CdcPatchEvent;
@@ -48,7 +51,8 @@ public class CollegeListener {
   }
 
   @SqsListener("${application.queues.college-patch}")
-  public void handleCdcPatch(CdcPatchEvent event) {
+  public void handleCdcPatch(CdcPatchEvent event)
+      throws JsonPatchException, JsonProcessingException, IOException {
     log.info("Received CDC patch for College.");
 
     boolean isDelete = event.patch().stream()
@@ -60,32 +64,10 @@ public class CollegeListener {
       log.info("Deleting College with tisId: {}", tisId);
       service.deleteByTisId(tisId);
     } else {
-      boolean isInsertOrLoad = event.patch().stream()
-          .anyMatch(op -> "add".equals(op.get("op").asText())
-              && "".equals(op.get("path").asText()));
-
-      College college;
-
-      if (isInsertOrLoad) {
-        JsonNode value = event.patch().stream()
-            .filter(op -> "add".equals(op.get("op").asText()))
-            .findFirst()
-            .map(op -> op.get("value"))
-            .orElseThrow();
-        college = objectMapper.convertValue(value, College.class);
-        college.setTisId(value.get("id").asText());
-      } else {
-        college = new College();
-        college.setTisId(event.keys().get("id").asText());
-        event.patch().stream()
-            .filter(op -> "replace".equals(op.get("op").asText()))
-            .forEach(op -> {
-              String field = op.get("path").asText().substring(1);
-              if ("label".equals(field)) {
-                college.setLabel(op.get("value").asText());
-              }
-            });
-      }
+      JsonPatch patch = JsonPatch.fromJson(objectMapper.valueToTree(event.patch()));
+      JsonNode patchedNode = patch.apply(objectMapper.createObjectNode());
+      College college = objectMapper.treeToValue(patchedNode, College.class);
+      college.setTisId(college.getTisId() != null ? college.getTisId() : event.keys().get("id").asText());
 
       log.info("Upserting College with tisId: {}", college.getTisId());
       service.update(college);

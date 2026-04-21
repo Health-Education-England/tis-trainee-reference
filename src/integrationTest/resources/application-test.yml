@@ -3,3 +3,13 @@ mongock:
 application:
   queues:
     college-patch: college-patch-queue
+spring:
+  cloud:
+    aws:
+      region:
+        static: eu-west-2
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        enabled: false

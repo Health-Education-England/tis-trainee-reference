@@ -32,6 +32,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
   implementation("org.springframework.boot:spring-boot-starter-web")
 
+  //JSON
+  implementation("com.github.java-json-tools:json-patch:1.13")
+
   //AWS
   implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
 
