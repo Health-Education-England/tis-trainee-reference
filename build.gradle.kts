@@ -33,7 +33,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
 
   //JSON
-  implementation("com.github.java-json-tools:json-patch:1.13")
+  implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16")
 
   //AWS
   implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")

@@ -21,12 +21,11 @@
 
 package uk.nhs.hee.tis.trainee.reference.event;
 
-import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public record CdcPatchEvent(
-    List<JsonNode> patch,
+    JsonNode patch,
     Map<String, JsonNode> keys,
     Map<String, String> metadata
 ) {}

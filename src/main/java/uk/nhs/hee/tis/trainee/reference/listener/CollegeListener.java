@@ -24,15 +24,14 @@ import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import io.awspring.cloud.sqs.annotation.SqsListener;
-import java.io.IOException;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.event.CdcPatchEvent;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
+import com.flipkart.zjsonpatch.JsonPatch;
 
 /**
  * A listener for College CDC patch events.
@@ -51,10 +50,10 @@ public class CollegeListener {
   }
 
   @SqsListener("${application.queues.college-patch}")
-  public void handleCdcPatch(CdcPatchEvent event) throws JsonPatchException, IOException {
+  public void handleCdcPatch(CdcPatchEvent event) throws JsonProcessingException {
     log.info("Received CDC patch for College.");
 
-    boolean isDelete = event.patch().stream()
+    boolean isDelete = StreamSupport.stream(event.patch().spliterator(), false)
         .anyMatch(op -> "remove".equals(op.get("op").asText())
             && "".equals(op.get("path").asText()));
 
@@ -63,13 +62,13 @@ public class CollegeListener {
       log.info("Deleting College with tisId: {}", tisId);
       service.deleteByTisId(tisId);
     } else {
-      boolean isInsertOrLoad = event.patch().stream()
+      boolean isInsertOrLoad = StreamSupport.stream(event.patch().spliterator(), false)
           .anyMatch(op -> "add".equals(op.get("op").asText())
               && "".equals(op.get("path").asText()));
 
       String tisId;
       if (isInsertOrLoad) {
-        tisId = event.patch().stream()
+        tisId = StreamSupport.stream(event.patch().spliterator(), false)
             .filter(op -> "add".equals(op.get("op").asText()))
             .findFirst()
             .map(op -> op.get("value").get("id").asText())
@@ -79,10 +78,11 @@ public class CollegeListener {
       }
 
       College existing = service.findByTisId(tisId).orElse(new College());
-      JsonPatch patch = JsonPatch.fromJson(objectMapper.valueToTree(event.patch()));
+      existing.setTisId(tisId);
       JsonNode existingNode = objectMapper.valueToTree(existing);
-      JsonNode patchedNode = patch.apply(existingNode);
+      JsonNode patchedNode = JsonPatch.apply(event.patch(), existingNode);
       College updated = objectMapper.treeToValue(patchedNode, College.class);
+      updated.setTisId(tisId);
 
       log.info("Upserting College with tisId: {}", updated.getTisId());
       service.update(updated);
