@@ -3,7 +3,7 @@ application:
   exclude-filters:
     pm-type: LAT,Visitor
   queues:
-    college: ${COLLEGE_QUEUE}
+    college-patch: tis-trainee-reference-${application.environment}-college-patch.fifo
 
 mongock:
   migration-scan-package: uk.nhs.hee.tis.trainee.reference.changelog

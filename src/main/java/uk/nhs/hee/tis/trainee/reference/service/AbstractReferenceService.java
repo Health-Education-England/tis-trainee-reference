@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.repository.ReferenceRepository;
 
@@ -31,6 +32,10 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
 
   protected AbstractReferenceService(ReferenceRepository<T> repository) {
     this.repository = repository;
+  }
+
+  public Optional<T> findByTisId(String tisId) {
+    return Optional.ofNullable(repository.findByTisId(tisId));
   }
 
   @Override

@@ -51,8 +51,7 @@ public class CollegeListener {
   }
 
   @SqsListener("${application.queues.college-patch}")
-  public void handleCdcPatch(CdcPatchEvent event)
-      throws JsonPatchException, JsonProcessingException, IOException {
+  public void handleCdcPatch(CdcPatchEvent event) throws JsonPatchException, IOException {
     log.info("Received CDC patch for College.");
 
     boolean isDelete = event.patch().stream()
@@ -64,13 +63,29 @@ public class CollegeListener {
       log.info("Deleting College with tisId: {}", tisId);
       service.deleteByTisId(tisId);
     } else {
-      JsonPatch patch = JsonPatch.fromJson(objectMapper.valueToTree(event.patch()));
-      JsonNode patchedNode = patch.apply(objectMapper.createObjectNode());
-      College college = objectMapper.treeToValue(patchedNode, College.class);
-      college.setTisId(college.getTisId() != null ? college.getTisId() : event.keys().get("id").asText());
+      boolean isInsertOrLoad = event.patch().stream()
+          .anyMatch(op -> "add".equals(op.get("op").asText())
+              && "".equals(op.get("path").asText()));
 
-      log.info("Upserting College with tisId: {}", college.getTisId());
-      service.update(college);
+      String tisId;
+      if (isInsertOrLoad) {
+        tisId = event.patch().stream()
+            .filter(op -> "add".equals(op.get("op").asText()))
+            .findFirst()
+            .map(op -> op.get("value").get("id").asText())
+            .orElseThrow();
+      } else {
+        tisId = event.keys().get("id").asText();
+      }
+
+      College existing = service.findByTisId(tisId).orElse(new College());
+      JsonPatch patch = JsonPatch.fromJson(objectMapper.valueToTree(event.patch()));
+      JsonNode existingNode = objectMapper.valueToTree(existing);
+      JsonNode patchedNode = patch.apply(existingNode);
+      College updated = objectMapper.treeToValue(patchedNode, College.class);
+
+      log.info("Upserting College with tisId: {}", updated.getTisId());
+      service.update(updated);
     }
   }
 }
