@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2024 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,15 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
-
-import org.testcontainers.utility.DockerImageName;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
 /**
- * Constants for {@link DockerImageName} values used in tests to ensure consistency.
+ * TODO: javadoc
  */
-public class DockerImageNames {
+public enum CdcEventType {
 
-  public static final DockerImageName LOCALSTACK = DockerImageName.parse("localstack/localstack:3");
-  public static final DockerImageName MONGO = DockerImageName.parse("mongo:5");
+  INSERT,
+  UPDATE,
+  DELETE
+
 }

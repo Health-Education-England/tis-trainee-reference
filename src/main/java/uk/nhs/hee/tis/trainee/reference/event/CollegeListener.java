@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2024 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,15 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference;
+package uk.nhs.hee.tis.trainee.reference.event;
 
-import org.testcontainers.utility.DockerImageName;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatchException;
+import io.awspring.cloud.sqs.annotation.SqsListener;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import uk.nhs.hee.tis.trainee.reference.dto.CdcEvent;
+import uk.nhs.hee.tis.trainee.reference.model.College;
+import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 
-/**
- * Constants for {@link DockerImageName} values used in tests to ensure consistency.
- */
-public class DockerImageNames {
+@Slf4j
+@Component
+public class CollegeListener {
 
-  public static final DockerImageName LOCALSTACK = DockerImageName.parse("localstack/localstack:3");
-  public static final DockerImageName MONGO = DockerImageName.parse("mongo:5");
+  private final CollegeService service;
+
+  public CollegeListener(CollegeService service) {
+    this.service = service;
+  }
+
+  @SqsListener("${application.queues.college-patch}")
+  void handleCollegePatch(CdcEvent event) throws JsonPatchException, JsonProcessingException {
+    switch (event.getEventType()) {
+      case INSERT -> service.create(new College(), event.getPatch());
+      case DELETE -> service.deleteByTisId(event.keys().id());
+      case UPDATE -> service.update(event.keys().id(), event.getPatch());
+    }
+  }
 }

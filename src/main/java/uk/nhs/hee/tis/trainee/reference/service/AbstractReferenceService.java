@@ -21,16 +21,24 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.repository.ReferenceRepository;
 
 public abstract class AbstractReferenceService<T> implements ReferenceService<T> {
 
-  private ReferenceRepository<T> repository;
+  private final ReferenceRepository<T> repository;
+  private final ObjectMapper mapper;
 
   protected AbstractReferenceService(ReferenceRepository<T> repository) {
     this.repository = repository;
+    this.mapper = new JsonMapper(); // TODO: inject object mapper.
   }
 
   @Override
@@ -59,6 +67,11 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
   }
 
   @Override
+  public T create(T entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    return patch(entity, patch);
+  }
+
+  @Override
   public T update(T entity) {
     T persistedEntity = repository.findByTisId(getTisId(entity));
 
@@ -68,6 +81,34 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
 
     copyAttributes(persistedEntity, entity);
     return repository.save(persistedEntity);
+  }
+
+  @Override
+  public T update(String tisId, JsonPatch patch)
+      throws JsonPatchException, JsonProcessingException {
+    T persistedEntity = repository.findByTisId(tisId);
+
+    if (persistedEntity == null) {
+      // TODO: may be unclear what entity type we're dealing with, check stacktrace gives context.
+      throw new IllegalArgumentException("Unknown entity with id [%s].".formatted(tisId));
+    }
+
+    return patch(persistedEntity, patch);
+  }
+
+  /**
+   * TODO: docs
+   *
+   * @param entity
+   * @param patch
+   * @return
+   * @throws JsonProcessingException
+   * @throws JsonPatchException
+   */
+  private T patch(T entity, JsonPatch patch) throws JsonProcessingException, JsonPatchException {
+    JsonNode patchedNode = patch.apply(mapper.convertValue(entity, JsonNode.class));
+    T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
+    return repository.save(patchedEntity);
   }
 
   @Override
