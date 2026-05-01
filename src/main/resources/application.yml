@@ -2,6 +2,8 @@ application:
   environment: ${ENVIRONMENT:local}
   exclude-filters:
     pm-type: LAT,Visitor
+  queues:
+    college-patch: tis-trainee-reference-${application.environment}-college-patch.fifo
 
 mongock:
   migration-scan-package: uk.nhs.hee.tis.trainee.reference.changelog
@@ -12,6 +14,9 @@ server:
     context-path: /reference
 
 spring:
+  cloud:
+    aws:
+      endpoint: ${AWS_ENDPOINT:}
   data:
     mongodb:
       uri: mongodb://${DB_USER:admin}:${DB_PASSWORD:pwd}@${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:reference}?authSource=${AUTH_SOURCE:admin}&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false

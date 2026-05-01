@@ -28,5 +28,6 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class DockerImageNames {
 
+  public static final DockerImageName LOCALSTACK = DockerImageName.parse("localstack/localstack:3");
   public static final DockerImageName MONGO = DockerImageName.parse("mongo:5");
 }
