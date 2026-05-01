@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +76,7 @@ class DbcServiceTest {
    */
   @BeforeEach
   void initData() {
-    service = new DbcService(repository, Mappers.getMapper(DbcMapper.class));
+    service = new DbcService(repository, Mappers.getMapper(DbcMapper.class), new ObjectMapper());
 
     dbc1 = new Dbc();
     dbc1.setId(DEFAULT_ID_1);

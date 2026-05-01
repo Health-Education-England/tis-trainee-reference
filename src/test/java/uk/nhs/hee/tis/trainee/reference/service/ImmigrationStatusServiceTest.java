@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,7 @@ class ImmigrationStatusServiceTest {
   @BeforeEach
   void initData() {
     service = new ImmigrationStatusService(repository,
-        Mappers.getMapper(ImmigrationStatusMapper.class));
+        Mappers.getMapper(ImmigrationStatusMapper.class), new ObjectMapper());
 
     immigrationStatus1 = new ImmigrationStatus();
     immigrationStatus1.setId(DEFAULT_ID_1);

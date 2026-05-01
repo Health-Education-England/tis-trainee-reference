@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
@@ -31,10 +32,12 @@ import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
 @XRayEnabled
 public class CollegeService extends AbstractReferenceService<College> {
 
+  //used for remaining rest endpoint
   private CollegeMapper mapper;
 
-  protected CollegeService(CollegeRepository repository, CollegeMapper mapper) {
-    super(repository);
+  protected CollegeService(CollegeRepository repository, CollegeMapper mapper,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
   }
 

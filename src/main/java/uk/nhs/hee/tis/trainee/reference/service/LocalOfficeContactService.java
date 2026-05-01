@@ -25,6 +25,7 @@ import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
 import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.SPECIALTY;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,9 @@ public class LocalOfficeContactService extends AbstractReferenceService<LocalOff
   private final LocalOfficeContactEnricherFacade facade;
 
   protected LocalOfficeContactService(LocalOfficeContactRepository repository,
-      LocalOfficeContactMapper mapper, LocalOfficeContactEnricherFacade facade) {
-    super(repository);
+      LocalOfficeContactMapper mapper, LocalOfficeContactEnricherFacade facade,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
     this.repository = repository;
     this.facade = facade;

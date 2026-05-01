@@ -31,6 +31,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -75,7 +76,7 @@ class LocalOfficeContactTypeServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeContactTypeService(repository,
-        Mappers.getMapper(LocalOfficeContactTypeMapper.class), contactService);
+        Mappers.getMapper(LocalOfficeContactTypeMapper.class), contactService, new ObjectMapper());
 
     contactType1 = new LocalOfficeContactType();
     contactType1.setTisId(DEFAULT_TIS_ID_1);

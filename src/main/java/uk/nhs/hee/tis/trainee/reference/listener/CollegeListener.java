@@ -20,72 +20,49 @@
  */
 package uk.nhs.hee.tis.trainee.reference.listener;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatchException;
 import io.awspring.cloud.sqs.annotation.SqsListener;
-import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.nhs.hee.tis.trainee.reference.event.CdcPatchEvent;
+import uk.nhs.hee.tis.trainee.reference.dto.CdcEvent;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
-import com.flipkart.zjsonpatch.JsonPatch;
 
 /**
  * A listener for College CDC patch events.
  */
 @Slf4j
 @Component
-@XRayEnabled
 public class CollegeListener {
 
   private final CollegeService service;
-  private final ObjectMapper objectMapper;
 
-  public CollegeListener(CollegeService service, ObjectMapper objectMapper) {
+  public CollegeListener(CollegeService service) {
     this.service = service;
-    this.objectMapper = objectMapper;
   }
 
   @SqsListener("${application.queues.college-patch}")
-  public void handleCdcPatch(CdcPatchEvent event) throws JsonProcessingException {
-    log.info("Received CDC patch for College.");
-
-    boolean isDelete = StreamSupport.stream(event.patch().spliterator(), false)
-        .anyMatch(op -> "remove".equals(op.get("op").asText())
-            && "".equals(op.get("path").asText()));
-
-    if (isDelete) {
-      String tisId = event.keys().get("id").asText();
-      log.info("Deleting College with tisId: {}", tisId);
-      service.deleteByTisId(tisId);
-    } else {
-      boolean isInsertOrLoad = StreamSupport.stream(event.patch().spliterator(), false)
-          .anyMatch(op -> "add".equals(op.get("op").asText())
-              && "".equals(op.get("path").asText()));
-
-      String tisId;
-      if (isInsertOrLoad) {
-        tisId = StreamSupport.stream(event.patch().spliterator(), false)
-            .filter(op -> "add".equals(op.get("op").asText()))
-            .findFirst()
-            .map(op -> op.get("value").get("id").asText())
-            .orElseThrow();
-      } else {
-        tisId = event.keys().get("id").asText();
+  void handleCollegePatch(CdcEvent event) throws JsonPatchException, JsonProcessingException {
+    log.info("Received event, type: {}", event.getEventType());
+    try {
+      switch (event.getEventType()) {
+        case INSERT -> {
+          log.info("Handling INSERT");
+          service.create(new College(), event.getPatch());
+        }
+        case DELETE -> {
+          log.info("Handling DELETE for id: {}", event.keys().id());
+          service.deleteByTisId(event.keys().id());
+        }
+        case UPDATE -> {
+          log.info("Handling UPDATE for id: {}", event.keys().id());
+          service.update(event.keys().id(), event.getPatch());
+        }
       }
-
-      College existing = service.findByTisId(tisId).orElse(new College());
-      existing.setTisId(tisId);
-      JsonNode existingNode = objectMapper.valueToTree(existing);
-      JsonNode patchedNode = JsonPatch.apply(event.patch(), existingNode);
-      College updated = objectMapper.treeToValue(patchedNode, College.class);
-      updated.setTisId(tisId);
-
-      log.info("Upserting College with tisId: {}", updated.getTisId());
-      service.update(updated);
+    } catch (Exception e) {
+      log.error("Error handling CDC patch", e);
+      throw e;
     }
   }
 }

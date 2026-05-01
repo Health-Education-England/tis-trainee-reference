@@ -21,6 +21,8 @@
 
 package uk.nhs.hee.tis.trainee.reference.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -28,6 +30,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "College")
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class College {
 
   @Id
@@ -35,5 +38,6 @@ public class College {
 
   @Indexed(unique = true)
   private String tisId;
+  @JsonAlias("name")
   private String label;
 }

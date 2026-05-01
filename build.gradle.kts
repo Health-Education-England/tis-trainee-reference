@@ -17,11 +17,9 @@ configurations {
     extendsFrom(configurations.annotationProcessor.get())
   }
 }
-
 dependencyManagement {
   imports {
     mavenBom(libs.spring.cloud.dependencies.aws.get().toString())
-    mavenBom(libs.spring.cloud.dependencies.core.get().toString())
   }
 }
 
@@ -32,10 +30,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
   implementation("org.springframework.boot:spring-boot-starter-web")
 
-  //JSON
-  implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16")
-
-  //AWS
   implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
 
   // AWS-XRay
@@ -55,9 +49,7 @@ dependencies {
   // Sentry reporting
   implementation(libs.sentry.core)
 
-  //Testing
-  implementation("org.testcontainers:localstack")
-  implementation("org.awaitility:awaitility")
+  implementation("com.github.java-json-tools:json-patch:1.13")
 }
 
 java {
@@ -80,7 +72,7 @@ sonarqube {
     property("sonar.projectKey", "Health-Education-England_tis-trainee-reference")
 
     property("sonar.java.checkstyle.reportPaths",
-      "build/reports/checkstyle/main.xml,build/reports/checkstyle/test.xml")
+            "build/reports/checkstyle/main.xml,build/reports/checkstyle/test.xml")
   }
 }
 
@@ -106,6 +98,7 @@ testing {
       dependencies {
         implementation("org.springframework.boot:spring-boot-testcontainers")
         implementation("org.testcontainers:junit-jupiter")
+        implementation("org.testcontainers:localstack")
         implementation("org.testcontainers:mongodb")
       }
 
