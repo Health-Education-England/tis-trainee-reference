@@ -102,24 +102,21 @@ class CollegeListenerIntegrationTest {
     mongoTemplate.insert(college);
 
     String eventString = """
-        {
-          "patch": [
-            {
-              "op": "replace",
-              "path": "",
-              "value": {
-                "id": "%s",
-                "abbreviation": "New Abbreviation",
-                "name": "New Name",
-                "status": "CURRENT"
-              }
-            }
-          ],
-          "keys": {
-            "id": "%s"
+    {
+      "patch": [
+        { "op": "test", "path": "/name", "value": "Original Label" },
+        { "op": "replace", "path": "", "value": {
+            "id": "%s",
+            "abbreviation": "FAC",
+            "name": "New Name",
+            "status": "CURRENT",
+            "uuid": "%s"
           }
         }
-        """.formatted(tisId, tisId);
+      ],
+      "metadata": { "timestamp": "2026-04-24T15:46:30.665729Z" }
+    }
+    """.formatted(tisId, UUID.randomUUID());
 
     JsonNode eventJson = JsonMapper.builder()
         .build()
