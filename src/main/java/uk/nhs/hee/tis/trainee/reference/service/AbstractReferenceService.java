@@ -24,6 +24,7 @@ package uk.nhs.hee.tis.trainee.reference.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
@@ -87,7 +88,9 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
   @Override
   public T update(String tisId, JsonPatch patch)
       throws JsonPatchException, JsonProcessingException {
+    log.debug("Looking up entity with tisId: {}", tisId);
     T persistedEntity = repository.findByTisId(tisId);
+    log.debug("Found entity: {}", persistedEntity);
 
     if (persistedEntity == null) {
       // TODO: may be unclear what entity type we're dealing with, check stacktrace gives context.
@@ -109,10 +112,12 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
   private T patch(T entity, JsonPatch patch) throws JsonProcessingException, JsonPatchException {
     JsonNode entityNode = mapper.convertValue(entity, JsonNode.class);
     JsonNode patchedNode = patch.apply(entityNode);
+    ((ObjectNode) patchedNode).set("id", entityNode.get("id"));
+    ((ObjectNode) patchedNode).set("tisId", entityNode.get("tisId"));
+    log.info("Patched node after ID restore: {}", patchedNode);
     T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
     return repository.save(patchedEntity);
   }
-
   @Override
   public void deleteByTisId(String tisId) {
     repository.deleteByTisId(tisId);

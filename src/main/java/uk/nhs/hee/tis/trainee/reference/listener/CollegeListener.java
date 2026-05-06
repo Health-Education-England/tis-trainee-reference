@@ -18,11 +18,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 package uk.nhs.hee.tis.trainee.reference.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.dto.CdcEvent;
@@ -43,25 +44,20 @@ public class CollegeListener {
   }
 
   @SqsListener("${application.queues.college-patch}")
-  void handleCollegePatch(CdcEvent event) throws JsonPatchException, JsonProcessingException {
-    log.info("Received event, type: {}", event.getEventType());
+  void handleCollegePatch(CdcEvent event) throws JsonPatchException, IOException {
     try {
       switch (event.getEventType()) {
         case INSERT -> {
-          log.info("Handling INSERT");
-          service.create(new College(), event.getPatch());
+          service.create(new College(), event.getPatchWithoutTests());
         }
         case DELETE -> {
-          log.info("Handling DELETE for id: {}", event.keys().id());
-          service.deleteByTisId(event.keys().id());
+          service.deleteByTisId(event.getTisId());
         }
         case UPDATE -> {
-          log.info("Handling UPDATE for id: {}", event.keys().id());
-          service.update(event.keys().id(), event.getPatch());
+          service.update(event.getTisId(), event.getPatchWithoutTests());
         }
       }
     } catch (Exception e) {
-      log.error("Error handling CDC patch", e);
       throw e;
     }
   }

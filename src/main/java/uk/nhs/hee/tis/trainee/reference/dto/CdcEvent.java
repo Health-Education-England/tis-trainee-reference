@@ -22,63 +22,73 @@
 package uk.nhs.hee.tis.trainee.reference.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.fge.jsonpatch.AddOperation;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.RemoveOperation;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
- * TODO: javadoc
+ * Represents a CDC patch event received from an SQS queue.
  *
- * @param operations
- * @param keys
+ * @param rawPatch   The raw JSON patch node, used for extracting values not exposed by the typed
+ *                   operations.
+ * @param keys       The key fields identifying the record, populated by the lambda if present.
+ * @param metadata   Additional metadata about the event.
  */
 public record CdcEvent(
     @JsonProperty("patch")
-    List<JsonPatchOperation> operations,
-    CdcKeys keys) {
+    JsonNode rawPatch,
+    CdcKeys keys,
+    Map<String, String> metadata) {
 
-  private static final String EMPTY_PATH = "path: \"\"";
-
-  /**
-   * TODO: javadoc
-   *
-   * @return
-   */
   public CdcEventType getEventType() {
-    return operations.stream()
-        .filter(op -> op.toString().endsWith(EMPTY_PATH))
-        .findFirst()
-        .map(op -> {
-          if (op instanceof AddOperation) {
-            return CdcEventType.INSERT;
-          }
-
-          if (op instanceof RemoveOperation) {
-            return CdcEventType.DELETE;
-          }
-
-          return null;
-        }).orElse(CdcEventType.UPDATE);
-
+    for (JsonNode op : rawPatch) {
+      if ("".equals(op.path("path").asText())) {
+        return switch (op.path("op").asText()) {
+          case "add" -> CdcEventType.INSERT;
+          case "remove" -> CdcEventType.DELETE;
+          default -> CdcEventType.UPDATE;
+        };
+      }
+    }
+    return CdcEventType.UPDATE;
   }
 
-  /**
-   * Constructs a JsonPatch from the list of patch operations.
-   *
-   * @return A JsonPatch representing the CDC patch operations.
-   */
-  public JsonPatch getPatch() {
-    return new JsonPatch(operations);
+  public String getTisId() {
+    if (keys != null && keys.id() != null) {
+      return keys.id();
+    }
+    for (JsonNode op : rawPatch) {
+      if ("".equals(op.path("path").asText())) {
+        return op.path("value").path("id").asText();
+      }
+    }
+    throw new IllegalArgumentException("Cannot extract TIS ID from patch: " + rawPatch);
   }
 
-  /**
-   * Represents the key fields used to identify a CDC record.
-   *
-   * @param id The TIS id of the record.
-   */
-  public record CdcKeys(String id) { // TODO: update lambda to include `id` even if `uuid` present.
-
+  public JsonPatch getPatch() throws IOException {
+    return JsonPatch.fromJson(rawPatch);
   }
+
+  public JsonPatch getPatchWithoutTests() throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode filtered = mapper.createArrayNode();
+    for (JsonNode op : rawPatch) {
+      if (!"test".equals(op.path("op").asText())) {
+        filtered.add(op);
+      }
+    }
+    return JsonPatch.fromJson(filtered);
+  }
+
+  public record CdcKeys(String id) {
+    // TODO: update lambda to include keys.
+  }
+
 }
