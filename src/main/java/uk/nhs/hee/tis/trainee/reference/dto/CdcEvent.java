@@ -25,12 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.github.fge.jsonpatch.AddOperation;
 import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchOperation;
-import com.github.fge.jsonpatch.RemoveOperation;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +43,15 @@ public record CdcEvent(
     CdcKeys keys,
     Map<String, String> metadata) {
 
+  /**
+   * Determines the type of CDC event by inspecting the operation at the root path.
+   *
+   * <p>An {@code add} at root indicates an INSERT, a {@code remove} at root indicates a DELETE,
+   * and any other operation at root indicates an UPDATE. If no root-path operation is found,
+   * UPDATE is assumed.
+   *
+   * @return The {@link CdcEventType} for this event.
+   */
   public CdcEventType getEventType() {
     for (JsonNode op : rawPatch) {
       if ("".equals(op.path("path").asText())) {
@@ -60,22 +65,53 @@ public record CdcEvent(
     return CdcEventType.UPDATE;
   }
 
+  /**
+   * Extracts the TIS ID for the record affected by this event.
+   *
+   * <p>Prefers {@code keys.id()} if populated by the lambda. Falls back to extracting the
+   * {@code id} field from the root operation's value in the patch.
+   *
+   * @return The TIS ID.
+   * @throws IllegalArgumentException if the TIS ID cannot be determined.
+   */
   public String getTisId() {
     if (keys != null && keys.id() != null) {
       return keys.id();
     }
     for (JsonNode op : rawPatch) {
       if ("".equals(op.path("path").asText())) {
+        // remove operations (DELETE) have no value to extract an ID from
+        if ("remove".equals(op.path("op").asText())) {
+          throw new IllegalArgumentException(
+              "Cannot extract TIS ID for DELETE event without keys: " + rawPatch);
+        }
         return op.path("value").path("id").asText();
       }
     }
     throw new IllegalArgumentException("Cannot extract TIS ID from patch: " + rawPatch);
   }
 
+  /**
+   * Constructs a {@link JsonPatch} from all patch operations.
+   *
+   * @return A JsonPatch representing all CDC patch operations.
+   * @throws IOException if the patch cannot be constructed.
+   */
   public JsonPatch getPatch() throws IOException {
     return JsonPatch.fromJson(rawPatch);
   }
 
+  /**
+   * Constructs a {@link JsonPatch} from the patch operations, excluding any {@code test}
+   * operations.
+   *
+   * <p>Test operations verify the before-state of a field using TIS column names, which may
+   * differ from TSS field names. Stripping them avoids patch failures caused by field name
+   * mismatches.
+   *
+   * @return A JsonPatch with test operations removed.
+   * @throws IOException if the patch cannot be constructed.
+   */
   public JsonPatch getPatchWithoutTests() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode filtered = mapper.createArrayNode();
@@ -87,6 +123,11 @@ public record CdcEvent(
     return JsonPatch.fromJson(filtered);
   }
 
+  /**
+   * Represents the key fields used to identify a CDC record.
+   *
+   * @param id The TIS id of the record.
+   */
   public record CdcKeys(String id) {
     // TODO: update lambda to include keys.
   }

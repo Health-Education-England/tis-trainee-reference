@@ -93,8 +93,8 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
     log.debug("Found entity: {}", persistedEntity);
 
     if (persistedEntity == null) {
-      // TODO: may be unclear what entity type we're dealing with, check stacktrace gives context.
-      throw new IllegalArgumentException("Unknown entity with id [%s].".formatted(tisId));
+      throw new IllegalArgumentException(
+          "Unknown entity for tisId [%s] in %s.".formatted(tisId, getClass().getSimpleName()));
     }
 
     return patch(persistedEntity, patch);
@@ -112,12 +112,21 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
   private T patch(T entity, JsonPatch patch) throws JsonProcessingException, JsonPatchException {
     JsonNode entityNode = mapper.convertValue(entity, JsonNode.class);
     JsonNode patchedNode = patch.apply(entityNode);
-    ((ObjectNode) patchedNode).set("id", entityNode.get("id"));
-    ((ObjectNode) patchedNode).set("tisId", entityNode.get("tisId"));
-    log.info("Patched node after ID restore: {}", patchedNode);
+    if (patchedNode.isObject()) {
+      ObjectNode patchedObject = (ObjectNode) patchedNode;
+      JsonNode id = entityNode.get("id");
+      JsonNode tisId = entityNode.get("tisId");
+      if (id != null && !id.isNull()) {
+        patchedObject.set("id", id);
+      }
+      if (tisId != null && !tisId.isNull()) {
+        patchedObject.set("tisId", tisId);
+      }
+    }
     T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
     return repository.save(patchedEntity);
   }
+
   @Override
   public void deleteByTisId(String tisId) {
     repository.deleteByTisId(tisId);

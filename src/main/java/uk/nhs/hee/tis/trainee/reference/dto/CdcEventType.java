@@ -23,7 +23,10 @@
 package uk.nhs.hee.tis.trainee.reference.dto;
 
 /**
- * TODO: javadoc
+ * The type of change captured by a CDC event.
+ *
+ * <p>These values map to patch operations: {@link #INSERT} for an add at the root path,
+ * {@link #DELETE} for a remove at the root path, and {@link #UPDATE} for all other operations.
  */
 public enum CdcEventType {
 

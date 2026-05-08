@@ -24,6 +24,7 @@ package uk.nhs.hee.tis.trainee.reference.event;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -132,8 +135,105 @@ class CollegeListenerIntegrationTest {
           College patchedCollege = mongoTemplate.findById(id, College.class);
           assertThat("Unexpected ID.", patchedCollege.getId(), is(id));
           assertThat("Unexpected TIS ID.", patchedCollege.getTisId(), is(tisId));
-          // TODO: will fail as there is currently no mapping between name (TIS) and label (TSS).
           assertThat("Unexpected label.", patchedCollege.getLabel(), is("New Name"));
         });
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  @Test
+  void shouldHandleInsertEvent() throws JsonProcessingException {
+    String tisId = UUID.randomUUID().toString();
+
+    String eventString = """
+    {
+      "patch": [
+        { "op": "add", "path": "", "value": {
+            "id": "%s",
+            "abbreviation": "FAC",
+            "name": "New College",
+            "status": "CURRENT",
+            "uuid": "%s"
+          }
+        }
+      ],
+      "metadata": { "timestamp": "2026-04-24T15:46:30.665729Z" }
+    }
+    """.formatted(tisId, UUID.randomUUID());
+
+    JsonNode eventJson = JsonMapper.builder()
+        .build()
+        .readTree(eventString);
+
+    sqsTemplate.send(COLLEGE_PATCH_QUEUE, eventJson);
+
+    await()
+        .pollInterval(Duration.ofSeconds(2))
+        .atMost(Duration.ofSeconds(10))
+        .ignoreExceptions()
+        .untilAsserted(() -> {
+          List<College> colleges = mongoTemplate.findAll(College.class);
+          assertThat("Unexpected college count.", colleges, hasSize(1));
+          College college = colleges.get(0);
+          assertThat("Unexpected TIS ID.", college.getTisId(), is(tisId));
+          assertThat("Unexpected label.", college.getLabel(), is("New College"));
+        });
+  }
+
+  @Test
+  void shouldHandleDeleteEvent() throws JsonProcessingException {
+    String tisId = UUID.randomUUID().toString();
+
+    College college = new College();
+    college.setTisId(tisId);
+    college.setLabel("College To Delete");
+    mongoTemplate.insert(college);
+
+    String eventString = """
+    {
+      "patch": [
+        { "op": "remove", "path": "" }
+      ],
+      "keys": { "id": "%s" },
+      "metadata": { "timestamp": "2026-04-24T15:46:30.665729Z" }
+    }
+    """.formatted(tisId);
+
+    JsonNode eventJson = JsonMapper.builder()
+        .build()
+        .readTree(eventString);
+
+    sqsTemplate.send(COLLEGE_PATCH_QUEUE, eventJson);
+
+    await()
+        .pollInterval(Duration.ofSeconds(2))
+        .atMost(Duration.ofSeconds(10))
+        .ignoreExceptions()
+        .untilAsserted(() -> {
+          long count = mongoTemplate.count(new Query(), College.class);
+          assertThat("Unexpected college count.", count, is(0L));
+        });
+  }
+
+
+
+
+
+
+
+
 }
