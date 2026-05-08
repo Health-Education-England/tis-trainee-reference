@@ -70,7 +70,20 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
 
   @Override
   public T create(T entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-    return patch(entity, patch);
+    JsonNode entityNode = mapper.convertValue(entity, JsonNode.class);
+    JsonNode patchedNode = patch.apply(entityNode);
+    if (patchedNode.isObject()) {
+      ObjectNode patchedObject = (ObjectNode) patchedNode;
+      // For INSERT, map the TIS id field to tisId since the patch value uses 'id' for the TIS ID
+      JsonNode tisId = patchedObject.get("id");
+      if (tisId != null && !tisId.isNull()) {
+        patchedObject.set("tisId", tisId);
+      }
+      patchedObject.remove("id"); // let MongoDB generate the _id
+    }
+    @SuppressWarnings("unchecked")
+    T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
+    return create(patchedEntity);
   }
 
   @Override
