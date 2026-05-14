@@ -139,22 +139,6 @@ class CollegeListenerIntegrationTest {
         });
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   @Test
   void shouldHandleInsertEvent() throws JsonProcessingException {
     String tisId = UUID.randomUUID().toString();

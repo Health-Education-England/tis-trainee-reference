@@ -28,12 +28,12 @@ import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.CollegeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.repository.CollegeRepository;
-@Slf4j
+
 @Service
 @XRayEnabled
 public class CollegeService extends AbstractReferenceService<College> {
 
-  //used for remaining rest endpoint
+  // used for remaining rest endpoint
   private CollegeMapper mapper;
 
   protected CollegeService(CollegeRepository repository, CollegeMapper mapper,

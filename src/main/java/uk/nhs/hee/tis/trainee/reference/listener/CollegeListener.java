@@ -45,7 +45,6 @@ public class CollegeListener {
 
   @SqsListener("${application.queues.college-patch}")
   void handleCollegePatch(CdcEvent event) throws JsonPatchException, IOException {
-    try {
       switch (event.getEventType()) {
         case INSERT -> {
           service.create(new College(), event.getPatchWithoutTests());
@@ -57,8 +56,5 @@ public class CollegeListener {
           service.update(event.getTisId(), event.getPatchWithoutTests());
         }
       }
-    } catch (Exception e) {
-      throw e;
     }
   }
-}
