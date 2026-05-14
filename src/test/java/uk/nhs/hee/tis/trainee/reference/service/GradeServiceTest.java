@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,7 @@ class GradeServiceTest {
    */
   @BeforeEach
   void initData() {
-    service = new GradeService(repository, Mappers.getMapper(GradeMapper.class));
+    service = new GradeService(repository, Mappers.getMapper(GradeMapper.class), new ObjectMapper());
 
     grade1 = new Grade();
     grade1.setId(DEFAULT_ID_1);

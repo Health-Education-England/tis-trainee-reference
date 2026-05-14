@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Dbc;
@@ -33,8 +34,9 @@ public class DbcService extends AbstractReferenceService<Dbc> {
 
   private DbcMapper mapper;
 
-  protected DbcService(DbcRepository repository, DbcMapper mapper) {
-    super(repository);
+  protected DbcService(DbcRepository repository, DbcMapper mapper,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
   }
 

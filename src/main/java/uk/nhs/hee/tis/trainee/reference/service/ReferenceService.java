@@ -21,6 +21,9 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
 
 public interface ReferenceService<T> {
@@ -41,12 +44,29 @@ public interface ReferenceService<T> {
   T create(T entity);
 
   /**
+   * Create an entity with the given patch data.
+   *
+   * @param patch The patch to create the entity from.
+   * @return The created entity.
+   */
+  T create(T entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException;
+
+  /**
    * Update the given entity.
    *
    * @param entity The entity to update.
    * @return The updated entity.
    */
   T update(T entity);
+
+  /**
+   * Update an entity by its TIS ID, by applying a JSON Patch to it.
+   *
+   * @param tisId The TID id of the entity to update.
+   * @param patch The patch to apply to the entity.
+   * @return The updated entity.
+   */
+  T update(String tisId, JsonPatch patch) throws JsonPatchException, JsonProcessingException;
 
   /**
    * Delete an entity by its TIS id.

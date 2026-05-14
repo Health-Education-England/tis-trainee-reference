@@ -32,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -79,7 +80,7 @@ class LocalOfficeServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeService(repository, Mappers.getMapper(LocalOfficeMapper.class),
-        contactService);
+        contactService, new ObjectMapper());
 
     localOffice1 = new LocalOffice();
     localOffice1.setId(DEFAULT_ID_1);

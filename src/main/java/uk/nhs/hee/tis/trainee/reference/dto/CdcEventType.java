@@ -1,7 +1,8 @@
+
 /*
  * The MIT License (MIT)
  *
- * Copyright 2020 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,34 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.service;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Grade;
-import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
+/**
+ * The type of change captured by a CDC event.
+ *
+ * <p>These values map to patch operations: {@link #INSERT} for an add at the root path,
+ * {@link #DELETE} for a remove at the root path, and {@link #UPDATE} for all other operations.
+ */
+public enum CdcEventType {
 
-@Service
-@XRayEnabled
-public class GradeService extends AbstractReferenceService<Grade> {
+  INSERT,
+  UPDATE,
+  DELETE
 
-  private GradeMapper mapper;
-
-  protected GradeService(GradeRepository repository, GradeMapper mapper,
-      ObjectMapper objectMapper) {
-    super(repository, objectMapper);
-    this.mapper = mapper;
-  }
-
-  @Override
-  protected String getTisId(Grade entity) {
-    return entity.getTisId();
-  }
-
-  @Override
-  protected void copyAttributes(Grade target, Grade source) {
-    mapper.update(target, source);
-  }
 }

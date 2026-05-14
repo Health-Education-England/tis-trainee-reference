@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +70,7 @@ class ProgrammeMembershipTypeServiceTest {
   @BeforeEach
   void initData() {
     service = new ProgrammeMembershipTypeService(repository,
-        new ProgrammeMembershipTypeMapperImpl(), List.of(EXCLUDED_LABEL_1, EXCLUDED_LABEL_2));
+        new ProgrammeMembershipTypeMapperImpl(), List.of(EXCLUDED_LABEL_1, EXCLUDED_LABEL_2), new ObjectMapper());
 
     programmeMembershipType1 = new ProgrammeMembershipType();
     programmeMembershipType1.setId(DEFAULT_ID_1);

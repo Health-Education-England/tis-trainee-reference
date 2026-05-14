@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.GenderMapper;
 import uk.nhs.hee.tis.trainee.reference.model.Gender;
@@ -33,8 +34,9 @@ public class GenderService extends AbstractReferenceService<Gender> {
 
   private GenderMapper mapper;
 
-  protected GenderService(GenderRepository repository, GenderMapper mapper) {
-    super(repository);
+  protected GenderService(GenderRepository repository, GenderMapper mapper,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
   }
 

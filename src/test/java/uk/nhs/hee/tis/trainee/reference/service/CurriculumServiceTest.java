@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +68,7 @@ class CurriculumServiceTest {
    */
   @BeforeEach
   void setUp() {
-    service = new CurriculumService(repository, Mappers.getMapper(CurriculumMapper.class));
+    service = new CurriculumService(repository, Mappers.getMapper(CurriculumMapper.class), new ObjectMapper());
 
     curriculum1 = new Curriculum();
     curriculum1.setId(DEFAULT_ID_1);

@@ -21,16 +21,26 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import uk.nhs.hee.tis.trainee.reference.repository.ReferenceRepository;
 
+@Slf4j
 public abstract class AbstractReferenceService<T> implements ReferenceService<T> {
 
-  private ReferenceRepository<T> repository;
+  private final ReferenceRepository<T> repository;
+  private final ObjectMapper mapper;
 
-  protected AbstractReferenceService(ReferenceRepository<T> repository) {
+  protected AbstractReferenceService(ReferenceRepository<T> repository, ObjectMapper mapper) {
     this.repository = repository;
+    this.mapper = mapper;
   }
 
   @Override
@@ -59,6 +69,24 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
   }
 
   @Override
+  public T create(T entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    JsonNode entityNode = mapper.convertValue(entity, JsonNode.class);
+    JsonNode patchedNode = patch.apply(entityNode);
+    if (patchedNode.isObject()) {
+      ObjectNode patchedObject = (ObjectNode) patchedNode;
+      // For INSERT, map the TIS id field to tisId since the patch value uses 'id' for the TIS ID
+      JsonNode tisId = patchedObject.get("id");
+      if (tisId != null && !tisId.isNull()) {
+        patchedObject.set("tisId", tisId);
+      }
+      patchedObject.remove("id"); // let MongoDB generate the _id
+    }
+    @SuppressWarnings("unchecked")
+    T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
+    return create(patchedEntity);
+  }
+
+  @Override
   public T update(T entity) {
     T persistedEntity = repository.findByTisId(getTisId(entity));
 
@@ -68,6 +96,48 @@ public abstract class AbstractReferenceService<T> implements ReferenceService<T>
 
     copyAttributes(persistedEntity, entity);
     return repository.save(persistedEntity);
+  }
+
+  @Override
+  public T update(String tisId, JsonPatch patch)
+      throws JsonPatchException, JsonProcessingException {
+    log.debug("Looking up entity with tisId: {}", tisId);
+    T persistedEntity = repository.findByTisId(tisId);
+    log.debug("Found entity: {}", persistedEntity);
+
+    if (persistedEntity == null) {
+      throw new IllegalArgumentException(
+          "Unknown entity for tisId [%s] in %s.".formatted(tisId, getClass().getSimpleName()));
+    }
+
+    return patch(persistedEntity, patch);
+  }
+
+  /**
+   * Applies a JSON patch to an entity and saves the result.
+   *
+   * @param entity The entity to patch.
+   * @param patch  The patch to apply.
+   * @return The patched and saved entity.
+   * @throws JsonProcessingException If the entity cannot be serialised or deserialised.
+   * @throws JsonPatchException      If the patch cannot be applied.
+   */
+  private T patch(T entity, JsonPatch patch) throws JsonProcessingException, JsonPatchException {
+    JsonNode entityNode = mapper.convertValue(entity, JsonNode.class);
+    JsonNode patchedNode = patch.apply(entityNode);
+    if (patchedNode.isObject()) {
+      ObjectNode patchedObject = (ObjectNode) patchedNode;
+      JsonNode id = entityNode.get("id");
+      JsonNode tisId = entityNode.get("tisId");
+      if (id != null && !id.isNull()) {
+        patchedObject.set("id", id);
+      }
+      if (tisId != null && !tisId.isNull()) {
+        patchedObject.set("tisId", tisId);
+      }
+    }
+    T patchedEntity = (T) mapper.treeToValue(patchedNode, entity.getClass());
+    return repository.save(patchedEntity);
   }
 
   @Override
