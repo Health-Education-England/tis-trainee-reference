@@ -22,14 +22,19 @@
 package uk.nhs.hee.tis.trainee.reference.mapper;
 
 import java.util.List;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import uk.nhs.hee.tis.trainee.reference.dto.CollegeDto;
+import uk.nhs.hee.tis.trainee.reference.dto.CollegePatchDto;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 
+/**
+ * Mapper for College entities and DTOs.
+ */
 @Mapper(componentModel = "spring")
-public interface CollegeMapper {
+public interface CollegeMapper extends PatchMapper<College, CollegePatchDto> {
 
   CollegeDto toDto(College college);
 
@@ -42,4 +47,19 @@ public interface CollegeMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "tisId", ignore = true)
   College update(@MappingTarget College target, College source);
+
+  @Mapping(target = "entityId", source = "id")
+  @Mapping(target = "name", source = "label")
+  @Mapping(target = "id", source = "tisId")
+  @Override
+  CollegePatchDto toPatchDto(College college);
+
+  @InheritInverseConfiguration
+  @Override
+  College toEntity(CollegePatchDto dto);
+
+  @Override
+  default void copyEntityId(CollegePatchDto source, CollegePatchDto target) {
+    target.setEntityId(source.getEntityId());
+  }
 }

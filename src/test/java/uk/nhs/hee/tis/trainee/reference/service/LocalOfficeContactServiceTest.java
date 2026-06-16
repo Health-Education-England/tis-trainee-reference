@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -34,9 +35,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,7 +111,7 @@ class LocalOfficeContactServiceTest {
   @BeforeEach
   void initData() {
     service = new LocalOfficeContactService(repository,
-        Mappers.getMapper(LocalOfficeContactMapper.class), facade);
+        Mappers.getMapper(LocalOfficeContactMapper.class), facade, new ObjectMapper());
 
     localOfficeContact1 = new LocalOfficeContact();
     localOfficeContact1.setTisId(DEFAULT_TIS_ID_1);
@@ -432,6 +437,33 @@ class LocalOfficeContactServiceTest {
   void updateAllForContactTypeShouldUpdateNothingIfContactTypeEmpty() {
 
     service.updateAllForContactType(new LocalOfficeContactType());
+
+    verify(repository, never()).save(any());
+  }
+
+  @Test
+  void shouldThrowExceptionCreatingLocalOfficeContactWithPatch() throws IOException {
+    String patch = """
+        [{"op":"add","path":"","value":{"id":"%s","name":"New"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    assertThrows(NotImplementedException.class,
+        () -> service.create(new LocalOfficeContact(), jsonPatch));
+
+    verify(repository, never()).insert(any(LocalOfficeContact.class));
+  }
+
+  @Test
+  void shouldThrowExceptionUpdatingLocalOfficeContactWithPatch() throws IOException {
+    String patch = """
+        [{"op":"replace","path":"","value":{"id":"%s","name":"Updated"}}]
+        """.formatted(DEFAULT_TIS_ID_1);
+    JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+
+    when(repository.findByTisId(DEFAULT_TIS_ID_1)).thenReturn(localOfficeContact1);
+
+    assertThrows(NotImplementedException.class, () -> service.update(DEFAULT_TIS_ID_1, jsonPatch));
 
     verify(repository, never()).save(any());
   }

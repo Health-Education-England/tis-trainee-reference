@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactTypeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
@@ -33,14 +34,15 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeReposit
 @Service
 @XRayEnabled
 public class LocalOfficeContactTypeService
-    extends AbstractReferenceService<LocalOfficeContactType> {
+    extends AbstractReferenceService<LocalOfficeContactType, LocalOfficeContactType> {
 
-  private LocalOfficeContactTypeMapper mapper;
-  private LocalOfficeContactService localOfficeContactService;
+  private final LocalOfficeContactTypeMapper mapper;
+  private final LocalOfficeContactService localOfficeContactService;
 
   protected LocalOfficeContactTypeService(LocalOfficeContactTypeRepository repository,
-      LocalOfficeContactTypeMapper mapper, LocalOfficeContactService localOfficeContactService) {
-    super(repository);
+      LocalOfficeContactTypeMapper mapper, LocalOfficeContactService localOfficeContactService,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
     this.localOfficeContactService = localOfficeContactService;
   }

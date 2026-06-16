@@ -22,6 +22,7 @@
 package uk.nhs.hee.tis.trainee.reference.service;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,18 +30,22 @@ import uk.nhs.hee.tis.trainee.reference.mapper.ProgrammeMembershipTypeMapper;
 import uk.nhs.hee.tis.trainee.reference.model.ProgrammeMembershipType;
 import uk.nhs.hee.tis.trainee.reference.repository.ProgrammeMembershipTypeRepository;
 
+/**
+ * Service for managing ProgrammeMembershipType reference data.
+ */
 @Service
 @XRayEnabled
 public class ProgrammeMembershipTypeService
-    extends AbstractReferenceService<ProgrammeMembershipType> {
+    extends AbstractReferenceService<ProgrammeMembershipType, ProgrammeMembershipType> {
 
   private final ProgrammeMembershipTypeMapper mapper;
   private final List<String> excludedTypes;
 
   protected ProgrammeMembershipTypeService(ProgrammeMembershipTypeRepository repository,
       ProgrammeMembershipTypeMapper mapper,
-      @Value("${application.exclude-filters.pm-type}") List<String> excludedTypes) {
-    super(repository);
+      @Value("${application.exclude-filters.pm-type}") List<String> excludedTypes,
+      ObjectMapper objectMapper) {
+    super(repository, objectMapper);
     this.mapper = mapper;
     this.excludedTypes = excludedTypes;
   }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright 2021 Crown Copyright (Health Education England)
+ * Copyright 2026 Crown Copyright (Health Education England)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,37 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.service;
+package uk.nhs.hee.tis.trainee.reference.dto;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.mapper.DbcMapper;
-import uk.nhs.hee.tis.trainee.reference.model.Dbc;
-import uk.nhs.hee.tis.trainee.reference.repository.DbcRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 /**
- * Service for managing DBC reference data.
+ * A DTO representing the patch fields for a College CDC event.
+ *
+ * <p>Field names match TIS column names as used in CDC patch operations.
  */
-@Service
-@XRayEnabled
-public class DbcService extends AbstractReferenceService<Dbc, Dbc> {
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CollegePatchDto {
 
-  private final DbcMapper mapper;
 
-  protected DbcService(DbcRepository repository, DbcMapper mapper,
-      ObjectMapper objectMapper) {
-    super(repository, objectMapper);
-    this.mapper = mapper;
-  }
+  private String entityId;
 
-  @Override
-  protected String getTisId(Dbc entity) {
-    return entity.getTisId();
-  }
-
-  @Override
-  protected void copyAttributes(Dbc target, Dbc source) {
-    mapper.update(target, source);
-  }
+  private String id;
+  private String name;
 }

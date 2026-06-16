@@ -10,11 +10,16 @@ plugins {
 }
 
 group = "uk.nhs.hee.tis.trainee"
-version = "1.7.1"
+version = "1.8.0"
 
 configurations {
   compileOnly {
     extendsFrom(configurations.annotationProcessor.get())
+  }
+}
+dependencyManagement {
+  imports {
+    mavenBom(libs.spring.cloud.dependencies.aws.get().toString())
   }
 }
 
@@ -24,6 +29,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-aop")
   implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
   implementation("org.springframework.boot:spring-boot-starter-web")
+
+  implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
 
   // AWS-XRay
   implementation(libs.aws.xray.spring)
@@ -41,6 +48,8 @@ dependencies {
 
   // Sentry reporting
   implementation(libs.sentry.core)
+
+  implementation("com.github.java-json-tools:json-patch:1.13")
 }
 
 java {
@@ -89,6 +98,7 @@ testing {
       dependencies {
         implementation("org.springframework.boot:spring-boot-testcontainers")
         implementation("org.testcontainers:junit-jupiter")
+        implementation("org.testcontainers:localstack")
         implementation("org.testcontainers:mongodb")
       }
 
