@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,14 +82,19 @@ class CollegeListenerIntegrationTest {
     registry.add("spring.cloud.aws.sqs.enabled", () -> true);
   }
 
+  @Autowired
+  private MongoTemplate mongoTemplate;
+
+  @BeforeEach
+  void setUp() {
+    mongoTemplate.dropCollection(College.class);
+  }
+
   @BeforeAll
   static void setUpBeforeAll() throws IOException, InterruptedException {
     localstack.execInContainer("awslocal", "sqs", "create-queue", "--queue-name",
         COLLEGE_PATCH_QUEUE);
   }
-
-  @Autowired
-  private MongoTemplate mongoTemplate;
 
   @Autowired
   private SqsTemplate sqsTemplate;
@@ -97,6 +103,7 @@ class CollegeListenerIntegrationTest {
   void shouldHandleReplaceEvent() throws JsonProcessingException {
     final String id = ObjectId.get().toString();
     String tisId = UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
     College college = new College();
     college.setId(id);
@@ -117,9 +124,10 @@ class CollegeListenerIntegrationTest {
               }
             }
           ],
-          "keys": { "id": "%s" }
+          "metadata": { "timestamp": "2026-06-19T10:00:00Z", "schema-name": "reference", "table-name": "College" },
+          "keys": { "uuid": "%s" }
         }
-        """.formatted(tisId, UUID.randomUUID(), tisId);
+        """.formatted(tisId, uuid, uuid);
 
     JsonNode eventJson = JsonMapper.builder()
         .build()
@@ -142,6 +150,7 @@ class CollegeListenerIntegrationTest {
   @Test
   void shouldHandleInsertEvent() throws JsonProcessingException {
     String tisId = UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
     String eventString = """
         {
@@ -155,9 +164,10 @@ class CollegeListenerIntegrationTest {
               }
             }
           ],
-          "keys": { "id": "%s" }
+          "metadata": { "timestamp": "2026-06-19T10:00:00Z", "schema-name": "reference", "table-name": "College" },
+          "keys": { "uuid": "%s" }
         }
-        """.formatted(tisId, UUID.randomUUID(), tisId);
+        """.formatted(tisId, uuid, uuid);
 
     JsonNode eventJson = JsonMapper.builder()
         .build()
@@ -179,22 +189,70 @@ class CollegeListenerIntegrationTest {
   }
 
   @Test
-  void shouldHandleDeleteEvent() throws JsonProcessingException {
+  void shouldHandleInactiveInsertEvent() throws JsonProcessingException {
     String tisId = UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
+
+    String eventString = """
+        {
+          "patch": [
+            { "op": "add", "path": "", "value": {
+                "id": "%s",
+                "abbreviation": "FAC",
+                "name": "Inactive College",
+                "status": "INACTIVE",
+                "uuid": "%s"
+              }
+            }
+          ],
+          "metadata": { "timestamp": "2026-06-19T10:00:00Z", "schema-name": "reference", "table-name": "College" },
+          "keys": { "uuid": "%s" }
+        }
+        """.formatted(tisId, uuid, uuid);
+
+    JsonNode eventJson = JsonMapper.builder()
+        .build()
+        .readTree(eventString);
+
+    sqsTemplate.send(COLLEGE_PATCH_QUEUE, eventJson);
+
+    await()
+        .pollInterval(Duration.ofSeconds(2))
+        .atMost(Duration.ofSeconds(10))
+        .ignoreExceptions()
+        .untilAsserted(() -> {
+          long count = mongoTemplate.count(new Query(), College.class);
+          assertThat("Unexpected college count.", count, is(0L));
+        });
+  }
+
+  @Test
+  void shouldHandleInactiveUpdateEvent() throws JsonProcessingException {
+    String tisId = UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
     College college = new College();
     college.setTisId(tisId);
-    college.setLabel("College To Delete");
+    college.setLabel("Active College");
     mongoTemplate.insert(college);
 
     String eventString = """
         {
           "patch": [
-            { "op": "remove", "path": "" }
+            { "op": "test", "path": "/status", "value": "CURRENT" },
+            { "op": "replace", "path": "", "value": {
+                "id": "%s",
+                "abbreviation": "FAC",
+                "name": "Active College",
+                "status": "INACTIVE",
+                "uuid": "%s"
+              }
+            }
           ],
-          "keys": { "id": "%s" }
+          "metadata": { "timestamp": "2026-06-19T10:00:00Z", "schema-name": "reference", "table-name": "College" },
+          "keys": { "uuid": "%s" }
         }
-        """.formatted(tisId);
+        """.formatted(tisId, uuid, uuid);
 
     JsonNode eventJson = JsonMapper.builder()
         .build()

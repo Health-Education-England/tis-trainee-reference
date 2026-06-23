@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +34,6 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.nhs.hee.tis.trainee.reference.dto.CdcEvent;
-import uk.nhs.hee.tis.trainee.reference.dto.CdcEvent.CdcKeys;
 import uk.nhs.hee.tis.trainee.reference.dto.CdcEventType;
 import uk.nhs.hee.tis.trainee.reference.model.College;
 import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
@@ -56,6 +56,7 @@ class CollegeListenerTest {
     CdcEvent event = mock(CdcEvent.class);
     JsonPatch patch = mock(JsonPatch.class);
     when(event.getEventType()).thenReturn(CdcEventType.INSERT);
+    when(event.isInactive()).thenReturn(false);
     when(event.getPatchWithoutTests()).thenReturn(patch);
 
     listener.handleCollegePatch(event);
@@ -64,11 +65,38 @@ class CollegeListenerTest {
   }
 
   @Test
-  void shouldCallDeleteByTisIdOnDeleteEvent() throws JsonPatchException, JsonProcessingException {
+  void shouldNotCallCreateOnInactiveInsertEvent()
+      throws JsonPatchException, JsonProcessingException {
     CdcEvent event = mock(CdcEvent.class);
-    CdcKeys keys = new CdcKeys(TIS_ID);
-    when(event.getEventType()).thenReturn(CdcEventType.DELETE);
-    when(event.keys()).thenReturn(keys);
+    when(event.getEventType()).thenReturn(CdcEventType.INSERT);
+    when(event.isInactive()).thenReturn(true);
+
+    listener.handleCollegePatch(event);
+
+    verifyNoInteractions(service);
+  }
+
+  @Test
+  void shouldCallUpdateOnUpdateEvent() throws JsonPatchException, JsonProcessingException {
+    CdcEvent event = mock(CdcEvent.class);
+    JsonPatch patch = mock(JsonPatch.class);
+    when(event.getEventType()).thenReturn(CdcEventType.UPDATE);
+    when(event.isInactive()).thenReturn(false);
+    when(event.getTisId()).thenReturn(TIS_ID);
+    when(event.getPatchWithoutTests()).thenReturn(patch);
+
+    listener.handleCollegePatch(event);
+
+    verify(service).update(TIS_ID, patch);
+  }
+
+  @Test
+  void shouldCallDeleteByTisIdOnInactiveUpdateEvent()
+      throws JsonPatchException, JsonProcessingException {
+    CdcEvent event = mock(CdcEvent.class);
+    when(event.getEventType()).thenReturn(CdcEventType.UPDATE);
+    when(event.isInactive()).thenReturn(true);
+    when(event.getTisId()).thenReturn(TIS_ID);
 
     listener.handleCollegePatch(event);
 
@@ -76,16 +104,13 @@ class CollegeListenerTest {
   }
 
   @Test
-  void shouldCallUpdateOnUpdateEvent() throws JsonPatchException, JsonProcessingException {
+  void shouldNotInteractWithServiceOnDeleteEvent()
+      throws JsonPatchException, JsonProcessingException {
     CdcEvent event = mock(CdcEvent.class);
-    JsonPatch patch = mock(JsonPatch.class);
-    CdcKeys keys = new CdcKeys(TIS_ID);
-    when(event.getEventType()).thenReturn(CdcEventType.UPDATE);
-    when(event.keys()).thenReturn(keys);
-    when(event.getPatchWithoutTests()).thenReturn(patch);
+    when(event.getEventType()).thenReturn(CdcEventType.DELETE);
 
     listener.handleCollegePatch(event);
 
-    verify(service).update(TIS_ID, patch);
+    verifyNoInteractions(service);
   }
 }
