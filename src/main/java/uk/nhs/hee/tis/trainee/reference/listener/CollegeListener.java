@@ -66,6 +66,7 @@ public class CollegeListener {
           service.update(tisId, event.getPatchWithoutTests());
         }
       }
+      default -> log.warn("Received unhandled event type [{}], no action taken.", eventType);
     }
   }
 }

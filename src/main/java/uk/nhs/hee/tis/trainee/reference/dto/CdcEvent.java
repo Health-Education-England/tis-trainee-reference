@@ -102,6 +102,14 @@ public record CdcEvent(
     return new JsonPatch(filtered);
   }
 
+  /**
+   * Determines whether the CDC event represents an inactive record.
+   *
+   * <p>Returns true if the root-path add or replace operation's value contains a
+   * {@code status} field equal to {@code INACTIVE}.
+   *
+   * @return true if the record status is INACTIVE, false otherwise.
+   */
   public boolean isInactive() {
     return operations.stream()
         .filter(op -> op instanceof ReplaceOperation || op instanceof AddOperation)
@@ -111,6 +119,14 @@ public record CdcEvent(
         .anyMatch("INACTIVE"::equals);
   }
 
+  /**
+   * Extracts the TIS ID from the root-path add or replace operation's value.
+   *
+   * <p>Returns the {@code id} field from the patch value, or null if no root-path
+   * add or replace operation is present (e.g. for delete events).
+   *
+   * @return The TIS ID, or null if not present in the patch.
+   */
   public String getTisId() {
     return operations.stream()
         .filter(op -> op instanceof ReplaceOperation || op instanceof AddOperation)

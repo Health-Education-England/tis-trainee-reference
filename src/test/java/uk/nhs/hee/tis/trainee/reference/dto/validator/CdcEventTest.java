@@ -144,7 +144,7 @@ class CdcEventTest {
         "name": "%s",
         "status": "CURRENT"
       }
-      """;
+        """;
     List<JsonPatchOperation> patch = List.of(
         new ReplaceOperation(new JsonPointer(""),
             MAPPER.readTree(patchTemplate.formatted(TIS_ID, "Test"))));
@@ -160,7 +160,7 @@ class CdcEventTest {
         "name": "%s",
         "status": "INACTIVE"
       }
-      """;
+        """;
     List<JsonPatchOperation> patch = List.of(
         new ReplaceOperation(new JsonPointer(""),
             MAPPER.readTree(patchTemplate.formatted(TIS_ID, "Test"))));
