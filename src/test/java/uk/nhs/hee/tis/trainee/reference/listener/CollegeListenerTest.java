@@ -65,6 +65,18 @@ class CollegeListenerTest {
   }
 
   @Test
+  void shouldNotInteractWithServiceOnUpdateEventWithNoTisId()
+      throws JsonPatchException, JsonProcessingException {
+    CdcEvent event = mock(CdcEvent.class);
+    when(event.getEventType()).thenReturn(CdcEventType.UPDATE);
+    when(event.getTisId()).thenReturn(null);
+
+    listener.handleCollegePatch(event);
+
+    verifyNoInteractions(service);
+  }
+
+  @Test
   void shouldNotCallCreateOnInactiveInsertEvent()
       throws JsonPatchException, JsonProcessingException {
     CdcEvent event = mock(CdcEvent.class);

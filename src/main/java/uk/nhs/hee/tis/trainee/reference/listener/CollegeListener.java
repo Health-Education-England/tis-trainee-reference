@@ -53,14 +53,17 @@ public class CollegeListener {
           service.create(new College(), event.getPatchWithoutTests());
         }
       }
-      case DELETE -> log.warn(
-          "Received unexpected DELETE event for tisId [{}], no action taken.",
-          event.getTisId());
+      case DELETE -> log.warn("Received unexpected DELETE event, no action taken.");
       case UPDATE -> {
+        String tisId = event.getTisId();
+        if (tisId == null) {
+          log.warn("Received UPDATE event with no id in patch, no action taken.");
+          return;
+        }
         if (event.isInactive()) {
-          service.deleteByTisId(event.getTisId());
+          service.deleteByTisId(tisId);
         } else {
-          service.update(event.getTisId(), event.getPatchWithoutTests());
+          service.update(tisId, event.getPatchWithoutTests());
         }
       }
     }
