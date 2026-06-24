@@ -45,11 +45,28 @@ public class CollegeListener {
 
   @SqsListener("${application.queues.college-patch}")
   void handleCollegePatch(CdcEvent event) throws JsonPatchException, JsonProcessingException {
-    log.info("Received event, type: {}", event.getEventType());
-    switch (event.getEventType()) {
-      case INSERT -> service.create(new College(), event.getPatchWithoutTests());
-      case DELETE -> service.deleteByTisId(event.keys().id());
-      case UPDATE -> service.update(event.keys().id(), event.getPatchWithoutTests());
+    var eventType = event.getEventType();
+    log.info("Received event, type: {}", eventType);
+    switch (eventType) {
+      case INSERT -> {
+        if (!event.isInactive()) {
+          service.create(new College(), event.getPatchWithoutTests());
+        }
+      }
+      case DELETE -> log.warn("Received unexpected DELETE event, no action taken.");
+      case UPDATE -> {
+        String tisId = event.getTisId();
+        if (tisId == null) {
+          log.warn("Received UPDATE event with no id in patch, no action taken.");
+          return;
+        }
+        if (event.isInactive()) {
+          service.deleteByTisId(tisId);
+        } else {
+          service.update(tisId, event.getPatchWithoutTests());
+        }
+      }
+      default -> log.warn("Received unhandled event type [{}], no action taken.", eventType);
     }
   }
 }

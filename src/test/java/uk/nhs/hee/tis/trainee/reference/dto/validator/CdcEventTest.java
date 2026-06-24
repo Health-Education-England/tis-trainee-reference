@@ -119,6 +119,62 @@ class CdcEventTest {
   }
 
   @Test
+  void shouldGetTisIdFromInsertPatch() {
+    CdcEvent event = new CdcEvent(insertPatch, null);
+    assertThat("Unexpected TIS ID.", event.getTisId(), is(TIS_ID));
+  }
+
+  @Test
+  void shouldGetTisIdFromUpdatePatch() {
+    CdcEvent event = new CdcEvent(updatePatch, null);
+    assertThat("Unexpected TIS ID.", event.getTisId(), is(TIS_ID));
+  }
+
+  @Test
+  void shouldReturnNullTisIdFromDeletePatch() {
+    CdcEvent event = new CdcEvent(deletePatch, null);
+    assertThat("Unexpected TIS ID.", event.getTisId(), is((String) null));
+  }
+
+  @Test
+  void shouldReturnFalseWhenStatusIsNotInactive() throws IOException, JsonPointerException {
+    String patchTemplate = """
+      {
+        "id": "%s",
+        "name": "%s",
+        "status": "CURRENT"
+      }
+        """;
+    List<JsonPatchOperation> patch = List.of(
+        new ReplaceOperation(new JsonPointer(""),
+            MAPPER.readTree(patchTemplate.formatted(TIS_ID, "Test"))));
+    CdcEvent event = new CdcEvent(patch, null);
+    assertThat("Unexpected inactive status.", event.isInactive(), is(false));
+  }
+
+  @Test
+  void shouldReturnTrueWhenStatusIsInactive() throws IOException, JsonPointerException {
+    String patchTemplate = """
+      {
+        "id": "%s",
+        "name": "%s",
+        "status": "INACTIVE"
+      }
+        """;
+    List<JsonPatchOperation> patch = List.of(
+        new ReplaceOperation(new JsonPointer(""),
+            MAPPER.readTree(patchTemplate.formatted(TIS_ID, "Test"))));
+    CdcEvent event = new CdcEvent(patch, null);
+    assertThat("Unexpected inactive status.", event.isInactive(), is(true));
+  }
+
+  @Test
+  void shouldReturnFalseWhenNoStatusInPatch() {
+    CdcEvent event = new CdcEvent(deletePatch, null);
+    assertThat("Unexpected inactive status.", event.isInactive(), is(false));
+  }
+
+  @Test
   void shouldGetPatchWithoutTests() throws JsonPatchException {
     CdcEvent event = new CdcEvent(updatePatchWithTest, null);
     JsonPatch patch = event.getPatchWithoutTests();
