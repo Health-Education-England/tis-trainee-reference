@@ -28,6 +28,7 @@ import com.github.fge.jsonpatch.AddOperation;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.RemoveOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
 import com.github.fge.jsonpatch.TestOperation;
 import java.util.List;
 
@@ -102,9 +103,44 @@ public record CdcEvent(
   }
 
   /**
+   * Determines whether the CDC event represents an inactive record.
+   *
+   * <p>Returns true if the root-path add or replace operation's value contains a
+   * {@code status} field equal to {@code INACTIVE}.
+   *
+   * @return true if the record status is INACTIVE, false otherwise.
+   */
+  public boolean isInactive() {
+    return operations.stream()
+        .filter(op -> op instanceof ReplaceOperation || op instanceof AddOperation)
+        .map(op -> (JsonNode) MAPPER.valueToTree(op))
+        .filter(node -> node.path("path").asText().equals(""))
+        .map(node -> node.path("value").path("status").asText(null))
+        .anyMatch("INACTIVE"::equals);
+  }
+
+  /**
+   * Extracts the TIS ID from the root-path add or replace operation's value.
+   *
+   * <p>Returns the {@code id} field from the patch value, or null if no root-path
+   * add or replace operation is present (e.g. for delete events).
+   *
+   * @return The TIS ID, or null if not present in the patch.
+   */
+  public String getTisId() {
+    return operations.stream()
+        .filter(op -> op instanceof ReplaceOperation || op instanceof AddOperation)
+        .map(op -> (JsonNode) MAPPER.valueToTree(op))
+        .filter(node -> node.path("path").asText().equals(""))
+        .map(node -> node.path("value").path("id").asText(null))
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
    * Represents the key fields used to identify a CDC record.
    *
-   * @param id The TIS ID of the record.
+   * @param uuid The TIS UUID of the record.
    */
-  public record CdcKeys(String id) {}
+  public record CdcKeys(String uuid) {}
 }
