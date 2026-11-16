@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import java.net.URI;
 import java.util.List;
 import org.slf4j.Logger;
@@ -43,7 +42,6 @@ import uk.nhs.hee.tis.trainee.reference.service.GradeService;
 
 @RestController
 @RequestMapping("/api")
-@XRayEnabled
 public class GradeResource {
 
   private static final Logger log = LoggerFactory.getLogger(GradeResource.class);

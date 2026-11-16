@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ import uk.nhs.hee.tis.trainee.reference.service.CovidChangeCircumstanceService;
 
 @RestController
 @RequestMapping("/api")
-@XRayEnabled
 public class CovidChangeCircumstanceResource {
 
   private static final Logger log = LoggerFactory.getLogger(CovidChangeCircumstanceResource.class);

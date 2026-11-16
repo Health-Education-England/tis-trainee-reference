@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.GradeMapper;
@@ -32,7 +31,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.GradeRepository;
  * Service for managing Grade reference data.
  */
 @Service
-@XRayEnabled
 public class GradeService extends AbstractReferenceService<Grade, Grade> {
 
   private final GradeMapper mapper;

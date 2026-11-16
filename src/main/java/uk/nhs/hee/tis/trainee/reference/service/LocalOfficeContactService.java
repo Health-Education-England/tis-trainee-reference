@@ -24,7 +24,6 @@ package uk.nhs.hee.tis.trainee.reference.service;
 import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
 import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.SPECIALTY;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
  * Service for local office contacts.
  */
 @Service
-@XRayEnabled
 @Slf4j
 public class LocalOfficeContactService
     extends AbstractReferenceService<LocalOfficeContact, LocalOfficeContact> {

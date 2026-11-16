@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import java.net.URI;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,6 @@ import uk.nhs.hee.tis.trainee.reference.service.DbcService;
 @Slf4j
 @RestController
 @RequestMapping("/api/dbc")
-@XRayEnabled
 public class DbcResource {
 
   private final DbcService service;

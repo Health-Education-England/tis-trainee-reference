@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeMapper;
@@ -32,7 +31,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
  * Service for managing LocalOffice reference data.
  */
 @Service
-@XRayEnabled
 public class LocalOfficeService extends AbstractReferenceService<LocalOffice, LocalOffice> {
 
   private final LocalOfficeMapper mapper;
