@@ -176,9 +176,9 @@ class TraineeTypeServiceTest {
         [{"op":"add","path":"","value":{"id":"%s","name":"New"}}]
         """.formatted(DEFAULT_TIS_ID_1);
     JsonPatch jsonPatch = JsonPatch.fromJson(new ObjectMapper().readTree(patch));
+    TraineeType traineeType = new TraineeType();
 
-    assertThrows(NotImplementedException.class,
-        () -> service.create(new TraineeType(), jsonPatch));
+    assertThrows(NotImplementedException.class, () -> service.create(traineeType, jsonPatch));
 
     verify(repository, never()).insert(any(TraineeType.class));
   }

@@ -21,6 +21,7 @@
 
 package uk.nhs.hee.tis.trainee.reference.facade;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
@@ -59,30 +60,26 @@ public class LocalOfficeContactEnricherFacade {
    * @return The enriched local office contact.
    */
   public LocalOfficeContact enrich(LocalOfficeContact localOfficeContact) {
-    if (localOfficeContact != null) {
-      LocalOffice localOffice;
-      LocalOfficeContactType contactType;
-      if (localOfficeContact.getLocalOfficeId() != null) {
-        localOffice = localOfficeRepository.findByUuid(localOfficeContact.getLocalOfficeId());
-        if (localOffice != null) {
-          localOfficeContact.setLocalOfficeName(localOffice.getLabel());
-        }
-      }
-      if (localOfficeContact.getContactTypeId() != null) {
-        contactType = contactTypeRepository.findByTisId(localOfficeContact.getContactTypeId());
-        if (contactType != null) {
-          localOfficeContact.setContactTypeName(contactType.getLabel());
-        }
-      }
-      if (localOfficeContact.getTraineeTypeId() != null) {
-        TraineeType traineeType = traineeTypeRepository.findByTisId(
-            localOfficeContact.getTraineeTypeId());
-        if (traineeType != null) {
-          localOfficeContact.setTraineeTypeCode(traineeType.getCode());
-        }
-      }
-      localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    if (localOfficeContact == null) {
+      return null;
     }
+
+    Optional.ofNullable(localOfficeContact.getLocalOfficeId())
+        .map(localOfficeRepository::findByUuid)
+        .map(LocalOffice::getLabel)
+        .ifPresent(localOfficeContact::setLocalOfficeName);
+
+    Optional.ofNullable(localOfficeContact.getContactTypeId())
+        .map(contactTypeRepository::findByTisId)
+        .map(LocalOfficeContactType::getLabel)
+        .ifPresent(localOfficeContact::setContactTypeName);
+
+    Optional.ofNullable(localOfficeContact.getTraineeTypeId())
+        .map(traineeTypeRepository::findByTisId)
+        .map(TraineeType::getCode)
+        .ifPresent(localOfficeContact::setTraineeTypeCode);
+
+    localOfficeContact.setLabel(generateLabel(localOfficeContact));
     return localOfficeContact;
   }
 
