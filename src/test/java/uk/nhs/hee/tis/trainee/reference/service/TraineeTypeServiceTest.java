@@ -28,8 +28,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -128,7 +128,7 @@ class TraineeTypeServiceTest {
 
     TraineeType traineeType = service.create(traineeType2);
 
-    verify(contactService, atLeastOnce()).updateAllForTraineeType(traineeType1);
+    verify(contactService, times(1)).updateAllForTraineeType(traineeType1);
 
     assertThat("Unexpected TIS id.", traineeType.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected label.", traineeType.getLabel(), is(DEFAULT_LABEL_2));
@@ -142,7 +142,7 @@ class TraineeTypeServiceTest {
 
     TraineeType traineeType = service.update(traineeType2);
 
-    verify(contactService, atLeastOnce()).updateAllForTraineeType(traineeType2);
+    verify(contactService, times(1)).updateAllForTraineeType(traineeType2);
 
     assertThat("Unexpected TIS id.", traineeType.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected label.", traineeType.getLabel(), is(DEFAULT_LABEL_2));

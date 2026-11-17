@@ -33,7 +33,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.TraineeTypeRepository;
 @Service
 public class TraineeTypeService
     extends AbstractReferenceService<TraineeType, TraineeType> {
-
   private final TraineeTypeMapper mapper;
   private final LocalOfficeContactService localOfficeContactService;
 
@@ -46,29 +45,13 @@ public class TraineeTypeService
   }
 
   /**
-   * Override the default create to enrich any related local office contacts after saving it.
+   * Enrich any related local office contacts after saving the trainee type.
    *
-   * @param entity The entity to create.
-   * @return The saved entity.
+   * @param savedEntity The saved trainee type.
    */
   @Override
-  public TraineeType create(TraineeType entity) {
-    entity = super.create(entity);
-    localOfficeContactService.updateAllForTraineeType(entity);
-    return entity;
-  }
-
-  /**
-   * Override the default update to enrich any related local office contacts after saving it.
-   *
-   * @param entity The entity to update.
-   * @return The saved entity.
-   */
-  @Override
-  public TraineeType update(TraineeType entity) {
-    entity = super.update(entity);
-    localOfficeContactService.updateAllForTraineeType(entity);
-    return entity;
+  protected void afterSave(TraineeType savedEntity) {
+    localOfficeContactService.updateAllForTraineeType(savedEntity);
   }
 
   @Override

@@ -66,13 +66,7 @@ public abstract class AbstractReferenceService<T, D> implements ReferenceService
 
   @Override
   public T create(T entity) {
-    T persistedEntity = repository.findByTisId(getTisId(entity));
-
-    if (persistedEntity != null) {
-      return update(entity);
-    }
-
-    return repository.insert(entity);
+    return upsert(entity);
   }
 
   @Override
@@ -83,14 +77,7 @@ public abstract class AbstractReferenceService<T, D> implements ReferenceService
 
   @Override
   public T update(T entity) {
-    T persistedEntity = repository.findByTisId(getTisId(entity));
-
-    if (persistedEntity == null) {
-      return create(entity);
-    }
-
-    copyAttributes(persistedEntity, entity);
-    return repository.save(persistedEntity);
+    return upsert(entity);
   }
 
   @Override
@@ -115,6 +102,38 @@ public abstract class AbstractReferenceService<T, D> implements ReferenceService
     }
 
     return repository.save(patchedEntity);
+  }
+
+  /**
+   * Insert the entity if its TIS ID is not yet known, otherwise update the persisted entity. The
+   * {@link #afterSave(Object)} hook is called exactly once with the saved entity.
+   *
+   * @param entity The entity to insert or update.
+   * @return The saved entity.
+   */
+  private T upsert(T entity) {
+    T persistedEntity = repository.findByTisId(getTisId(entity));
+    T savedEntity;
+
+    if (persistedEntity == null) {
+      savedEntity = repository.insert(entity);
+    } else {
+      copyAttributes(persistedEntity, entity);
+      savedEntity = repository.save(persistedEntity);
+    }
+
+    afterSave(savedEntity);
+    return savedEntity;
+  }
+
+  /**
+   * A hook called once after an entity is created or updated, for example to update related
+   * records. Does nothing by default.
+   *
+   * @param savedEntity The saved entity.
+   */
+  protected void afterSave(T savedEntity) {
+    // No post-save processing by default.
   }
 
   /**

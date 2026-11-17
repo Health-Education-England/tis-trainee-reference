@@ -29,8 +29,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType.FOUNDATION;
@@ -309,7 +309,7 @@ class LocalOfficeContactServiceTest {
 
     LocalOfficeContact localOfficeContact = service.create(localOfficeContact2);
 
-    verify(facade, atLeastOnce()).enrich(localOfficeContact2);
+    verify(facade, times(1)).enrich(localOfficeContact2);
 
     assertThat("Unexpected TIS id.", localOfficeContact.getTisId(), is(DEFAULT_TIS_ID_1));
     assertThat("Unexpected local office id.", localOfficeContact.getLocalOfficeId(),
@@ -334,7 +334,7 @@ class LocalOfficeContactServiceTest {
 
     LocalOfficeContact localOfficeContact = service.update(localOfficeContact2);
 
-    verify(facade, atLeastOnce()).enrich(localOfficeContact2);
+    verify(facade, times(1)).enrich(localOfficeContact2);
 
     assertThat("Unexpected TIS id.", localOfficeContact.getTisId(), is(DEFAULT_TIS_ID_2));
     assertThat("Unexpected local office id.", localOfficeContact.getLocalOfficeId(),
