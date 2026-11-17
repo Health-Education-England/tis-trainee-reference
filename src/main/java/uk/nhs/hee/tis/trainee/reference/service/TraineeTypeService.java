@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.trainee.reference.mapper.TraineeTypeMapper;
@@ -32,7 +31,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.TraineeTypeRepository;
  * Service for trainee types.
  */
 @Service
-@XRayEnabled
 public class TraineeTypeService
     extends AbstractReferenceService<TraineeType, TraineeType> {
 
