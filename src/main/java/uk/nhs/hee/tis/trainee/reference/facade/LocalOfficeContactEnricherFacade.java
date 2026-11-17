@@ -26,8 +26,10 @@ import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
+import uk.nhs.hee.tis.trainee.reference.repository.TraineeTypeRepository;
 
 /**
  * A facade for enriching local office contacts with associated information.
@@ -38,17 +40,20 @@ public class LocalOfficeContactEnricherFacade {
 
   private final LocalOfficeRepository localOfficeRepository;
   private final LocalOfficeContactTypeRepository contactTypeRepository;
+  private final TraineeTypeRepository traineeTypeRepository;
 
   LocalOfficeContactEnricherFacade(LocalOfficeRepository localOfficeRepository,
-      LocalOfficeContactTypeRepository contactTypeRepository) {
+      LocalOfficeContactTypeRepository contactTypeRepository,
+      TraineeTypeRepository traineeTypeRepository) {
     this.localOfficeRepository = localOfficeRepository;
     this.contactTypeRepository = contactTypeRepository;
+    this.traineeTypeRepository = traineeTypeRepository;
   }
 
   /**
-   * Enrich a local office contact with data from the local office and the contact type. If local
-   * office or contact type do not exist (which should be at most a temporary situation) they are
-   * ignored.
+   * Enrich a local office contact with data from the local office, the contact type and the trainee
+   * type. If local office, contact type or trainee type do not exist (which should be at most a
+   * temporary situation) they are ignored.
    *
    * @param localOfficeContact The local office contact to enrich.
    * @return The enriched local office contact.
@@ -69,7 +74,29 @@ public class LocalOfficeContactEnricherFacade {
           localOfficeContact.setContactTypeName(contactType.getLabel());
         }
       }
+      if (localOfficeContact.getTraineeTypeId() != null) {
+        TraineeType traineeType = traineeTypeRepository.findByTisId(
+            localOfficeContact.getTraineeTypeId());
+        if (traineeType != null) {
+          localOfficeContact.setTraineeTypeCode(traineeType.getCode());
+        }
+      }
       localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    }
+    return localOfficeContact;
+  }
+
+  /**
+   * Enrich a local office contact with its trainee type code.
+   *
+   * @param localOfficeContact The local office contact to enrich.
+   * @param traineeTypeCode    The trainee type code.
+   * @return The enriched local office contact.
+   */
+  public LocalOfficeContact enrichWithTraineeType(LocalOfficeContact localOfficeContact,
+      String traineeTypeCode) {
+    if (localOfficeContact != null) {
+      localOfficeContact.setTraineeTypeCode(traineeTypeCode);
     }
     return localOfficeContact;
   }

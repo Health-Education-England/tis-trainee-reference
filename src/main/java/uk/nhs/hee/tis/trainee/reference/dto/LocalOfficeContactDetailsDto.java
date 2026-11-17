@@ -32,8 +32,10 @@ public class LocalOfficeContactDetailsDto {
   private String tisId;
   private String localOfficeId;
   private String contactTypeId;
+  private String traineeTypeId;
   private String contact;
   private String label;
   private String localOfficeName;
   private String contactTypeName;
+  private String traineeTypeCode;
 }

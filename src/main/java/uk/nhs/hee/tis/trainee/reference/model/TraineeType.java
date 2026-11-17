@@ -19,13 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.trainee.reference.dto;
+package uk.nhs.hee.tis.trainee.reference.model;
+
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * The type of the trainee.
+ * Model for persisted trainee type records.
  */
-public enum TraineeType {
-  FOUNDATION,
-  PUBLIC_HEALTH,
-  SPECIALTY
+@Document(collection = "TraineeType")
+@Data
+public class TraineeType {
+
+  @Id
+  private String tisId; //this table does not have the old numeric ID field
+
+  private String code;
+  private String label;
 }

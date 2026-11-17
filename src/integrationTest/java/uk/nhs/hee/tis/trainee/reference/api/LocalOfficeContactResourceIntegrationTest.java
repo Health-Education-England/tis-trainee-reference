@@ -52,6 +52,7 @@ import uk.nhs.hee.tis.trainee.reference.DockerImageNames;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 
 @SpringBootTest
 @Testcontainers
@@ -67,6 +68,8 @@ class LocalOfficeContactResourceIntegrationTest {
   private static final String
       FOUNDATION_CONTACT_TYPE_NAME = "Default Contact Type Name - Foundation";
   private static final String CONTACT = "Default Contact";
+  private static final String TRAINEE_TYPE_ID = UUID.randomUUID().toString();
+  private static final String TRAINEE_TYPE_CODE = "FOUNDATION";
 
   @Container
   @ServiceConnection
@@ -84,6 +87,69 @@ class LocalOfficeContactResourceIntegrationTest {
     mongoTemplate.findAllAndRemove(new Query(), LocalOffice.class);
     mongoTemplate.findAllAndRemove(new Query(), LocalOfficeContactType.class);
     mongoTemplate.findAllAndRemove(new Query(), LocalOfficeContact.class);
+    mongoTemplate.findAllAndRemove(new Query(), TraineeType.class);
+  }
+
+  @Test
+  void shouldFilterLocalOfficeContactsByTraineeTypeCodeBeforeContactTypeName() throws Exception {
+    LocalOfficeContact specialtyCode = new LocalOfficeContact();
+    specialtyCode.setTisId(ObjectId.get().toString());
+    specialtyCode.setLabel("a");
+    specialtyCode.setContactTypeName(CONTACT_TYPE_NAME);
+    specialtyCode.setTraineeTypeCode("SPECIALTY");
+
+    LocalOfficeContact foundationCode = new LocalOfficeContact();
+    foundationCode.setTisId(ObjectId.get().toString());
+    foundationCode.setLabel("b");
+    foundationCode.setContactTypeName(CONTACT_TYPE_NAME);
+    foundationCode.setTraineeTypeCode("FOUNDATION");
+
+    LocalOfficeContact foundationName = new LocalOfficeContact();
+    foundationName.setTisId(ObjectId.get().toString());
+    foundationName.setLabel("c");
+    foundationName.setContactTypeName(FOUNDATION_CONTACT_TYPE_NAME);
+
+    mongoTemplate.insertAll(List.of(specialtyCode, foundationCode, foundationName));
+
+    mockMvc.perform(get("/api/local-office-contact")
+            .queryParam("traineeType", "FOUNDATION"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$.[0].tisId").value(foundationCode.getTisId()))
+        .andExpect(jsonPath("$.[0].traineeTypeCode").value("FOUNDATION"))
+        .andExpect(jsonPath("$.[1].tisId").value(foundationName.getTisId()));
+
+    mockMvc.perform(get("/api/local-office-contact")
+            .queryParam("traineeType", "SPECIALTY"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].tisId").value(specialtyCode.getTisId()));
+  }
+
+  @Test
+  void shouldEnrichLocalOfficeContactsWhenTraineeTypeCreated() throws Exception {
+    LocalOfficeContact contact = new LocalOfficeContact();
+    contact.setTisId(TIS_ID);
+    contact.setTraineeTypeId(TRAINEE_TYPE_ID);
+    contact.setContactTypeName(CONTACT_TYPE_NAME);
+    mongoTemplate.insert(contact);
+
+    String content = """
+        {
+          "tisId": "%s",
+          "code": "%s",
+          "label": "Foundation"
+        }
+        """.formatted(TRAINEE_TYPE_ID, TRAINEE_TYPE_CODE);
+
+    mockMvc.perform(post("/api/trainee-type")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+        .andExpect(status().isCreated());
+
+    LocalOfficeContact enriched = mongoTemplate.findById(TIS_ID, LocalOfficeContact.class);
+    assertThat("Unexpected trainee type code.", enriched.getTraineeTypeCode(),
+        is(TRAINEE_TYPE_CODE));
   }
 
   @Test
@@ -288,6 +354,12 @@ class LocalOfficeContactResourceIntegrationTest {
     contactType.setLabel(CONTACT_TYPE_NAME);
     mongoTemplate.insert(contactType);
 
+    TraineeType traineeType = new TraineeType();
+    traineeType.setTisId(TRAINEE_TYPE_ID);
+    traineeType.setCode(TRAINEE_TYPE_CODE);
+    traineeType.setLabel("Foundation");
+    mongoTemplate.insert(traineeType);
+
     String content = """
         {
           "tisId": "%s",
@@ -296,15 +368,18 @@ class LocalOfficeContactResourceIntegrationTest {
           "localOfficeName": "%s",
           "contactTypeId": "%s",
           "contactTypeName": "%s",
+          "traineeTypeId": "%s",
           "contact": "%s"
         }
         """.formatted(TIS_ID, LABEL, LOCAL_OFFICE_ID, LOCAL_OFFICE_NAME, CONTACT_TYPE_ID,
-        CONTACT_TYPE_NAME, CONTACT);
+        CONTACT_TYPE_NAME, TRAINEE_TYPE_ID, CONTACT);
 
     mockMvc.perform(post("/api/local-office-contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
-        .andExpect(status().isCreated());
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.traineeTypeId").value(TRAINEE_TYPE_ID))
+        .andExpect(jsonPath("$.traineeTypeCode").value(TRAINEE_TYPE_CODE));
 
     List<LocalOfficeContact> entities = mongoTemplate.findAll(LocalOfficeContact.class);
     assertThat("Unexpected local office contact count.", entities, hasSize(1));
@@ -317,6 +392,9 @@ class LocalOfficeContactResourceIntegrationTest {
     assertThat("Unexpected local office name.", entity.getLocalOfficeName(), is(LOCAL_OFFICE_NAME));
     assertThat("Unexpected contact type ID.", entity.getContactTypeId(), is(CONTACT_TYPE_ID));
     assertThat("Unexpected contact type name.", entity.getContactTypeName(), is(CONTACT_TYPE_NAME));
+    assertThat("Unexpected trainee type ID.", entity.getTraineeTypeId(), is(TRAINEE_TYPE_ID));
+    assertThat("Unexpected trainee type code.", entity.getTraineeTypeCode(),
+        is(TRAINEE_TYPE_CODE));
     assertThat("Unexpected contact.", entity.getContact(), is(CONTACT));
   }
 

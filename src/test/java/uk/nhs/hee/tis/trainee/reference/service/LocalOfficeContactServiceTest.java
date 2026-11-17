@@ -33,7 +33,8 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
+import static uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType.FOUNDATION;
+import static uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType.SPECIALTY;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -53,12 +54,13 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
+import uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType;
 import uk.nhs.hee.tis.trainee.reference.facade.LocalOfficeContactEnricherFacade;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,6 +78,8 @@ class LocalOfficeContactServiceTest {
   private static final String DEFAULT_CONTACT_TYPE_ID_2 = UUID.randomUUID().toString();
   private static final String DEFAULT_FOUNDATION_CONTACT_TYPE_ID_1 = UUID.randomUUID().toString();
   private static final String DEFAULT_FOUNDATION_CONTACT_TYPE_ID_2 = UUID.randomUUID().toString();
+
+  private static final String DEFAULT_TRAINEE_TYPE_ID = UUID.randomUUID().toString();
 
   private static final String DEFAULT_CONTACT_1 = "https://hee.freshdesk.com/support/home";
   private static final String DEFAULT_CONTACT_2 = "england.ltft.eoe@nhs.net";
@@ -171,9 +175,9 @@ class LocalOfficeContactServiceTest {
 
   @ParameterizedTest
   @NullSource
-  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  @EnumSource(value = TssTraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
   void getAllLocalOfficeContactShouldReturnNonFoundationLocalOfficeContactsForNonFoundation(
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
     List<LocalOfficeContact> localOfficeContacts = List.of(
         localOfficeContact1,
         localOfficeContact2,
@@ -212,9 +216,9 @@ class LocalOfficeContactServiceTest {
 
   @ParameterizedTest
   @NullSource
-  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  @EnumSource(value = TssTraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
   void getLocalOfficeContactByUuidShouldReturnCorrectLocalOfficeContactsForNonFoundation(
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
     when(repository.findByLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1))
         .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
 
@@ -243,9 +247,9 @@ class LocalOfficeContactServiceTest {
 
   @ParameterizedTest
   @NullSource
-  @EnumSource(value = TraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  @EnumSource(value = TssTraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
   void getLocalOfficeContactByNameShouldReturnCorrectLocalOfficeContactsForNonFoundation(
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
     when(repository.findByLocalOfficeName(DEFAULT_LOCAL_OFFICE_1))
         .thenReturn(List.of(localOfficeContact1, localOfficeFoundationContact1));
 
@@ -439,6 +443,88 @@ class LocalOfficeContactServiceTest {
     service.updateAllForContactType(new LocalOfficeContactType());
 
     verify(repository, never()).save(any());
+  }
+
+  @Test
+  void updateAllForTraineeTypeShouldUpdateAllRelevantContacts() {
+    localOfficeContact1.setTraineeTypeId(DEFAULT_TRAINEE_TYPE_ID);
+    localOfficeContact2.setTraineeTypeId(DEFAULT_TRAINEE_TYPE_ID);
+
+    TraineeType traineeType = new TraineeType();
+    traineeType.setTisId(DEFAULT_TRAINEE_TYPE_ID);
+    traineeType.setCode("SPECIALTY");
+
+    when(repository.save(any())).thenAnswer(returnsFirstArg());
+    when(repository.findByTraineeTypeId(DEFAULT_TRAINEE_TYPE_ID))
+        .thenReturn(List.of(localOfficeContact1, localOfficeContact2));
+    when(repository.findByTisId(DEFAULT_TIS_ID_1)).thenReturn(localOfficeContact1);
+    when(repository.findByTisId(DEFAULT_TIS_ID_2)).thenReturn(localOfficeContact2);
+    when(facade.enrichWithTraineeType(any(), any())).thenAnswer(returnsFirstArg());
+
+    service.updateAllForTraineeType(traineeType);
+
+    verify(facade).enrichWithTraineeType(localOfficeContact1, "SPECIALTY");
+    verify(facade).enrichWithTraineeType(localOfficeContact2, "SPECIALTY");
+    verify(repository).save(localOfficeContact1);
+    verify(repository).save(localOfficeContact2);
+  }
+
+  @Test
+  void updateAllForTraineeTypeShouldUpdateNothingIfTraineeTypeEmpty() {
+
+    service.updateAllForTraineeType(new TraineeType());
+
+    verify(repository, never()).save(any());
+  }
+
+  @Test
+  void getShouldFilterByTraineeTypeCodeWhenSetForFoundation() {
+    localOfficeContact1.setTraineeTypeCode("FOUNDATION");
+    localOfficeFoundationContact1.setTraineeTypeCode("SPECIALTY");
+    when(repository.findAll(Sort.by("label"))).thenReturn(List.of(localOfficeContact1,
+        localOfficeContact2, localOfficeFoundationContact1, localOfficeFoundationContact2));
+
+    List<LocalOfficeContact> contacts = service.get(FOUNDATION);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", contacts, hasSize(2));
+    assertThat("The returned local office contact list doesn't contain the expected "
+        + "local office contact", contacts,
+        hasItems(localOfficeContact1, localOfficeFoundationContact2));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @EnumSource(value = TssTraineeType.class, mode = Mode.EXCLUDE, names = "FOUNDATION")
+  void getShouldFilterByTraineeTypeCodeWhenSetForNonFoundation(TssTraineeType traineeType) {
+    localOfficeContact1.setTraineeTypeCode("FOUNDATION");
+    localOfficeFoundationContact1.setTraineeTypeCode("SPECIALTY");
+    when(repository.findAll(Sort.by("label"))).thenReturn(List.of(localOfficeContact1,
+        localOfficeContact2, localOfficeFoundationContact1, localOfficeFoundationContact2));
+
+    List<LocalOfficeContact> contacts = service.get(traineeType);
+
+    assertThat("Unexpected size of returned LocalOfficeContact list", contacts, hasSize(2));
+    assertThat("The returned local office contact list doesn't contain the expected "
+        + "local office contact", contacts,
+        hasItems(localOfficeContact2, localOfficeFoundationContact1));
+  }
+
+  @Test
+  void getShouldNotMatchUnknownTraineeTypeCode() {
+    localOfficeContact1.setTraineeTypeCode("DENTAL");
+    when(repository.findAll(Sort.by("label"))).thenReturn(List.of(localOfficeContact1));
+
+    assertThat("Unexpected Specialty contacts.", service.get(SPECIALTY), hasSize(0));
+    assertThat("Unexpected Foundation contacts.", service.get(FOUNDATION), hasSize(0));
+  }
+
+  @Test
+  void getShouldTreatMissingContactTypeNameAsSpecialtyWhenNoTraineeTypeCode() {
+    localOfficeContact1.setContactTypeName(null);
+    when(repository.findAll(Sort.by("label"))).thenReturn(List.of(localOfficeContact1));
+
+    assertThat("Unexpected Specialty contacts.", service.get(SPECIALTY), hasSize(1));
+    assertThat("Unexpected Foundation contacts.", service.get(FOUNDATION), hasSize(0));
   }
 
   @Test

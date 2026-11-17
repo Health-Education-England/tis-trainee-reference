@@ -45,7 +45,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.ResponseEntity;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDetailsDto;
 import uk.nhs.hee.tis.trainee.reference.dto.LocalOfficeContactDto;
-import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
+import uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapperImpl;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.service.LocalOfficeContactService;
@@ -101,8 +101,8 @@ class LocalOfficeContactResourceTest {
   }
 
   @ParameterizedTest
-  @EnumSource(TraineeType.class)
-  void shouldGetAllLocalOfficeContacts(TraineeType traineeType) {
+  @EnumSource(TssTraineeType.class)
+  void shouldGetAllLocalOfficeContacts(TssTraineeType traineeType) {
     LocalOfficeContact entity1 = new LocalOfficeContact();
     entity1.setTisId(DEFAULT_TIS_ID_1);
     entity1.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -159,7 +159,7 @@ class LocalOfficeContactResourceTest {
       FOUNDATION    | ' - Foundation'
       SPECIALTY     | ''
       """)
-  void shouldGetAllLocalOfficeContactsWithoutTraineeTypeSuffix(TraineeType traineeType,
+  void shouldGetAllLocalOfficeContactsWithoutTraineeTypeSuffix(TssTraineeType traineeType,
       String suffix) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
@@ -178,8 +178,8 @@ class LocalOfficeContactResourceTest {
   }
 
   @ParameterizedTest
-  @EnumSource(TraineeType.class)
-  void shouldGetLocalOfficeContactsByLoUuid(TraineeType traineeType) {
+  @EnumSource(TssTraineeType.class)
+  void shouldGetLocalOfficeContactsByLoUuid(TssTraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
     entity.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -216,7 +216,7 @@ class LocalOfficeContactResourceTest {
       FOUNDATION    | ' - Foundation'
       SPECIALTY     | ''
       """)
-  void shouldGetLocalOfficeContactsByLoUuidWithoutTraineeTypeSuffix(TraineeType traineeType,
+  void shouldGetLocalOfficeContactsByLoUuidWithoutTraineeTypeSuffix(TssTraineeType traineeType,
       String suffix) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
@@ -240,8 +240,8 @@ class LocalOfficeContactResourceTest {
   }
 
   @ParameterizedTest
-  @EnumSource(TraineeType.class)
-  void shouldGetLocalOfficeContactsByLoName(TraineeType traineeType) {
+  @EnumSource(TssTraineeType.class)
+  void shouldGetLocalOfficeContactsByLoName(TssTraineeType traineeType) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
     entity.setLocalOfficeId(DEFAULT_LOCAL_OFFICE_ID_1);
@@ -278,7 +278,7 @@ class LocalOfficeContactResourceTest {
       FOUNDATION    | ' - Foundation'
       SPECIALTY     | ''
       """)
-  void shouldGetLocalOfficeContactsByLoNameWithoutTraineeTypeSuffix(TraineeType traineeType,
+  void shouldGetLocalOfficeContactsByLoNameWithoutTraineeTypeSuffix(TssTraineeType traineeType,
       String suffix) {
     LocalOfficeContact entity = new LocalOfficeContact();
     entity.setTisId(DEFAULT_TIS_ID_1);
