@@ -25,9 +25,3 @@ spring:
 sentry:
   dsn: ${SENTRY_DSN:}
   environment: ${application.environment}
-
-com:
-  amazonaws:
-    xray:
-      emitters:
-        daemon-address: ${AWS_XRAY_DAEMON_ADDRESS:}

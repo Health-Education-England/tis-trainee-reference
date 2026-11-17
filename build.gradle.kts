@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "uk.nhs.hee.tis.trainee"
-version = "1.8.1"
+version = "1.9.0"
 
 configurations {
   compileOnly {
@@ -31,9 +31,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
 
   implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
-
-  // AWS-XRay
-  implementation(libs.aws.xray.spring)
 
   // Lombok
   compileOnly("org.projectlombok:lombok")

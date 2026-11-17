@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +33,6 @@ import uk.nhs.hee.tis.trainee.reference.repository.ProgrammeMembershipTypeReposi
  * Service for managing ProgrammeMembershipType reference data.
  */
 @Service
-@XRayEnabled
 public class ProgrammeMembershipTypeService
     extends AbstractReferenceService<ProgrammeMembershipType, ProgrammeMembershipType> {
 

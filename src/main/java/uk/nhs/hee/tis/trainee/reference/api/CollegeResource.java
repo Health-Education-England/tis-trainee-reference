@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.trainee.reference.api;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +34,6 @@ import uk.nhs.hee.tis.trainee.reference.service.CollegeService;
 @Slf4j
 @RestController
 @RequestMapping("/api")
-@XRayEnabled
 public class CollegeResource {
 
   private final CollegeService service;
