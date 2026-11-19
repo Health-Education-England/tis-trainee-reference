@@ -44,29 +44,13 @@ public class LocalOfficeService extends AbstractReferenceService<LocalOffice, Lo
   }
 
   /**
-   * Override the default create to enrich any related local office contacts after saving it.
+   * Enrich any related local office contacts after saving the local office.
    *
-   * @param entity The entity to create.
-   * @return The saved entity.
+   * @param savedEntity The saved local office.
    */
   @Override
-  public LocalOffice create(LocalOffice entity) {
-    entity = super.create(entity);
-    localOfficeContactService.updateAllForLocalOffice(entity);
-    return entity;
-  }
-
-  /**
-   * Override the default update to enrich any related local office contacts after saving it.
-   *
-   * @param entity The entity to update.
-   * @return The saved entity.
-   */
-  @Override
-  public LocalOffice update(LocalOffice entity) {
-    entity = super.update(entity);
-    localOfficeContactService.updateAllForLocalOffice(entity);
-    return entity;
+  protected void afterSave(LocalOffice savedEntity) {
+    localOfficeContactService.updateAllForLocalOffice(savedEntity);
   }
 
   @Override

@@ -24,6 +24,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
@@ -35,8 +37,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
+import uk.nhs.hee.tis.trainee.reference.repository.TraineeTypeRepository;
 
 @ExtendWith(MockitoExtension.class)
 class LocalOfficeContactEnricherFacadeTest {
@@ -57,12 +61,16 @@ class LocalOfficeContactEnricherFacadeTest {
   @Mock
   private LocalOfficeContactTypeRepository contactTypeRepository;
 
+  @Mock
+  private TraineeTypeRepository traineeTypeRepository;
+
   /**
    * Set up data.
    */
   @BeforeEach
   void initData() {
-    facade = new LocalOfficeContactEnricherFacade(localOfficeRepository, contactTypeRepository);
+    facade = new LocalOfficeContactEnricherFacade(localOfficeRepository, contactTypeRepository,
+        traineeTypeRepository);
 
     localOfficeContact1 = new LocalOfficeContact();
     localOfficeContact1.setTisId(DEFAULT_TIS_ID_1);
@@ -113,6 +121,55 @@ class LocalOfficeContactEnricherFacadeTest {
         is("a contact type name"));
     assertThat("Unexpected label", localOfficeContact1.getLabel(),
         is(facade.generateLabel(localOfficeContact1)));
+  }
+
+  @Test
+  void enrichShouldSetTraineeTypeCodeWhenTraineeTypeFound() {
+    localOfficeContact1.setTraineeTypeId("traineeTypeId");
+    TraineeType traineeType = new TraineeType();
+    traineeType.setTisId("traineeTypeId");
+    traineeType.setCode("FOUNDATION");
+    when(traineeTypeRepository.findByTisId("traineeTypeId")).thenReturn(traineeType);
+
+    facade.enrich(localOfficeContact1);
+
+    assertThat("Unexpected trainee type code", localOfficeContact1.getTraineeTypeCode(),
+        is("FOUNDATION"));
+  }
+
+  @Test
+  void enrichShouldIgnoreMissingTraineeTypeRecord() {
+    localOfficeContact1.setTraineeTypeId("traineeTypeId");
+    when(traineeTypeRepository.findByTisId("traineeTypeId")).thenReturn(null);
+
+    facade.enrich(localOfficeContact1);
+
+    assertNull(localOfficeContact1.getTraineeTypeCode(), "Unexpected trainee type code");
+  }
+
+  @Test
+  void enrichShouldIgnoreMissingTraineeTypeId() {
+    facade.enrich(localOfficeContact1);
+
+    verify(traineeTypeRepository, never()).findByTisId(any());
+    assertNull(localOfficeContact1.getTraineeTypeCode(), "Unexpected trainee type code");
+  }
+
+  @Test
+  void enrichWithTraineeTypeShouldUpdateLocalOfficeContact() {
+    localOfficeContact1.setLabel("original label");
+
+    facade.enrichWithTraineeType(localOfficeContact1, "FOUNDATION");
+
+    assertThat("Unexpected trainee type code", localOfficeContact1.getTraineeTypeCode(),
+        is("FOUNDATION"));
+    assertThat("Unexpected label", localOfficeContact1.getLabel(), is("original label"));
+  }
+
+  @Test
+  void enrichWithTraineeTypeShouldReturnNullLocalOfficeContact() {
+    LocalOfficeContact enriched = facade.enrichWithTraineeType(null, "any code");
+    assertNull(enriched, "Unexpected local office contact");
   }
 
   @Test
