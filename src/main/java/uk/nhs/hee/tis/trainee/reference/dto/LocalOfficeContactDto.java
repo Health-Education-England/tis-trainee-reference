@@ -32,5 +32,6 @@ public class LocalOfficeContactDto {
   private String tisId;
   private String localOfficeId;
   private String contactTypeId;
+  private String traineeTypeId;
   private String contact;
 }

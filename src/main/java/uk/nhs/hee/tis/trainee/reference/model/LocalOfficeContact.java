@@ -39,10 +39,12 @@ public class LocalOfficeContact {
   @Indexed()
   private String localOfficeId;
   private String contactTypeId;
+  private String traineeTypeId;
   private String contact;
   private String label; //to be composed of local office, contact and contact type
 
-  //denormalise from related records: enrichment of these fields will follow in next PR
+  //denormalised from related records
   private String localOfficeName;
   private String contactTypeName;
+  private String traineeTypeCode;
 }

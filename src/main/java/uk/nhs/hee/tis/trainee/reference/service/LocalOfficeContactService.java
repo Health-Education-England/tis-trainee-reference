@@ -21,19 +21,20 @@
 
 package uk.nhs.hee.tis.trainee.reference.service;
 
-import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.FOUNDATION;
-import static uk.nhs.hee.tis.trainee.reference.dto.TraineeType.SPECIALTY;
+import static uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType.FOUNDATION;
+import static uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType.SPECIALTY;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.trainee.reference.dto.TraineeType;
+import uk.nhs.hee.tis.trainee.reference.dto.TssTraineeType;
 import uk.nhs.hee.tis.trainee.reference.facade.LocalOfficeContactEnricherFacade;
 import uk.nhs.hee.tis.trainee.reference.mapper.LocalOfficeContactMapper;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactRepository;
 
 /**
@@ -70,7 +71,7 @@ public class LocalOfficeContactService
    * @param traineeType The trainee type to filter by.
    * @return The list of local office contacts matching the trainee type.
    */
-  public List<LocalOfficeContact> get(TraineeType traineeType) {
+  public List<LocalOfficeContact> get(TssTraineeType traineeType) {
     return filterByTraineeType(super.get(), traineeType);
   }
 
@@ -82,7 +83,7 @@ public class LocalOfficeContactService
    * @return The list of local office contacts matching the local office ID and trainee type.
    */
   public List<LocalOfficeContact> getByLocalOfficeUuid(String localOfficeId,
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
     return filterByTraineeType(repository.findByLocalOfficeId(localOfficeId), traineeType);
   }
 
@@ -94,27 +95,35 @@ public class LocalOfficeContactService
    * @return The list of local office contacts matching the local office name and trainee type.
    */
   public List<LocalOfficeContact> getByLocalOfficeName(String localOfficeName,
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
     return filterByTraineeType(repository.findByLocalOfficeName(localOfficeName), traineeType);
   }
 
   /**
-   * Filter a list of local office contacts by trainee type.
+   * Filter a list of local office contacts by trainee type. Contacts with a trainee type are
+   * matched on its code, contacts without one fall back to checking the contact type name for the
+   * Foundation suffix. Trainee types other than Foundation currently use the Specialty contacts.
    *
    * @param contacts    The list of local office contacts to filter.
    * @param traineeType The trainee type to filter by.
    * @return The list of local office contacts matching the trainee type.
    */
   private List<LocalOfficeContact> filterByTraineeType(List<LocalOfficeContact> contacts,
-      TraineeType traineeType) {
+      TssTraineeType traineeType) {
+    TssTraineeType contactTraineeType = traineeType == FOUNDATION ? FOUNDATION : SPECIALTY;
+
     return contacts.stream()
         .filter(c -> {
-          String contactTypeName = c.getContactTypeName();
-          if (traineeType == FOUNDATION) {
-            return contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
-          } else {
-            return !contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
+          String traineeTypeCode = c.getTraineeTypeCode();
+          if (traineeTypeCode != null) {
+            return traineeTypeCode.equals(contactTraineeType.name());
           }
+
+          // TODO: remove the label fallback once all contacts have a trainee type.
+          String contactTypeName = c.getContactTypeName();
+          boolean isFoundation = contactTypeName != null
+              && contactTypeName.endsWith(FOUNDATION_LABEL_SUFFIX);
+          return contactTraineeType == FOUNDATION ? isFoundation : !isFoundation;
         })
         .toList();
   }
@@ -176,6 +185,24 @@ public class LocalOfficeContactService
         log.info("Updating local office contact '{}' with contact type '{}'", c.getTisId(),
             contactType.getLabel());
         LocalOfficeContact enriched = facade.enrichWithContactType(c, contactType.getLabel());
+        super.update(enriched);
+      });
+    }
+  }
+
+  /**
+   * Update all local office contacts for a given trainee type.
+   *
+   * @param traineeType The trainee type that triggered the update.
+   */
+  public void updateAllForTraineeType(TraineeType traineeType) {
+    if (traineeType.getTisId() != null) {
+      List<LocalOfficeContact> localOfficeContactList = repository
+          .findByTraineeTypeId(traineeType.getTisId());
+      localOfficeContactList.forEach(c -> {
+        log.info("Updating local office contact '{}' with trainee type '{}'", c.getTisId(),
+            traineeType.getCode());
+        LocalOfficeContact enriched = facade.enrichWithTraineeType(c, traineeType.getCode());
         super.update(enriched);
       });
     }

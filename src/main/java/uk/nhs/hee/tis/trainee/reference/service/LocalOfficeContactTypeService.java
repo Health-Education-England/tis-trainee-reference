@@ -46,29 +46,13 @@ public class LocalOfficeContactTypeService
   }
 
   /**
-   * Override the default create to enrich any related local office contacts after saving it.
+   * Enrich any related local office contacts after saving the contact type.
    *
-   * @param entity The entity to create.
-   * @return The saved entity.
+   * @param savedEntity The saved contact type.
    */
   @Override
-  public LocalOfficeContactType create(LocalOfficeContactType entity) {
-    entity = super.create(entity);
-    localOfficeContactService.updateAllForContactType(entity);
-    return entity;
-  }
-
-  /**
-   * Override the default update to enrich any related local office contacts after saving it.
-   *
-   * @param entity The entity to update.
-   * @return The saved entity.
-   */
-  @Override
-  public LocalOfficeContactType update(LocalOfficeContactType entity) {
-    entity = super.update(entity);
-    localOfficeContactService.updateAllForContactType(entity);
-    return entity;
+  protected void afterSave(LocalOfficeContactType savedEntity) {
+    localOfficeContactService.updateAllForContactType(savedEntity);
   }
 
   @Override

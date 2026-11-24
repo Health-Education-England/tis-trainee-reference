@@ -21,13 +21,16 @@
 
 package uk.nhs.hee.tis.trainee.reference.facade;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOffice;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContact;
 import uk.nhs.hee.tis.trainee.reference.model.LocalOfficeContactType;
+import uk.nhs.hee.tis.trainee.reference.model.TraineeType;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeContactTypeRepository;
 import uk.nhs.hee.tis.trainee.reference.repository.LocalOfficeRepository;
+import uk.nhs.hee.tis.trainee.reference.repository.TraineeTypeRepository;
 
 /**
  * A facade for enriching local office contacts with associated information.
@@ -38,38 +41,59 @@ public class LocalOfficeContactEnricherFacade {
 
   private final LocalOfficeRepository localOfficeRepository;
   private final LocalOfficeContactTypeRepository contactTypeRepository;
+  private final TraineeTypeRepository traineeTypeRepository;
 
   LocalOfficeContactEnricherFacade(LocalOfficeRepository localOfficeRepository,
-      LocalOfficeContactTypeRepository contactTypeRepository) {
+      LocalOfficeContactTypeRepository contactTypeRepository,
+      TraineeTypeRepository traineeTypeRepository) {
     this.localOfficeRepository = localOfficeRepository;
     this.contactTypeRepository = contactTypeRepository;
+    this.traineeTypeRepository = traineeTypeRepository;
   }
 
   /**
-   * Enrich a local office contact with data from the local office and the contact type. If local
-   * office or contact type do not exist (which should be at most a temporary situation) they are
-   * ignored.
+   * Enrich a local office contact with data from the local office, the contact type and the trainee
+   * type. If local office, contact type or trainee type do not exist (which should be at most a
+   * temporary situation) they are ignored.
    *
    * @param localOfficeContact The local office contact to enrich.
    * @return The enriched local office contact.
    */
   public LocalOfficeContact enrich(LocalOfficeContact localOfficeContact) {
+    if (localOfficeContact == null) {
+      return null;
+    }
+
+    Optional.ofNullable(localOfficeContact.getLocalOfficeId())
+        .map(localOfficeRepository::findByUuid)
+        .map(LocalOffice::getLabel)
+        .ifPresent(localOfficeContact::setLocalOfficeName);
+
+    Optional.ofNullable(localOfficeContact.getContactTypeId())
+        .map(contactTypeRepository::findByTisId)
+        .map(LocalOfficeContactType::getLabel)
+        .ifPresent(localOfficeContact::setContactTypeName);
+
+    Optional.ofNullable(localOfficeContact.getTraineeTypeId())
+        .map(traineeTypeRepository::findByTisId)
+        .map(TraineeType::getCode)
+        .ifPresent(localOfficeContact::setTraineeTypeCode);
+
+    localOfficeContact.setLabel(generateLabel(localOfficeContact));
+    return localOfficeContact;
+  }
+
+  /**
+   * Enrich a local office contact with its trainee type code.
+   *
+   * @param localOfficeContact The local office contact to enrich.
+   * @param traineeTypeCode    The trainee type code.
+   * @return The enriched local office contact.
+   */
+  public LocalOfficeContact enrichWithTraineeType(LocalOfficeContact localOfficeContact,
+      String traineeTypeCode) {
     if (localOfficeContact != null) {
-      LocalOffice localOffice;
-      LocalOfficeContactType contactType;
-      if (localOfficeContact.getLocalOfficeId() != null) {
-        localOffice = localOfficeRepository.findByUuid(localOfficeContact.getLocalOfficeId());
-        if (localOffice != null) {
-          localOfficeContact.setLocalOfficeName(localOffice.getLabel());
-        }
-      }
-      if (localOfficeContact.getContactTypeId() != null) {
-        contactType = contactTypeRepository.findByTisId(localOfficeContact.getContactTypeId());
-        if (contactType != null) {
-          localOfficeContact.setContactTypeName(contactType.getLabel());
-        }
-      }
-      localOfficeContact.setLabel(generateLabel(localOfficeContact));
+      localOfficeContact.setTraineeTypeCode(traineeTypeCode);
     }
     return localOfficeContact;
   }
